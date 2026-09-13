@@ -1,0 +1,1151 @@
+{
+	"info": {
+		"_postman_id": "6f2b3a1e-9c4d-4e2a-8b7f-3d5c1a9e2f60",
+		"name": "Inithium Core API",
+		"description": "Requests for the Inithium core API template (apps/api). Collection variables (baseUrl, email, password, accessToken, ...) flow automatically between requests via pre-request/test scripts, so Register -> Login -> Me can be run in sequence with no manual variable substitution.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "email",
+			"value": "test@example.com",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": "Password123!",
+			"type": "string"
+		},
+		{
+			"key": "firstName",
+			"value": "Test",
+			"type": "string"
+		},
+		{
+			"key": "lastName",
+			"value": "User",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "notificationId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "API Utils",
+			"item": [
+				{
+					"name": "API Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response has success: true', () => {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/health",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"health"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"success\": true,\n  \"data\": {\n    \"status\": \"ok\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "API Test Error",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+									"pm.test('Response has success: false and VALIDATION_ERROR code', () => {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(false);",
+									"  pm.expect(json.error.code).to.eql('VALIDATION_ERROR');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/test-error",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"test-error"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Validation Error",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/test-error",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"test-error"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"This is a simulated validation error for testing the global error handler\",\n    \"details\": {\n      \"field\": \"example\"\n    }\n  }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Generate a unique account on every run so re-running the collection never 409s.",
+									"const uniqueEmail = `test+${Date.now()}@example.com`;",
+									"pm.collectionVariables.set('email', uniqueEmail);",
+									"pm.collectionVariables.set('password', 'Password123!');",
+									"pm.collectionVariables.set('firstName', 'Test');",
+									"pm.collectionVariables.set('lastName', 'User');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"",
+									"if (pm.response.code === 201) {",
+									"  const json = pm.response.json();",
+									"  pm.collectionVariables.set('accessToken', json.accessToken);",
+									"  pm.collectionVariables.set('userId', json.user.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"firstName\": \"{{firstName}}\",\n  \"lastName\": \"{{lastName}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"",
+									"if (pm.response.code === 200) {",
+									"  const json = pm.response.json();",
+									"  pm.collectionVariables.set('accessToken', json.accessToken);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Me",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Pages",
+			"item": [
+				{
+					"name": "Resolve Page By Route",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/pages/resolve?route=/blog/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pages",
+								"resolve"
+							],
+							"query": [
+								{
+									"key": "route",
+									"value": "/blog/:id"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Navigation Pages",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/pages/navigation/primary-nav",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pages",
+								"navigation",
+								"primary-nav"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Page",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// A freshly registered/logged-in user always has role 'user' (see Auth > Register), which grants no capabilities by default, so this route's pages:manage guard should reject it.",
+									"pm.test('Status code is 403 (default user lacks pages:manage capability)', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"slug\": \"blog\",\n  \"title\": \"Blog\",\n  \"routePattern\": \"/blog/:id\",\n  \"isPluginPage\": true,\n  \"pluginOrigin\": \"blog-plugin\",\n  \"animation\": { \"enter\": \"animate__fadeIn\", \"exit\": \"animate__fadeOut\", \"duration\": 300, \"delay\": 0 },\n  \"backgroundColor\": { \"color\": \"surface\", \"intensity\": 100 },\n  \"foregroundColor\": { \"color\": \"primary-foreground\", \"intensity\": 500 },\n  \"access\": { \"isPublic\": true, \"isAnonymousOnly\": false, \"requiredRoles\": [] },\n  \"navigation\": { \"locations\": [\"primary-nav\"], \"label\": \"Blog\", \"order\": 1 },\n  \"layoutTemplate\": \"default\",\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/pages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pages"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Home Page",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Verifies a page can be assigned to more than one nav location at once (primary-nav AND primary-footer).",
+									"pm.test('Status code is 403 (default user lacks pages:manage capability)', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"slug\": \"home\",\n  \"title\": \"Home\",\n  \"routePattern\": \"/\",\n  \"isPluginPage\": false,\n  \"animation\": { \"enter\": \"animate__fadeIn\", \"exit\": \"animate__fadeOut\", \"duration\": 300, \"delay\": 0 },\n  \"backgroundColor\": { \"color\": \"surface\", \"intensity\": 100 },\n  \"foregroundColor\": { \"color\": \"primary-foreground\", \"intensity\": 500 },\n  \"access\": { \"isPublic\": true, \"isAnonymousOnly\": false, \"requiredRoles\": [] },\n  \"navigation\": { \"locations\": [\"primary-nav\", \"primary-footer\"], \"label\": \"Home\", \"order\": 0 },\n  \"layoutTemplate\": \"default\",\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/pages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pages"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Docs Page",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Verifies a page can be assigned to more than one nav location at once (primary-nav AND primary-footer).",
+									"pm.test('Status code is 403 (default user lacks pages:manage capability)', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"slug\": \"docs\",\n  \"title\": \"Docs\",\n  \"routePattern\": \"/docs\",\n  \"isPluginPage\": false,\n  \"animation\": { \"enter\": \"animate__fadeIn\", \"exit\": \"animate__fadeOut\", \"duration\": 300, \"delay\": 0 },\n  \"backgroundColor\": { \"color\": \"surface\", \"intensity\": 100 },\n  \"foregroundColor\": { \"color\": \"primary-foreground\", \"intensity\": 500 },\n  \"access\": { \"isPublic\": true, \"isAnonymousOnly\": false, \"requiredRoles\": [] },\n  \"navigation\": { \"locations\": [\"primary-nav\", \"primary-footer\"], \"label\": \"Docs\", \"order\": 1 },\n  \"layoutTemplate\": \"default\",\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/pages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pages"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Privacy Policy Page",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Lives only in the footer's secondary section (secondary-footer), not the primary nav.",
+									"pm.test('Status code is 403 (default user lacks pages:manage capability)', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"slug\": \"privacy-policy\",\n  \"title\": \"Privacy Policy\",\n  \"routePattern\": \"/privacy-policy\",\n  \"isPluginPage\": false,\n  \"animation\": { \"enter\": \"animate__fadeIn\", \"exit\": \"animate__fadeOut\", \"duration\": 300, \"delay\": 0 },\n  \"backgroundColor\": { \"color\": \"surface\", \"intensity\": 100 },\n  \"foregroundColor\": { \"color\": \"primary-foreground\", \"intensity\": 500 },\n  \"access\": { \"isPublic\": true, \"isAnonymousOnly\": false, \"requiredRoles\": [] },\n  \"navigation\": { \"locations\": [\"secondary-footer\"], \"label\": \"Privacy Policy\", \"order\": 0 },\n  \"layoutTemplate\": \"default\",\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/pages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pages"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Presence",
+			"item": [
+				{
+					"name": "Get User Presence",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response has success: true and a status field', () => {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"  pm.expect(json.data).to.have.property('status');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{userId}}/presence",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{userId}}",
+								"presence"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "List My Notifications",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response has success: true and a data array', () => {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"  pm.expect(json.data).to.be.an('array');",
+									"  if (json.data.length > 0) {",
+									"    pm.collectionVariables.set('notificationId', json.data[0].id);",
+									"  }",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"notifications"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Unread Notification Count",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response has success: true and a count field', () => {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"  pm.expect(json.data).to.have.property('count');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/unread-count",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"unread-count"
+							]
+						}
+					}
+				},
+				{
+					"name": "Mark Notification As Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response has success: true and isRead: true', () => {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"  pm.expect(json.data.isRead).to.eql(true);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/{{notificationId}}/read",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"{{notificationId}}",
+								"read"
+							]
+						}
+					}
+				},
+				{
+					"name": "Mark All Notifications As Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response has success: true and a count field', () => {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"  pm.expect(json.data).to.have.property('count');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/read-all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"read-all"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Notification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 204', () => pm.response.to.have.status(204));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/{{notificationId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"{{notificationId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Profile",
+			"item": [
+				{
+					"name": "Get Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response has success: true', () => {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/profile/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"profile",
+								"{{userId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update My Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"{{firstName}}\",\n  \"lastName\": \"{{lastName}}\",\n  \"email\": \"{{email}}\",\n  \"avatar\": {\n    \"variant\": \"initials\",\n    \"style\": { \"bgColor\": { \"color\": \"primary\", \"intensity\": 500 }, \"shape\": \"circle\" }\n  },\n  \"profileBanner\": {\n    \"cellSize\": 40,\n    \"variance\": 0.5,\n    \"xColors\": [\"#006a8e\", \"#f5a42d\"],\n    \"yColors\": [\"#397e7f\"]\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/profile/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"profile",
+								"me"
+							]
+						}
+					}
+				},
+				{
+					"name": "Toggle Dark Mode",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 (feature enabled) or 403 (feature disabled)', () => {",
+									"  pm.expect([200, 403]).to.include(pm.response.code);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/profile/me/dark-mode/toggle",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"profile",
+								"me",
+								"dark-mode",
+								"toggle"
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify Current Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response data.valid is true', () => {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.data.valid).to.eql(true);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/profile/me/password/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"profile",
+								"me",
+								"password",
+								"verify"
+							]
+						}
+					}
+				},
+				{
+					"name": "Change Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"",
+									"if (pm.response.code === 200) {",
+									"  pm.collectionVariables.set('password', 'NewPassword123!');",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"{{password}}\",\n  \"newPassword\": \"NewPassword123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/profile/me/password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"profile",
+								"me",
+								"password"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Update User Permissions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// A freshly registered/logged-in user always has role 'user' (see Auth > Register), which grants no capabilities by default - users:managePermissions is deliberately excluded from every role's default bundle (owner-granted only), so this route's guard should reject it regardless of role.",
+									"pm.test('Status code is 403 (default user lacks users:managePermissions capability)', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"capabilityOverrides\": { \"pages:manage\": true }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{userId}}/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{userId}}",
+								"permissions"
+							]
+						}
+					}
+				},
+				{
+					"name": "Transfer Ownership",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// requireOwner (not requirePermission) gates this route - a freshly registered second-or-later user is never the owner (only the very first user ever registered is, see Auth > Register), so this should be rejected regardless of role/capabilities.",
+									"pm.test('Status code is 403 (default user is not the owner)', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{userId}}/transfer-ownership",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{userId}}",
+								"transfer-ownership"
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}

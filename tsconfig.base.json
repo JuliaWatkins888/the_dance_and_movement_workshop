@@ -1,0 +1,62 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "bundler",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2021",
+    "module": "esnext",
+    "lib": [
+      "es2020",
+      "dom"
+    ],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "paths": {
+      "@inithium/*": [
+        "./libs/*"
+      ],
+      "@inithium/db": [
+        "./libs/db/src/index.ts"
+      ],
+      "@inithium/auth": [
+        "./libs/auth/src/index.ts"
+      ],
+      "@inithium/permissions": [
+        "./libs/permissions/src/index.ts"
+      ],
+      "@inithium/realtime": [
+        "./libs/realtime/src/index.ts"
+      ],
+      "@inithium/notifications": [
+        "./libs/notifications/src/index.ts"
+      ],
+      "@inithium/api-core": [
+        "./libs/api-core/src/index.ts"
+      ],
+      "@inithium/api-client": [
+        "./libs/api-client/src/index.ts"
+      ],
+      "@inithium/api-utils": [
+        "./libs/api-utils/src/index.ts"
+      ],
+      "@inithium/ui": [
+        "./libs/ui/src/index.ts"
+      ],
+      "@inithium/cms": [
+        "./libs/cms/src/index.ts"
+      ],
+      "@inithium/time": [
+        "./libs/time/src/index.ts"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
+}

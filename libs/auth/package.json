@@ -1,0 +1,13 @@
+{
+  "name": "@inithium/auth",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "dependencies": {
+    "jsonwebtoken": "^9.0.3",
+    "bcryptjs": "^3.0.3",
+    "zod": "^4.4.3",
+    "express": "^5.1.0"
+  }
+}

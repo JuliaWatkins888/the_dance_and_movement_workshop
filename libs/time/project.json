@@ -1,0 +1,23 @@
+{
+  "name": "time",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/time/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/time",
+        "main": "libs/time/src/index.ts",
+        "tsConfig": "libs/time/tsconfig.lib.json"
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p libs/time/tsconfig.lib.json"
+      }
+    }
+  }
+}

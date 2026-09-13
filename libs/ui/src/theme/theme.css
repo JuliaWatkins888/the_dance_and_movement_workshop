@@ -1,0 +1,494 @@
+/*
+ * Inithium UI - semantic color theme.
+ *
+ * Two layers, by design:
+ *  - The --ui-* custom properties below are the brand surface. Redefine them
+ *    (e.g. in a consuming app's :root, or under a data-theme selector) to apply a
+ *    custom brand theme without touching this file.
+ *  - The @theme block registers each token into Tailwind v4's --color-* namespace so
+ *    "bg-primary-500", "text-primary-foreground-500", opacity modifiers
+ *    ("bg-accent-500/40"), etc. all work exactly like Tailwind's built-in palette.
+ *
+ * Import this file *after* '@import "tailwindcss";' in the consuming app's global
+ * stylesheet.
+ */
+
+/*
+ * Brand typography. Same "define once at the token layer, consume everywhere" pattern as the
+ * color tokens below: --ui-font-primary is the display face (applied to every h1-h6 in the app,
+ * plus the Navbar/CmsNavbar brand title further down, which render as a <span> so the element
+ * rule alone doesn't reach them), --ui-font-secondary is the body-copy face applied to <body> and
+ * inherited by everything that doesn't opt into primary. Both are also registered into Tailwind's
+ * --font-* theme namespace below so `font-primary`/`font-secondary` utility classes work anywhere
+ * a one-off override is needed.
+ */
+@font-face {
+  font-family: 'InithiumPrimary';
+  src: url('./fonts/primary.woff2') format('woff2');
+  /* Full weight range on a single face so font-bold/font-semibold (already used on every
+     h1-h3 in the app) pick this real face instead of triggering the browser's faux-bold. */
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'InithiumSecondary';
+  src: url('./fonts/secondary.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --ui-font-primary: 'InithiumPrimary', ui-sans-serif, system-ui, sans-serif;
+  --ui-font-secondary: 'InithiumSecondary', ui-sans-serif, system-ui, sans-serif;
+
+  --ui-primary-100: #e6f3f8;
+  --ui-primary-200: #c0e3ef;
+  --ui-primary-300: #8ccce1;
+  --ui-primary-400: #4daed0;
+  --ui-primary-500: #006a8e;
+  --ui-primary-600: #005a7b;
+  --ui-primary-700: #004a66;
+  --ui-primary-800: #003b51;
+  --ui-primary-900: #002c3d;
+  --ui-primary-950: #001924;
+
+  --ui-secondary-100: #edf6f6;
+  --ui-secondary-200: #d0e7e8;
+  --ui-secondary-300: #a5d3d4;
+  --ui-secondary-400: #6eb7b9;
+  --ui-secondary-500: #397e7f;
+  --ui-secondary-600: #2d6b6c;
+  --ui-secondary-700: #235758;
+  --ui-secondary-800: #1b4546;
+  --ui-secondary-900: #143536;
+  --ui-secondary-950: #0b1f20;
+
+  --ui-accent-100: #fef5e6;
+  --ui-accent-200: #fde5bf;
+  --ui-accent-300: #fbd18d;
+  --ui-accent-400: #f8ba58;
+  --ui-accent-500: #f5a42d;
+  --ui-accent-600: #d9881d;
+  --ui-accent-700: #b36b13;
+  --ui-accent-800: #8e5210;
+  --ui-accent-900: #734211;
+  --ui-accent-950: #422305;
+
+  --ui-surface-100: #f8fafc;
+  --ui-surface-200: #f1f5f9;
+  --ui-surface-300: #e2e8f0;
+  --ui-surface-400: #cbd5e1;
+  --ui-surface-500: #94a3b8;
+  --ui-surface-600: #64748b;
+  --ui-surface-700: #475569;
+  --ui-surface-800: #334155;
+  --ui-surface-900: #1e293b;
+  --ui-surface-950: #0f172a;
+
+  --ui-tertiary-100: #f2f3f5;
+  --ui-tertiary-200: #dce0e6;
+  --ui-tertiary-300: #c0c7d2;
+  --ui-tertiary-400: #9aa6b6;
+  --ui-tertiary-500: #64748b;
+  --ui-tertiary-600: #576579;
+  --ui-tertiary-700: #485464;
+  --ui-tertiary-800: #39424f;
+  --ui-tertiary-900: #2b323c;
+  --ui-tertiary-950: #191d23;
+
+  --ui-quaternary-100: #e8edf4;
+  --ui-quaternary-200: #c4d1e3;
+  --ui-quaternary-300: #94accd;
+  --ui-quaternary-400: #537aaf;
+  --ui-quaternary-500: #25374f;
+  --ui-quaternary-600: #203045;
+  --ui-quaternary-700: #1b2839;
+  --ui-quaternary-800: #151f2d;
+  --ui-quaternary-900: #101822;
+  --ui-quaternary-950: #090e14;
+
+  --ui-primary-foreground-100: #0a0a0a;
+  --ui-primary-foreground-200: #0a0a0a;
+  --ui-primary-foreground-300: #0a0a0a;
+  --ui-primary-foreground-400: #0a0a0a;
+  --ui-primary-foreground-500: #fafafa;
+  --ui-primary-foreground-600: #fafafa;
+  --ui-primary-foreground-700: #fafafa;
+  --ui-primary-foreground-800: #fafafa;
+  --ui-primary-foreground-900: #fafafa;
+  --ui-primary-foreground-950: #fafafa;
+
+  --ui-secondary-foreground-100: #0a0a0a;
+  --ui-secondary-foreground-200: #0a0a0a;
+  --ui-secondary-foreground-300: #0a0a0a;
+  --ui-secondary-foreground-400: #0a0a0a;
+  --ui-secondary-foreground-500: #fafafa;
+  --ui-secondary-foreground-600: #fafafa;
+  --ui-secondary-foreground-700: #fafafa;
+  --ui-secondary-foreground-800: #fafafa;
+  --ui-secondary-foreground-900: #fafafa;
+  --ui-secondary-foreground-950: #fafafa;
+
+  --ui-accent-foreground-100: #0a0a0a;
+  --ui-accent-foreground-200: #0a0a0a;
+  --ui-accent-foreground-300: #0a0a0a;
+  --ui-accent-foreground-400: #0a0a0a;
+  --ui-accent-foreground-500: #fafafa;
+  --ui-accent-foreground-600: #fafafa;
+  --ui-accent-foreground-700: #fafafa;
+  --ui-accent-foreground-800: #fafafa;
+  --ui-accent-foreground-900: #fafafa;
+  --ui-accent-foreground-950: #fafafa;
+
+  --ui-surface-foreground-100: #0a0a0a;
+  --ui-surface-foreground-200: #0a0a0a;
+  --ui-surface-foreground-300: #0a0a0a;
+  --ui-surface-foreground-400: #0a0a0a;
+  --ui-surface-foreground-500: #0a0a0a;
+  --ui-surface-foreground-600: #fafafa;
+  --ui-surface-foreground-700: #fafafa;
+  --ui-surface-foreground-800: #fafafa;
+  --ui-surface-foreground-900: #fafafa;
+  --ui-surface-foreground-950: #fafafa;
+
+  --ui-tertiary-foreground-100: #0a0a0a;
+  --ui-tertiary-foreground-200: #0a0a0a;
+  --ui-tertiary-foreground-300: #0a0a0a;
+  --ui-tertiary-foreground-400: #0a0a0a;
+  --ui-tertiary-foreground-500: #fafafa;
+  --ui-tertiary-foreground-600: #fafafa;
+  --ui-tertiary-foreground-700: #fafafa;
+  --ui-tertiary-foreground-800: #fafafa;
+  --ui-tertiary-foreground-900: #fafafa;
+  --ui-tertiary-foreground-950: #fafafa;
+
+  --ui-quaternary-foreground-100: #0a0a0a;
+  --ui-quaternary-foreground-200: #0a0a0a;
+  --ui-quaternary-foreground-300: #0a0a0a;
+  --ui-quaternary-foreground-400: #0a0a0a;
+  --ui-quaternary-foreground-500: #fafafa;
+  --ui-quaternary-foreground-600: #fafafa;
+  --ui-quaternary-foreground-700: #fafafa;
+  --ui-quaternary-foreground-800: #fafafa;
+  --ui-quaternary-foreground-900: #fafafa;
+  --ui-quaternary-foreground-950: #fafafa;
+}
+
+body {
+  font-family: var(--ui-font-secondary);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ui-font-primary);
+}
+
+/*
+ * Dark mode override. `surface` is the only scale that inverts here - it's the layering/
+ * background token (see CLAUDE.md section 5), so it's the one thing that actually needs to flip
+ * between "light backgrounds, dark text" and "dark backgrounds, light text". The 5 raw brand
+ * colors (primary/secondary/accent/tertiary/quaternary) and their own -foreground partners carry
+ * brand identity, not layering intent, so they stay fixed in both modes - a button styled
+ * bg-primary-500/text-primary-foreground-500 looks the same whether the page around it is light
+ * or dark.
+ *
+ * Every surface/surface-foreground shade below is the light-mode scale's mirror image around its
+ * midpoint (100<->950, 200<->900, 300<->800, 400<->700, 500<->600), so any component already
+ * built against the bg-surface and text-surface-foreground utilities repaints correctly with
+ * zero component-level changes - see resolveColorClass.ts, which only ever emits the class name,
+ * never a color value itself.
+ *
+ * Toggled by stamping data-theme="dark" on the document root - see apps/web/src/app/RootRouter.tsx,
+ * which is the one place mounted on every route (public site and /cms alike) and so the one
+ * place that resolves the effective dark-mode boolean (the appearance.darkModeEnabled admin
+ * setting gating the signed-in user's own UserEntity.darkMode preference) and applies it here.
+ */
+:root[data-theme='dark'] {
+  --ui-surface-100: #0f172a;
+  --ui-surface-200: #1e293b;
+  --ui-surface-300: #334155;
+  --ui-surface-400: #475569;
+  --ui-surface-500: #64748b;
+  --ui-surface-600: #94a3b8;
+  --ui-surface-700: #cbd5e1;
+  --ui-surface-800: #e2e8f0;
+  --ui-surface-900: #f1f5f9;
+  --ui-surface-950: #f8fafc;
+
+  --ui-surface-foreground-100: #fafafa;
+  --ui-surface-foreground-200: #fafafa;
+  --ui-surface-foreground-300: #fafafa;
+  --ui-surface-foreground-400: #fafafa;
+  --ui-surface-foreground-500: #fafafa;
+  --ui-surface-foreground-600: #0a0a0a;
+  --ui-surface-foreground-700: #0a0a0a;
+  --ui-surface-foreground-800: #0a0a0a;
+  --ui-surface-foreground-900: #0a0a0a;
+  --ui-surface-foreground-950: #0a0a0a;
+}
+
+@theme {
+  --color-primary-100: var(--ui-primary-100);
+  --color-primary-200: var(--ui-primary-200);
+  --color-primary-300: var(--ui-primary-300);
+  --color-primary-400: var(--ui-primary-400);
+  --color-primary-500: var(--ui-primary-500);
+  --color-primary-600: var(--ui-primary-600);
+  --color-primary-700: var(--ui-primary-700);
+  --color-primary-800: var(--ui-primary-800);
+  --color-primary-900: var(--ui-primary-900);
+  --color-primary-950: var(--ui-primary-950);
+
+  --color-secondary-100: var(--ui-secondary-100);
+  --color-secondary-200: var(--ui-secondary-200);
+  --color-secondary-300: var(--ui-secondary-300);
+  --color-secondary-400: var(--ui-secondary-400);
+  --color-secondary-500: var(--ui-secondary-500);
+  --color-secondary-600: var(--ui-secondary-600);
+  --color-secondary-700: var(--ui-secondary-700);
+  --color-secondary-800: var(--ui-secondary-800);
+  --color-secondary-900: var(--ui-secondary-900);
+  --color-secondary-950: var(--ui-secondary-950);
+
+  --color-accent-100: var(--ui-accent-100);
+  --color-accent-200: var(--ui-accent-200);
+  --color-accent-300: var(--ui-accent-300);
+  --color-accent-400: var(--ui-accent-400);
+  --color-accent-500: var(--ui-accent-500);
+  --color-accent-600: var(--ui-accent-600);
+  --color-accent-700: var(--ui-accent-700);
+  --color-accent-800: var(--ui-accent-800);
+  --color-accent-900: var(--ui-accent-900);
+  --color-accent-950: var(--ui-accent-950);
+
+  --color-surface-100: var(--ui-surface-100);
+  --color-surface-200: var(--ui-surface-200);
+  --color-surface-300: var(--ui-surface-300);
+  --color-surface-400: var(--ui-surface-400);
+  --color-surface-500: var(--ui-surface-500);
+  --color-surface-600: var(--ui-surface-600);
+  --color-surface-700: var(--ui-surface-700);
+  --color-surface-800: var(--ui-surface-800);
+  --color-surface-900: var(--ui-surface-900);
+  --color-surface-950: var(--ui-surface-950);
+
+  --color-tertiary-100: var(--ui-tertiary-100);
+  --color-tertiary-200: var(--ui-tertiary-200);
+  --color-tertiary-300: var(--ui-tertiary-300);
+  --color-tertiary-400: var(--ui-tertiary-400);
+  --color-tertiary-500: var(--ui-tertiary-500);
+  --color-tertiary-600: var(--ui-tertiary-600);
+  --color-tertiary-700: var(--ui-tertiary-700);
+  --color-tertiary-800: var(--ui-tertiary-800);
+  --color-tertiary-900: var(--ui-tertiary-900);
+  --color-tertiary-950: var(--ui-tertiary-950);
+
+  --color-quaternary-100: var(--ui-quaternary-100);
+  --color-quaternary-200: var(--ui-quaternary-200);
+  --color-quaternary-300: var(--ui-quaternary-300);
+  --color-quaternary-400: var(--ui-quaternary-400);
+  --color-quaternary-500: var(--ui-quaternary-500);
+  --color-quaternary-600: var(--ui-quaternary-600);
+  --color-quaternary-700: var(--ui-quaternary-700);
+  --color-quaternary-800: var(--ui-quaternary-800);
+  --color-quaternary-900: var(--ui-quaternary-900);
+  --color-quaternary-950: var(--ui-quaternary-950);
+
+  --color-primary-foreground-100: var(--ui-primary-foreground-100);
+  --color-primary-foreground-200: var(--ui-primary-foreground-200);
+  --color-primary-foreground-300: var(--ui-primary-foreground-300);
+  --color-primary-foreground-400: var(--ui-primary-foreground-400);
+  --color-primary-foreground-500: var(--ui-primary-foreground-500);
+  --color-primary-foreground-600: var(--ui-primary-foreground-600);
+  --color-primary-foreground-700: var(--ui-primary-foreground-700);
+  --color-primary-foreground-800: var(--ui-primary-foreground-800);
+  --color-primary-foreground-900: var(--ui-primary-foreground-900);
+  --color-primary-foreground-950: var(--ui-primary-foreground-950);
+
+  --color-secondary-foreground-100: var(--ui-secondary-foreground-100);
+  --color-secondary-foreground-200: var(--ui-secondary-foreground-200);
+  --color-secondary-foreground-300: var(--ui-secondary-foreground-300);
+  --color-secondary-foreground-400: var(--ui-secondary-foreground-400);
+  --color-secondary-foreground-500: var(--ui-secondary-foreground-500);
+  --color-secondary-foreground-600: var(--ui-secondary-foreground-600);
+  --color-secondary-foreground-700: var(--ui-secondary-foreground-700);
+  --color-secondary-foreground-800: var(--ui-secondary-foreground-800);
+  --color-secondary-foreground-900: var(--ui-secondary-foreground-900);
+  --color-secondary-foreground-950: var(--ui-secondary-foreground-950);
+
+  --color-accent-foreground-100: var(--ui-accent-foreground-100);
+  --color-accent-foreground-200: var(--ui-accent-foreground-200);
+  --color-accent-foreground-300: var(--ui-accent-foreground-300);
+  --color-accent-foreground-400: var(--ui-accent-foreground-400);
+  --color-accent-foreground-500: var(--ui-accent-foreground-500);
+  --color-accent-foreground-600: var(--ui-accent-foreground-600);
+  --color-accent-foreground-700: var(--ui-accent-foreground-700);
+  --color-accent-foreground-800: var(--ui-accent-foreground-800);
+  --color-accent-foreground-900: var(--ui-accent-foreground-900);
+  --color-accent-foreground-950: var(--ui-accent-foreground-950);
+
+  --color-surface-foreground-100: var(--ui-surface-foreground-100);
+  --color-surface-foreground-200: var(--ui-surface-foreground-200);
+  --color-surface-foreground-300: var(--ui-surface-foreground-300);
+  --color-surface-foreground-400: var(--ui-surface-foreground-400);
+  --color-surface-foreground-500: var(--ui-surface-foreground-500);
+  --color-surface-foreground-600: var(--ui-surface-foreground-600);
+  --color-surface-foreground-700: var(--ui-surface-foreground-700);
+  --color-surface-foreground-800: var(--ui-surface-foreground-800);
+  --color-surface-foreground-900: var(--ui-surface-foreground-900);
+  --color-surface-foreground-950: var(--ui-surface-foreground-950);
+
+  --color-tertiary-foreground-100: var(--ui-tertiary-foreground-100);
+  --color-tertiary-foreground-200: var(--ui-tertiary-foreground-200);
+  --color-tertiary-foreground-300: var(--ui-tertiary-foreground-300);
+  --color-tertiary-foreground-400: var(--ui-tertiary-foreground-400);
+  --color-tertiary-foreground-500: var(--ui-tertiary-foreground-500);
+  --color-tertiary-foreground-600: var(--ui-tertiary-foreground-600);
+  --color-tertiary-foreground-700: var(--ui-tertiary-foreground-700);
+  --color-tertiary-foreground-800: var(--ui-tertiary-foreground-800);
+  --color-tertiary-foreground-900: var(--ui-tertiary-foreground-900);
+  --color-tertiary-foreground-950: var(--ui-tertiary-foreground-950);
+
+  --color-quaternary-foreground-100: var(--ui-quaternary-foreground-100);
+  --color-quaternary-foreground-200: var(--ui-quaternary-foreground-200);
+  --color-quaternary-foreground-300: var(--ui-quaternary-foreground-300);
+  --color-quaternary-foreground-400: var(--ui-quaternary-foreground-400);
+  --color-quaternary-foreground-500: var(--ui-quaternary-foreground-500);
+  --color-quaternary-foreground-600: var(--ui-quaternary-foreground-600);
+  --color-quaternary-foreground-700: var(--ui-quaternary-foreground-700);
+  --color-quaternary-foreground-800: var(--ui-quaternary-foreground-800);
+  --color-quaternary-foreground-900: var(--ui-quaternary-foreground-900);
+  --color-quaternary-foreground-950: var(--ui-quaternary-foreground-950);
+}
+
+@theme {
+  --font-primary: var(--ui-font-primary);
+  --font-secondary: var(--ui-font-secondary);
+}
+
+/*
+ * Loader component animations (see components/Loader/Loader.tsx) - registered as Tailwind v4
+ * --animate-* theme tokens (which auto-generate the matching `animate-loader-*` utility) rather
+ * than reused via the built-in animate-bounce/animate-ping utilities those variants used to rely
+ * on. Both of those are tuned for a single one-shot notification flourish - stacked back-to-back
+ * on a delay to fake a loading rhythm, they read as a stutter/flash rather than a continuous
+ * loop. These use transform+opacity only (compositor-friendly, no layout thrash) with an
+ * ease-in-out timing function and few keyframe stops, which is what actually reads as "smooth".
+ */
+@theme {
+  --animate-loader-dot: loader-dot 1.2s ease-in-out infinite;
+  --animate-loader-bar: loader-bar 1.1s ease-in-out infinite;
+  --animate-loader-pulse: loader-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes loader-dot {
+  0%, 80%, 100% { transform: scale(0.5); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes loader-bar {
+  0%, 100% { transform: scaleY(0.35); opacity: 0.6; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes loader-pulse {
+  0%, 100% { transform: scale(0.75); opacity: 0.55; }
+  50% { transform: scale(1); opacity: 1; }
+}
+
+/*
+ * Tailwind v4 only emits CSS for class names it finds literally in scanned source.
+ * resolveColorClass() builds class strings at runtime (template interpolation), so
+ * without this, none of the resulting classes would ever be generated. This inlines
+ * every {prefix}-{semantic token}-{shade}[/opacity] combination so the bounded,
+ * library-owned semantic token surface always renders regardless of how a caller
+ * assembles the string. Raw Tailwind palette colors (e.g. "emerald") hit the same gap
+ * and get the same treatment below.
+ */
+@source inline("{text,bg,border,ring}-{primary,secondary,tertiary,quaternary,accent,surface,primary-foreground,secondary-foreground,tertiary-foreground,quaternary-foreground,accent-foreground,surface-foreground}-{100,200,300,400,500,600,700,800,900,950}{,/10,/20,/30,/40,/50,/60,/70,/80,/90}");
+
+
+/*
+ * Same problem, Tailwind's own default palette: "emerald", "amber", etc. passed
+ * dynamically through ColorSpec.color hit the identical JIT-scanning gap as the
+ * semantic tokens above, since resolveColorClass() builds those class strings at
+ * runtime too. This force-generates the standard palette the same way. It trades CSS
+ * weight for "any Tailwind color, fully dynamic" actually working - Tailwind can't
+ * tree-shake force-generated candidates, so this ships every listed color/shade/prefix
+ * combination whether or not an app uses it. Scope the prefix or family list down here
+ * if that cost matters more than the flexibility.
+ */
+@source inline("{text,bg,border,ring}-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{100,200,300,400,500,600,700,800,900,950}{,/10,/20,/30,/40,/50,/60,/70,/80,/90}");
+
+/*
+ * resolveMargin()/resolvePadding() build "{m,p}[t,r,b,l]-[Npx]" from a plain `number`
+ * (see src/utils/resolveSpacing.ts) - an unbounded domain, unlike the finite color and
+ * token sets above. There is no way to enumerate "every integer" in a safelist, so this
+ * can only ever cover a chosen range, not the type's full contract. This inlines every
+ * pixel value from 0-128 per direction, which covers ordinary spacing; a value outside
+ * that range (or negative, which margin - but not padding - legitimately wants) needs
+ * the consuming app's own @source inline(...) to render. Raise the range here instead
+ * if 0-128 doesn't cover this app's actual spacing values.
+ */
+@source inline("{m,mt,mr,mb,ml,p,pt,pr,pb,pl}-[{0..128}px]");
+
+/*
+ * resolveFlexClasses() builds "gap[-x,-y]-[Npx]" from a plain `number` (see
+ * src/utils/resolveFlexClasses.ts) the same way resolveMargin()/resolvePadding() do -
+ * same unbounded-domain gap, same fix: inline every pixel value from 0-128. A gap value
+ * outside that range needs the consuming app's own @source inline(...) to render.
+ */
+@source inline("{gap,gap-x,gap-y}-[{0..128}px]");
+
+/*
+ * resolveFlexClasses() also assembles Box/AnimateBox's display/direction/wrap/justify/
+ * align/content classes from small lookup tables (same file). Unlike the gap/margin/
+ * padding case above this is a finite, fully enumerable set - not "any integer" - but it
+ * hits the identical JIT-scanning gap: the literal class strings live only inside that
+ * lookup table, never as a complete token in a file Tailwind's content scanner actually
+ * walks (a consumer only ever writes `flex={{ direction: 'col' }}`, never the string
+ * "flex-col" itself). Without this, every Box/AnimateBox using `flex` silently renders
+ * with the browser's initial flex-direction/justify-content/align-items instead of the
+ * one requested.
+ */
+@source inline("{flex,inline-flex}");
+@source inline("flex-{row,row-reverse,col,col-reverse,wrap,wrap-reverse,nowrap}");
+@source inline("justify-{start,end,center,between,around,evenly}");
+@source inline("items-{start,end,center,baseline,stretch}");
+@source inline("content-{start,end,center,between,around,evenly,stretch}");
+
+/*
+ * resolveButtonVariant() builds a few hover-state classes from an arbitrary `color` string
+ * at a FIXED shade per kind - hover:text-{color}-500 (filled), hover:bg-{color}-100
+ * (outlined/ghost), hover:border-b-{color}-500 (link) - same runtime-interpolation gap as
+ * the two blocks above, scoped to just the two shades Button actually varies by color
+ * instead of the full 100-950 range, since the fixed (non-hover) base color already goes
+ * through the general-purpose blocks above.
+ */
+@source inline("hover:{text,border-b}-{primary,secondary,tertiary,quaternary,accent,surface,primary-foreground,secondary-foreground,tertiary-foreground,quaternary-foreground,accent-foreground,surface-foreground,slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-500");
+@source inline("hover:bg-{primary,secondary,tertiary,quaternary,accent,surface,primary-foreground,secondary-foreground,tertiary-foreground,quaternary-foreground,accent-foreground,surface-foreground,slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-100");
+
+/*
+ * Input/Select/Textarea build their focus ring color as "focus-visible:ring-{color}-{shade}"
+ * from a caller-supplied ColorSpec (see components/Input/Input.tsx) - same runtime-
+ * interpolation gap as the blocks above, this time under the focus-visible: variant, which
+ * needs its own safelist entry since Tailwind's JIT scanner keys candidates on the full
+ * variant+utility string, not the bare utility.
+ */
+@source inline("focus-visible:ring-{primary,secondary,tertiary,quaternary,accent,surface,primary-foreground,secondary-foreground,tertiary-foreground,quaternary-foreground,accent-foreground,surface-foreground,slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{100,200,300,400,500,600,700,800,900,950}{,/10,/20,/30,/40,/50,/60,/70,/80,/90}");
+
+/*
+ * Switch's track and Checkbox/RadioGroup's checked fill build
+ * "data-[state=checked]:bg-{color}-{shade}" from a caller-supplied ColorSpec - same
+ * runtime-interpolation gap as the blocks above, this time keyed off Radix's own
+ * `data-state` attribute rather than a CSS pseudo-class.
+ */
+@source inline("data-[state=checked]:bg-{primary,secondary,tertiary,quaternary,accent,surface,primary-foreground,secondary-foreground,tertiary-foreground,quaternary-foreground,accent-foreground,surface-foreground,slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{100,200,300,400,500,600,700,800,900,950}{,/10,/20,/30,/40,/50,/60,/70,/80,/90}");
+
+/*
+ * Checkbox's indeterminate fill needs the identical treatment as its checked fill above,
+ * just keyed off Radix's "indeterminate" data-state instead of "checked".
+ */
+@source inline("data-[state=indeterminate]:bg-{primary,secondary,tertiary,quaternary,accent,surface,primary-foreground,secondary-foreground,tertiary-foreground,quaternary-foreground,accent-foreground,surface-foreground,slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{100,200,300,400,500,600,700,800,900,950}{,/10,/20,/30,/40,/50,/60,/70,/80,/90}");

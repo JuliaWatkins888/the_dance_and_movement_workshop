@@ -1,0 +1,24 @@
+{
+  "name": "permissions",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/permissions/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/permissions",
+        "main": "libs/permissions/src/index.ts",
+        "tsConfig": "libs/permissions/tsconfig.lib.json",
+        "assets": ["libs/permissions/*.md"]
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p libs/permissions/tsconfig.lib.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@inithium/cms",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-router-dom": "6.30.3",
+    "recharts": "^2.15.0"
+  }
+}

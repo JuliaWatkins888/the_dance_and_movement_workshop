@@ -1,0 +1,24 @@
+{
+  "name": "api-utils",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/api-utils/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/api-utils",
+        "main": "libs/api-utils/src/index.ts",
+        "tsConfig": "libs/api-utils/tsconfig.lib.json",
+        "assets": ["libs/api-utils/*.md"]
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p libs/api-utils/tsconfig.lib.json"
+      }
+    }
+  }
+}

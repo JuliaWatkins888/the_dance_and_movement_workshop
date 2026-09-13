@@ -1,0 +1,10 @@
+{
+  "name": "@inithium/db",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "dependencies": {
+    "mongoose": "^9.9.4"
+  }
+}

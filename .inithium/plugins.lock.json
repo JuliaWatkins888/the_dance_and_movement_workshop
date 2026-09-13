@@ -1,0 +1,947 @@
+{
+  "version": 1,
+  "plugins": {
+    "cms": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-13T12:33:37.153Z",
+      "dependencies": [],
+      "npmDependencies": {
+        "recharts": "^2.15.0"
+      },
+      "injections": [
+        {
+          "target": "libs/cms",
+          "source": "src/cms",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/app/RootRouter.tsx",
+          "source": "src/app/RootRouter.fragment.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/permissions/src/roles/role-capability-defaults.ts",
+          "source": "src/permissions/roles/role-capability-defaults.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "tsconfig.base.json",
+          "source": "src/tsconfig-paths.fragment.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "tsconfig-paths-merge",
+          "jsonPaths": {
+            "@inithium/cms": [
+              "./libs/cms/src/index.ts"
+            ]
+          }
+        },
+        {
+          "target": "libs/ui/src/composites/ListRow.tsx",
+          "source": "src/ui/composites/ListRow.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ui/src/composites/SearchFilterBar.tsx",
+          "source": "src/ui/composites/SearchFilterBar.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ui/src/composites/useSelection.ts",
+          "source": "src/ui/composites/useSelection.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ui/src/composites/index.ts",
+          "source": "src/ui/composites/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/ui/src/index.ts",
+          "source": "src/ui/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        }
+      ]
+    },
+    "gallery": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-13T12:33:47.301Z",
+      "dependencies": [],
+      "npmDependencies": {
+        "multer": "^2.0.0",
+        "@types/multer": "^1.4.12"
+      },
+      "injections": [
+        {
+          "target": "libs/permissions/src/roles/role-capability-defaults.ts",
+          "source": "src/permissions/roles/role-capability-defaults.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/contracts/gallery-image.contract.ts",
+          "source": "src/db/contracts/gallery-image.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/db-provider.contract.ts",
+          "source": "src/db/contracts/db-provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/schemas/gallery-image.schema.ts",
+          "source": "src/db/schemas/gallery-image.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/gallery-image.repository.ts",
+          "source": "src/db/providers/mongo/gallery-image.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/mongo.provider.ts",
+          "source": "src/db/providers/mongo/mongo.provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/index.ts",
+          "source": "src/db/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/page-seeds/gallery.page-seed.ts",
+          "source": "src/db/page-seeds/gallery.page-seed.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/page-seeds/registry.ts",
+          "source": "src/db/page-seeds/registry.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-core/src/schemas/gallery.schema.ts",
+          "source": "src/api-core/schemas/gallery.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/gallery.route.ts",
+          "source": "src/api-core/routes/gallery.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/index.ts",
+          "source": "src/api-core/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-core/src/routes/gallery.route.ts",
+          "source": "src/api-core/routes/gallery.route.storage.ts",
+          "requires": "storage",
+          "status": "deferred",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/api/uploads/gallery/.gitkeep",
+          "source": "src/apps/api/uploads/gallery/.gitkeep",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/endpoints/gallery.endpoints.ts",
+          "source": "src/api-client/endpoints/gallery.endpoints.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/baseApi.ts",
+          "source": "src/api-client/baseApi.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-client/src/index.ts",
+          "source": "src/api-client/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "apps/web/src/pages/GalleryPage.tsx",
+          "source": "src/pages/GalleryPage.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/pages/pageComponents.ts",
+          "source": "src/pages/pageComponents.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/cms/src/modules/gallery-admin.module.tsx",
+          "source": "src/cms/modules/gallery-admin.module.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/gallery/GalleryAdminModule.tsx",
+          "source": "src/cms/modules/gallery/GalleryAdminModule.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/gallery/GalleryImageEditDialog.tsx",
+          "source": "src/cms/modules/gallery/GalleryImageEditDialog.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/gallery/GalleryImageEditDialog.tsx",
+          "source": "src/cms/modules/gallery/GalleryImageEditDialog.storage.tsx",
+          "requires": "storage",
+          "status": "deferred",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/permissions/definitions/gallery-manage.capability.ts",
+          "source": "src/cms/permissions/definitions/gallery-manage.capability.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        }
+      ]
+    },
+    "contact": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-13T12:33:52.601Z",
+      "dependencies": [],
+      "npmDependencies": {
+        "express-rate-limit": "^8.7.0"
+      },
+      "injections": [
+        {
+          "target": "libs/permissions/src/roles/role-capability-defaults.ts",
+          "source": "src/permissions/roles/role-capability-defaults.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/contracts/communication.contract.ts",
+          "source": "src/db/contracts/communication.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/db-provider.contract.ts",
+          "source": "src/db/contracts/db-provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/schemas/communication.schema.ts",
+          "source": "src/db/schemas/communication.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/communication.repository.ts",
+          "source": "src/db/providers/mongo/communication.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/mongo.provider.ts",
+          "source": "src/db/providers/mongo/mongo.provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/index.ts",
+          "source": "src/db/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/page-seeds/contact.page-seed.ts",
+          "source": "src/db/page-seeds/contact.page-seed.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/page-seeds/registry.ts",
+          "source": "src/db/page-seeds/registry.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-core/src/schemas/contact.schema.ts",
+          "source": "src/api-core/schemas/contact.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/contact.route.ts",
+          "source": "src/api-core/routes/contact.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/index.ts",
+          "source": "src/api-core/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-client/src/endpoints/contact.endpoints.ts",
+          "source": "src/api-client/endpoints/contact.endpoints.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/endpoints/settings.endpoints.ts",
+          "source": "src/api-client/settings.endpoints.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-client/src/baseApi.ts",
+          "source": "src/api-client/baseApi.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-client/src/index.ts",
+          "source": "src/api-client/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/ui/src/composites/CommunicationThread.tsx",
+          "source": "src/ui/composites/CommunicationThread.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ui/src/composites/index.ts",
+          "source": "src/ui/composites/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/ui/src/index.ts",
+          "source": "src/ui/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "apps/web/src/pages/ContactPage.tsx",
+          "source": "src/apps/web/pages/ContactPage.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/pages/ContactThreadDialogContent.tsx",
+          "source": "src/apps/web/pages/ContactThreadDialogContent.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/pages/pageComponents.ts",
+          "source": "src/apps/web/pages/pageComponents.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "apps/web/src/app/notificationHooks/contact.notification-hook.tsx",
+          "source": "src/apps/web/app/notificationHooks/contact.notification-hook.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/communications-admin.module.tsx",
+          "source": "src/cms/modules/communications-admin.module.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/communications/CommunicationsAdminModule.tsx",
+          "source": "src/cms/modules/communications/CommunicationsAdminModule.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/communications/CommunicationThreadDialogContent.tsx",
+          "source": "src/cms/modules/communications/CommunicationThreadDialogContent.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/communications/communicationNeedsReply.ts",
+          "source": "src/cms/modules/communications/communicationNeedsReply.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/dashboard/widgets/communications-needing-reply.widget.tsx",
+          "source": "src/cms/dashboard/widgets/communications-needing-reply.widget.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/settings/definitions/contact-recipient-email.setting.ts",
+          "source": "src/cms/settings/definitions/contact-recipient-email.setting.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/settings/definitions/contact-captcha-enabled.setting.ts",
+          "source": "src/cms/settings/definitions/contact-captcha-enabled.setting.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/settings/definitions/contact-captcha-site-key.setting.ts",
+          "source": "src/cms/settings/definitions/contact-captcha-site-key.setting.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/permissions/definitions/contact-manage-threads.capability.ts",
+          "source": "src/cms/permissions/definitions/contact-manage-threads.capability.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        }
+      ]
+    },
+    "staff": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-13T12:33:58.380Z",
+      "dependencies": [],
+      "npmDependencies": {
+        "multer": "^2.0.0",
+        "@types/multer": "^1.4.12"
+      },
+      "injections": [
+        {
+          "target": "libs/permissions/src/roles/role-capability-defaults.ts",
+          "source": "src/permissions/roles/role-capability-defaults.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/contracts/staff.contract.ts",
+          "source": "src/db/contracts/staff.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/db-provider.contract.ts",
+          "source": "src/db/contracts/db-provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/schemas/staff.schema.ts",
+          "source": "src/db/schemas/staff.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/staff.repository.ts",
+          "source": "src/db/providers/mongo/staff.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/mongo.provider.ts",
+          "source": "src/db/providers/mongo/mongo.provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/index.ts",
+          "source": "src/db/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/page-seeds/staff.page-seed.ts",
+          "source": "src/db/page-seeds/staff.page-seed.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/page-seeds/registry.ts",
+          "source": "src/db/page-seeds/registry.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-core/src/schemas/staff.schema.ts",
+          "source": "src/api-core/schemas/staff.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/staff.route.ts",
+          "source": "src/api-core/routes/staff.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/index.ts",
+          "source": "src/api-core/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-core/src/routes/staff.route.ts",
+          "source": "src/api-core/routes/staff.route.storage.ts",
+          "requires": "storage",
+          "status": "deferred",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/api/uploads/staff/.gitkeep",
+          "source": "src/apps/api/uploads/staff/.gitkeep",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/endpoints/staff.endpoints.ts",
+          "source": "src/api-client/endpoints/staff.endpoints.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/baseApi.ts",
+          "source": "src/api-client/baseApi.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-client/src/index.ts",
+          "source": "src/api-client/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "apps/web/src/pages/StaffPage.tsx",
+          "source": "src/pages/StaffPage.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/pages/pageComponents.ts",
+          "source": "src/pages/pageComponents.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/cms/src/permissions/definitions/staff-manage.capability.ts",
+          "source": "src/cms/permissions/definitions/staff-manage.capability.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/staff-admin.module.tsx",
+          "source": "src/cms/modules/staff-admin.module.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/staff/StaffAdminModule.tsx",
+          "source": "src/cms/modules/staff/StaffAdminModule.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/staff/UserPicker.tsx",
+          "source": "src/cms/modules/staff/UserPicker.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/staff/StaffEditDialog.tsx",
+          "source": "src/cms/modules/staff/StaffEditDialog.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/staff/StaffEditDialog.tsx",
+          "source": "src/cms/modules/staff/StaffEditDialog.storage.tsx",
+          "requires": "storage",
+          "status": "deferred",
+          "strategy": "overwrite"
+        }
+      ]
+    },
+    "time": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-13T12:34:02.792Z",
+      "dependencies": [],
+      "npmDependencies": {},
+      "injections": [
+        {
+          "target": "libs/permissions/src/roles/role-capability-defaults.ts",
+          "source": "src/permissions/roles/role-capability-defaults.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/contracts/time-entry.contract.ts",
+          "source": "src/db/contracts/time-entry.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/time-entry-type.contract.ts",
+          "source": "src/db/contracts/time-entry-type.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/time-settings.contract.ts",
+          "source": "src/db/contracts/time-settings.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/time-audit-log.contract.ts",
+          "source": "src/db/contracts/time-audit-log.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/db-provider.contract.ts",
+          "source": "src/db/contracts/db-provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/schemas/time-entry.schema.ts",
+          "source": "src/db/schemas/time-entry.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/schemas/time-entry-type.schema.ts",
+          "source": "src/db/schemas/time-entry-type.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/schemas/time-settings.schema.ts",
+          "source": "src/db/schemas/time-settings.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/schemas/time-audit-log.schema.ts",
+          "source": "src/db/schemas/time-audit-log.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/time-entry.repository.ts",
+          "source": "src/db/providers/mongo/time-entry.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/time-entry-type.repository.ts",
+          "source": "src/db/providers/mongo/time-entry-type.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/time-settings.repository.ts",
+          "source": "src/db/providers/mongo/time-settings.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/time-audit-log.repository.ts",
+          "source": "src/db/providers/mongo/time-audit-log.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/mongo.provider.ts",
+          "source": "src/db/providers/mongo/mongo.provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/index.ts",
+          "source": "src/db/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-core/src/routes/time/timeAccess.ts",
+          "source": "src/api-core/routes/time/timeAccess.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/time/timeSweep.ts",
+          "source": "src/api-core/routes/time/timeSweep.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/time/timeZoneMath.ts",
+          "source": "src/api-core/routes/time/timeZoneMath.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/time/timeDto.ts",
+          "source": "src/api-core/routes/time/timeDto.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/time/time-clock.route.ts",
+          "source": "src/api-core/routes/time/time-clock.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/time/time-admin.route.ts",
+          "source": "src/api-core/routes/time/time-admin.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/time/time-entry-types.route.ts",
+          "source": "src/api-core/routes/time/time-entry-types.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/time/time-settings.route.ts",
+          "source": "src/api-core/routes/time/time-settings.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/time/time-export.route.ts",
+          "source": "src/api-core/routes/time/time-export.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/schemas/time.schema.ts",
+          "source": "src/api-core/schemas/time.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/index.ts",
+          "source": "src/api-core/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-client/src/endpoints/time-clock.endpoints.ts",
+          "source": "src/api-client/endpoints/time-clock.endpoints.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/endpoints/time-admin.endpoints.ts",
+          "source": "src/api-client/endpoints/time-admin.endpoints.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/endpoints/time-entry-types.endpoints.ts",
+          "source": "src/api-client/endpoints/time-entry-types.endpoints.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/endpoints/time-settings.endpoints.ts",
+          "source": "src/api-client/endpoints/time-settings.endpoints.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/baseApi.ts",
+          "source": "src/api-client/baseApi.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-client/src/index.ts",
+          "source": "src/api-client/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/time",
+          "source": "src/time",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/app/RootRouter.tsx",
+          "source": "src/app/RootRouter.fragment.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "tsconfig.base.json",
+          "source": "src/tsconfig-paths.fragment.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "tsconfig-paths-merge",
+          "jsonPaths": {
+            "@inithium/time": [
+              "./libs/time/src/index.ts"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
