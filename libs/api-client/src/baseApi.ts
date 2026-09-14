@@ -61,6 +61,9 @@ export const baseApi = createApi({
     'TimeSettings',
     'TimeAuditLog',
 // inithium:block:time:tag-types:end
+// inithium:block:policy:tag-types:start
+    'PolicyCategory',
+// inithium:block:policy:tag-types:end
     // inithium:anchor:tag-types
   ],
   endpoints: () => ({}),

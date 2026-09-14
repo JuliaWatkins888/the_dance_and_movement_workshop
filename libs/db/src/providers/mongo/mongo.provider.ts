@@ -41,6 +41,11 @@ import { TimeEntryTypeModel } from '../../schemas/time-entry-type.schema';
 import { TimeSettingsModel } from '../../schemas/time-settings.schema';
 import { TimeAuditLogModel } from '../../schemas/time-audit-log.schema';
 // inithium:block:time:imports:end
+// inithium:block:policy:imports:start
+import { PolicyRepository } from '../../contracts/policy.contract';
+import { createMongoPolicyRepository } from './policy.repository';
+import { PolicyCategoryModel } from '../../schemas/policy.schema';
+// inithium:block:policy:imports:end
 // inithium:anchor:imports
 
 const userRepository = createMongoUserRepository(UserModel);
@@ -62,6 +67,9 @@ const timeEntryTypeRepository = createMongoTimeEntryTypeRepository(TimeEntryType
 const timeSettingsRepository = createMongoTimeSettingsRepository(TimeSettingsModel);
 const timeAuditLogRepository = createMongoTimeAuditLogRepository(TimeAuditLogModel);
 // inithium:block:time:repository-instances:end
+// inithium:block:policy:repository-instances:start
+const policyRepository = createMongoPolicyRepository(PolicyCategoryModel);
+// inithium:block:policy:repository-instances:end
 // inithium:anchor:repository-instances
 
 export const mongoProvider: DbProvider = {
@@ -97,5 +105,8 @@ export const mongoProvider: DbProvider = {
   getTimeSettingsRepository: (): TimeSettingsRepository => timeSettingsRepository,
   getTimeAuditLogRepository: (): TimeAuditLogRepository => timeAuditLogRepository,
 // inithium:block:time:members:end
+// inithium:block:policy:members:start
+  getPolicyRepository: (): PolicyRepository => policyRepository,
+// inithium:block:policy:members:end
   // inithium:anchor:members
 };

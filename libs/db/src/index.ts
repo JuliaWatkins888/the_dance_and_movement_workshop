@@ -31,6 +31,14 @@ import { CreateTimeEntryTypeInput, UpdateTimeEntryTypeInput } from './contracts/
 import { UpdateTimeSettingsInput } from './contracts/time-settings.contract';
 import { CreateTimeAuditLogInput } from './contracts/time-audit-log.contract';
 // inithium:block:time:imports:end
+// inithium:block:policy:imports:start
+import {
+  CreatePolicyCategoryInput,
+  CreatePolicyItemInput,
+  UpdatePolicyCategoryInput,
+  UpdatePolicyItemInput,
+} from './contracts/policy.contract';
+// inithium:block:policy:imports:end
 // inithium:anchor:imports
 import { activeProvider as defaultProvider } from './providers/active-provider';
 
@@ -177,6 +185,22 @@ export const listTimeAuditLogByEntryId = (entryId: string) => getTimeAuditLogRep
 export const deleteTimeAuditLogsByEntryIds = (entryIds: string[]) => getTimeAuditLogRepository().deleteByEntryIds(entryIds);
 
 // inithium:block:time:repositories:end
+// inithium:block:policy:repositories:start
+export const getPolicyRepository = () => activeProvider.getPolicyRepository();
+export const listPolicyCategories = () => getPolicyRepository().findAll();
+export const getPolicyCategoryById = (id: string) => getPolicyRepository().findCategoryById(id);
+export const createPolicyCategory = (input: CreatePolicyCategoryInput) => getPolicyRepository().createCategory(input);
+export const updatePolicyCategory = (id: string, input: UpdatePolicyCategoryInput) =>
+  getPolicyRepository().updateCategory(id, input);
+export const deletePolicyCategory = (id: string) => getPolicyRepository().deleteCategory(id);
+export const createPolicyItem = (categoryId: string, input: CreatePolicyItemInput) =>
+  getPolicyRepository().createItem(categoryId, input);
+export const updatePolicyItem = (categoryId: string, itemId: string, input: UpdatePolicyItemInput) =>
+  getPolicyRepository().updateItem(categoryId, itemId, input);
+export const deletePolicyItem = (categoryId: string, itemId: string) =>
+  getPolicyRepository().deleteItem(categoryId, itemId);
+
+// inithium:block:policy:repositories:end
 // inithium:anchor:repositories
 
 export type { DbProvider, DbConfig } from './contracts/db-provider.contract';
@@ -284,9 +308,21 @@ export type {
   TimeAuditLogRepository,
 } from './contracts/time-audit-log.contract';
 // inithium:block:time:type-exports:end
+// inithium:block:policy:type-exports:start
+export type {
+  PolicyCategoryEntity,
+  PolicyItemEntity,
+  CreatePolicyCategoryInput,
+  UpdatePolicyCategoryInput,
+  CreatePolicyItemInput,
+  UpdatePolicyItemInput,
+  PolicyRepository,
+} from './contracts/policy.contract';
+// inithium:block:policy:type-exports:end
 // inithium:anchor:type-exports
 export { ensureSeededPages } from './page-seeds/ensureSeededPages';
 export { pruneOrphanedPluginPages } from './page-seeds/pruneOrphanedPluginPages';
 export { ensureSeededSettings } from './settings-seeds/ensureSeededSettings';
 export { ensureOwnerBootstrap } from './bootstrap/ensureOwnerBootstrap';
+export { ensureSeededPolicies } from './policy-seeds/ensureSeededPolicies';
 export { mongoProvider } from './providers/mongo/mongo.provider';

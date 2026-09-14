@@ -187,6 +187,11 @@ export {
   Banner,
   Card,
   Pill,
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+  RichTextEditor,
   // inithium:anchor:components
 } from './components';
 export type {
@@ -220,6 +225,11 @@ export type {
   BannerProps,
   CardProps,
   PillProps,
+  AccordionProps,
+  AccordionItemProps,
+  AccordionTriggerProps,
+  AccordionContentProps,
+  RichTextEditorProps,
   // inithium:anchor:component-types
 } from './components';
 
@@ -233,6 +243,7 @@ export {
   useElementSize,
   ColorPicker,
   ColorSpecPicker,
+  IconPicker,
   AutoIncrementingList,
   Pagination,
   ChangePasswordDialog,
@@ -259,6 +270,7 @@ export type {
   AvatarConfigProps,
   ColorPickerProps,
   ColorSpecPickerProps,
+  IconPickerProps,
   AutoIncrementingListProps,
   PaginationProps,
   ChangePasswordDialogProps,

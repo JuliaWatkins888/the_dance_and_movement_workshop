@@ -207,4 +207,25 @@ export { timeSettingsApi, useGetTimeSettingsQuery, useUpdateTimeSettingsMutation
 export type { TimeSettingsDto, UpdateTimeSettingsInput, ArchiveTimeYearResult } from './endpoints/time-settings.endpoints';
 
 // inithium:block:time:exports:end
+// inithium:block:policy:exports:start
+export {
+  policiesApi,
+  useListPoliciesQuery,
+  useCreatePolicyCategoryMutation,
+  useUpdatePolicyCategoryMutation,
+  useDeletePolicyCategoryMutation,
+  useCreatePolicyItemMutation,
+  useUpdatePolicyItemMutation,
+  useDeletePolicyItemMutation,
+} from './endpoints/policies.endpoints';
+export type {
+  PolicyCategoryDto,
+  PolicyItemDto,
+  PolicyCategoryWriteInput,
+  UpdatePolicyCategoryInput,
+  PolicyItemWriteInput,
+  UpdatePolicyItemInput,
+} from './endpoints/policies.endpoints';
+
+// inithium:block:policy:exports:end
 // inithium:anchor:exports

@@ -1,6 +1,5 @@
 import type { CreatePageInput } from '../contracts/page.contract';
 import homePageSeed from './home.page-seed';
-import docsPageSeed from './docs.page-seed';
 import loginPageSeed from './login.page-seed';
 import signupPageSeed from './signup.page-seed';
 import privacyPolicyPageSeed from './privacy-policy.page-seed';
@@ -14,6 +13,9 @@ import contactPageSeed from './contact.page-seed';
 // inithium:block:staff:imports:start
 import staffPageSeed from './staff.page-seed';
 // inithium:block:staff:imports:end
+// inithium:block:policy:imports:start
+import policiesPageSeed from './policies.page-seed';
+// inithium:block:policy:imports:end
 // inithium:anchor:imports
 
 // Every page the app should always have a Page DB record for, reconciled once at API startup by
@@ -28,7 +30,6 @@ import staffPageSeed from './staff.page-seed';
 // directory scan.
 export const pageSeeds: CreatePageInput[] = [
   homePageSeed,
-  docsPageSeed,
   loginPageSeed,
   signupPageSeed,
   privacyPolicyPageSeed,
@@ -42,5 +43,8 @@ export const pageSeeds: CreatePageInput[] = [
 // inithium:block:staff:seeds:start
   staffPageSeed,
 // inithium:block:staff:seeds:end
+// inithium:block:policy:seeds:start
+  policiesPageSeed,
+// inithium:block:policy:seeds:end
   // inithium:anchor:seeds
 ];

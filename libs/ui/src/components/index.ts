@@ -79,4 +79,10 @@ export type { CardProps } from './Card/Card';
 export { Pill } from './Pill/Pill';
 export type { PillProps } from './Pill/Pill';
 
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion/Accordion';
+export type { AccordionProps, AccordionItemProps, AccordionTriggerProps, AccordionContentProps } from './Accordion/Accordion';
+
+export { RichTextEditor } from './RichTextEditor/RichTextEditor';
+export type { RichTextEditorProps } from './RichTextEditor/RichTextEditor';
+
 // inithium:anchor:exports
