@@ -17,6 +17,9 @@ import { TimeEntryTypeRepository } from './time-entry-type.contract';
 import { TimeSettingsRepository } from './time-settings.contract';
 import { TimeAuditLogRepository } from './time-audit-log.contract';
 // inithium:block:time:imports:end
+// inithium:block:policy:imports:start
+import { PolicyRepository } from './policy.contract';
+// inithium:block:policy:imports:end
 // inithium:anchor:imports
 
 export interface DbConfig {
@@ -48,5 +51,8 @@ export interface DbProvider {
   getTimeSettingsRepository: () => TimeSettingsRepository;
   getTimeAuditLogRepository: () => TimeAuditLogRepository;
 // inithium:block:time:members:end
+// inithium:block:policy:members:start
+  getPolicyRepository: () => PolicyRepository;
+// inithium:block:policy:members:end
   // inithium:anchor:members
 }

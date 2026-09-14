@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Checkbox,
+  IconPicker,
   Input,
   Select,
   SelectItem,
@@ -297,7 +298,7 @@ export const PageEditDialog = ({ page, onDone }: PageEditDialogProps) => {
               value={navOrder}
               onChange={(event) => setNavOrder(Number(event.target.value))}
             />
-            <Input label="Nav Icon" value={navIcon} onChange={(event) => setNavIcon(event.target.value)} />
+            <IconPicker label="Nav Icon" value={navIcon} onValueChange={setNavIcon} />
           </Box>
         </TabsContent>
 

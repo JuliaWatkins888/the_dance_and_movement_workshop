@@ -1,6 +1,5 @@
 import type { PageComponentMap } from '@inithium/ui';
 import { HomePage } from './HomePage';
-import { DocsPage } from './DocsPage';
 import { LoginPage } from './LoginPage';
 import { SignupPage } from './SignupPage';
 import { PrivacyPolicyPage } from './PrivacyPolicyPage';
@@ -14,17 +13,19 @@ import { ContactPage } from './ContactPage';
 // inithium:block:staff:imports:start
 import { StaffPage } from './StaffPage';
 // inithium:block:staff:imports:end
+// inithium:block:policy:imports:start
+import { PoliciesPage } from './PoliciesPage';
+// inithium:block:policy:imports:end
 // inithium:anchor:imports
 
 // Keyed by Page.slug, matching libs/db/src/page-seeds/registry.ts's own seeded records: home
-// ("/"), docs ("/docs"), login ("/login"), signup ("/signup"), privacy-policy
-// ("/privacy-policy"), profile ("/profile/:id"). A plugin that adds its own page(s) appends its
-// own slug(s) here via a merge-strategy injection - every entry here has a corresponding
-// page-seed reconciled by ensureSeededPages() at API boot, and must still be added here by hand
-// alongside its seed (no mechanism auto-derives this map from the seed registry).
+// ("/"), login ("/login"), signup ("/signup"), privacy-policy ("/privacy-policy"), profile
+// ("/profile/:id"). A plugin that adds its own page(s) appends its own slug(s) here via a
+// merge-strategy injection - every entry here has a corresponding page-seed reconciled by
+// ensureSeededPages() at API boot, and must still be added here by hand alongside its seed (no
+// mechanism auto-derives this map from the seed registry).
 export const pageComponents: PageComponentMap = {
   home: HomePage,
-  docs: DocsPage,
   login: LoginPage,
   signup: SignupPage,
   'privacy-policy': PrivacyPolicyPage,
@@ -38,5 +39,8 @@ export const pageComponents: PageComponentMap = {
 // inithium:block:staff:components:start
   staff: StaffPage,
 // inithium:block:staff:components:end
+// inithium:block:policy:components:start
+  policies: PoliciesPage,
+// inithium:block:policy:components:end
   // inithium:anchor:components
 };

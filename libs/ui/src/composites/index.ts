@@ -24,6 +24,9 @@ export type { ColorPickerProps } from './ColorPicker';
 export { ColorSpecPicker } from './ColorSpecPicker';
 export type { ColorSpecPickerProps } from './ColorSpecPicker';
 
+export { IconPicker } from './IconPicker';
+export type { IconPickerProps } from './IconPicker';
+
 export { AutoIncrementingList } from './AutoIncrementingList';
 export type { AutoIncrementingListProps } from './AutoIncrementingList';
 

@@ -1,7 +1,14 @@
 import dns from 'node:dns';
 import express from 'express';
 import cors from 'cors';
-import { connectDatabase, ensureOwnerBootstrap, ensureSeededPages, ensureSeededSettings, pruneOrphanedPluginPages } from '@inithium/db';
+import {
+  connectDatabase,
+  ensureOwnerBootstrap,
+  ensureSeededPages,
+  ensureSeededPolicies,
+  ensureSeededSettings,
+  pruneOrphanedPluginPages,
+} from '@inithium/db';
 import { getAuthProvider } from '@inithium/auth';
 import { registerCoreRoutes } from '@inithium/api-core';
 import { errorHandler } from '@inithium/api-utils';
@@ -47,6 +54,11 @@ const startServer = async () => {
     // migration path for a workspace upgrading into capability-based permissions with
     // pre-existing users that predate the isOwner field.
     await ensureOwnerBootstrap();
+    // One-time content seed for the Policies plugin - only ever inserts anything on a database
+    // that has zero policy categories (a brand-new instance, or one from before this plugin was
+    // added); see ensureSeededPolicies's own comment for why this doesn't need
+    // ensureSeededPages's per-slug reconcile loop.
+    await ensureSeededPolicies();
 
     getAuthProvider().assertConfigured?.();
     registerCoreRoutes(app);

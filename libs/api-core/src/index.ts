@@ -24,6 +24,9 @@ import timeEntryTypesRouter from './routes/time/time-entry-types.route';
 import timeSettingsRouter from './routes/time/time-settings.route';
 import timeExportRouter from './routes/time/time-export.route';
 // inithium:block:time:imports:end
+// inithium:block:policy:imports:start
+import policyRouter from './routes/policy.route';
+// inithium:block:policy:imports:end
 // inithium:anchor:imports
 
 export const registerCoreRoutes = (app: Express): void => {
@@ -52,6 +55,9 @@ export const registerCoreRoutes = (app: Express): void => {
   app.use(timeSettingsRouter);
   app.use(timeExportRouter);
 // inithium:block:time:routes:end
+// inithium:block:policy:routes:start
+  app.use(policyRouter);
+// inithium:block:policy:routes:end
   // inithium:anchor:routes
   console.log('✅ Core routes registered');
 };

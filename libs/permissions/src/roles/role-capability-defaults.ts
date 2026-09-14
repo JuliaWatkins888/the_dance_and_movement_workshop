@@ -17,6 +17,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:time:contributor:start
   'time:track',
 // inithium:block:time:contributor:end
+// inithium:block:policy:contributor:start
+  'policies:manage',
+// inithium:block:policy:contributor:end
     // inithium:anchor:contributor
   ],
   editor: [
@@ -35,6 +38,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:time:editor:start
   'time:track',
 // inithium:block:time:editor:end
+// inithium:block:policy:editor:start
+  'policies:manage',
+// inithium:block:policy:editor:end
     // inithium:anchor:editor
   ],
   // users:managePermissions is deliberately absent even from admin - granting the ability to
@@ -60,6 +66,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
   'time:track',
   'time:manage',
 // inithium:block:time:admin:end
+// inithium:block:policy:admin:start
+  'policies:manage',
+// inithium:block:policy:admin:end
     // inithium:anchor:admin
   ],
 };
