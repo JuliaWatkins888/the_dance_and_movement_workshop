@@ -31,7 +31,7 @@ import { useOpenChangePasswordDialog } from '../pages/profile/openChangePassword
 
 // Kept in one place and passed to both Navbar (`height`) and PageShell (`navbarHeight`) so the
 // two composites' sizing always stays in sync.
-const NAVBAR_HEIGHT = 64;
+const NAVBAR_HEIGHT = 72;
 
 // Routing here is entirely data-driven: react-router-dom only supplies history/location, not
 // <Route> elements — every path change re-resolves the current Page record from the backend
@@ -42,6 +42,10 @@ export function App() {
   const navigate = useNavigateWithTransition();
 
   const { data: page, isLoading: isPageLoading } = useGetPageByRouteQuery({ route });
+  // Home renders its own title above the intro paragraph (see HomePage) - showing the site name
+  // a second time in the Navbar right above it would just repeat the same brand name twice on
+  // the one page that already leads with it.
+  const isHomePage = location.pathname === '/';
   const { data: primaryNavPages = [], isLoading: isPrimaryNavLoading } = useGetNavPagesQuery('primary-nav');
   const { data: profileNavPages = [], isLoading: isProfileNavLoading } = useGetNavPagesQuery('profile-nav');
   const { data: primaryFooterPages = [], isLoading: isPrimaryFooterLoading } = useGetNavPagesQuery('primary-footer');
@@ -138,12 +142,12 @@ export function App() {
             onLogout={logout}
             // inithium:anchor:navbar-props
             logo={{ src: '/logo.webp', alt: appName }}
-            title={appName}
+            title={isHomePage ? undefined : appName}
             height={NAVBAR_HEIGHT}
           />
 
           {isPageLoading ? (
-            <Box padding={{ base: 16 }} bgColor={{ color: 'surface', intensity: 100 }} style={{ minHeight: 'calc(100vh - 64px)' }} flex={{ justify: 'center', align: 'center' }}>
+            <Box padding={{ base: 16 }} bgColor={{ color: 'surface', intensity: 100 }} style={{ minHeight: `calc(100vh - ${NAVBAR_HEIGHT}px)` }} flex={{ justify: 'center', align: 'center' }}>
               <Loader variant="spinner" color={{ color: 'primary', intensity: 500 }} />
             </Box>
           ) : page ? (

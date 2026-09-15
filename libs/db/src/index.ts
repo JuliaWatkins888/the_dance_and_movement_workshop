@@ -39,6 +39,9 @@ import {
   UpdatePolicyItemInput,
 } from './contracts/policy.contract';
 // inithium:block:policy:imports:end
+// inithium:block:classes:imports:start
+import { CreateClassInput, FindManyClassesOptions, UpdateClassInput } from './contracts/class.contract';
+// inithium:block:classes:imports:end
 // inithium:anchor:imports
 import { activeProvider as defaultProvider } from './providers/active-provider';
 
@@ -201,6 +204,15 @@ export const deletePolicyItem = (categoryId: string, itemId: string) =>
   getPolicyRepository().deleteItem(categoryId, itemId);
 
 // inithium:block:policy:repositories:end
+// inithium:block:classes:repositories:start
+export const getClassRepository = () => activeProvider.getClassRepository();
+export const listClasses = (options: FindManyClassesOptions) => getClassRepository().findMany(options);
+export const listPublishedClasses = () => getClassRepository().findPublished();
+export const createClass = (input: CreateClassInput) => getClassRepository().create(input);
+export const updateClass = (id: string, input: UpdateClassInput) => getClassRepository().update(id, input);
+export const deleteClass = (id: string) => getClassRepository().delete(id);
+
+// inithium:block:classes:repositories:end
 // inithium:anchor:repositories
 
 export type { DbProvider, DbConfig } from './contracts/db-provider.contract';
@@ -319,6 +331,18 @@ export type {
   PolicyRepository,
 } from './contracts/policy.contract';
 // inithium:block:policy:type-exports:end
+// inithium:block:classes:type-exports:start
+export { DAYS_OF_WEEK } from './contracts/class.contract';
+export type {
+  ClassEntity,
+  CreateClassInput,
+  UpdateClassInput,
+  DayOfWeek,
+  ClassSearchField,
+  FindManyClassesOptions,
+  ClassRepository,
+} from './contracts/class.contract';
+// inithium:block:classes:type-exports:end
 // inithium:anchor:type-exports
 export { ensureSeededPages } from './page-seeds/ensureSeededPages';
 export { pruneOrphanedPluginPages } from './page-seeds/pruneOrphanedPluginPages';

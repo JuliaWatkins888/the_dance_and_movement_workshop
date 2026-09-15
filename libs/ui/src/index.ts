@@ -155,6 +155,7 @@ export type { DrawerRecord, DrawerContent, DrawerRenderContext, ShowDrawerOption
 
 export {
   Text,
+  AmpersandText,
   Box,
   AnimateBox,
   Button,
@@ -196,6 +197,7 @@ export {
 } from './components';
 export type {
   TextProps,
+  AmpersandTextProps,
   BoxProps,
   AnimateBoxProps,
   ButtonProps,

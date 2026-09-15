@@ -16,6 +16,13 @@ const NEUTRAL_TEXT_COLOR: ColorSpec = { color: 'slate', intensity: 500 };
 // below (e.g. destructive confirm buttons) - carved out ahead of that fallback rather than
 // replacing it, so every other raw color/intensity combination keeps today's slate-500 text.
 const RED_500_TEXT_COLOR: ColorSpec = { color: 'slate', intensity: 100 };
+// Every filled "primary" button (the site's main call-to-action color, used for Login/Signup
+// submit, every CMS Save button, Pagination, Navbar login, ...) gets a fixed near-white
+// surface-100 label rather than following the general primary-foreground pairing below - a
+// deliberate, explicit choice for this one color so its contrast never depends on how
+// primary-foreground happens to be themed. Carved out ahead of the semantic-token branch, same
+// precedent as RED_500_TEXT_COLOR above.
+const PRIMARY_TEXT_COLOR: ColorSpec = { color: 'surface', intensity: 100 };
 
 const STANDARD_PADDING: SpacingProp = { top: 5, right: 15, bottom: 5, left: 15 };
 const LINK_PADDING: SpacingProp = { top: 4, bottom: 4 };
@@ -49,11 +56,14 @@ export const resolveButtonVariant = (spec: ButtonVariantSpec | undefined): Butto
       // for legible text; raw palette colors (red, emerald, ...) have no such pairing, so
       // they fall back to a fixed light neutral instead of guessing a contrasting shade -
       // except red at its default intensity (500), which gets its own lighter override above.
-      const textColor: ColorSpec = isSemanticColorToken(color)
-        ? { color: `${color}-foreground`, intensity, opacity }
-        : color === 'red' && intensity === DEFAULT_INTENSITY
-          ? RED_500_TEXT_COLOR
-          : NEUTRAL_TEXT_COLOR;
+      const textColor: ColorSpec =
+        color === 'primary'
+          ? PRIMARY_TEXT_COLOR
+          : isSemanticColorToken(color)
+            ? { color: `${color}-foreground`, intensity, opacity }
+            : color === 'red' && intensity === DEFAULT_INTENSITY
+              ? RED_500_TEXT_COLOR
+              : NEUTRAL_TEXT_COLOR;
 
       return {
         bgColor: colorSpec,

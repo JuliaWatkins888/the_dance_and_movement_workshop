@@ -20,6 +20,9 @@ import { TimeAuditLogRepository } from './time-audit-log.contract';
 // inithium:block:policy:imports:start
 import { PolicyRepository } from './policy.contract';
 // inithium:block:policy:imports:end
+// inithium:block:classes:imports:start
+import { ClassRepository } from './class.contract';
+// inithium:block:classes:imports:end
 // inithium:anchor:imports
 
 export interface DbConfig {
@@ -54,5 +57,8 @@ export interface DbProvider {
 // inithium:block:policy:members:start
   getPolicyRepository: () => PolicyRepository;
 // inithium:block:policy:members:end
+// inithium:block:classes:members:start
+  getClassRepository: () => ClassRepository;
+// inithium:block:classes:members:end
   // inithium:anchor:members
 }

@@ -22,7 +22,7 @@ export interface PageShellProps {
   readonly className?: string;
 }
 
-const DEFAULT_NAVBAR_HEIGHT = 64;
+const DEFAULT_NAVBAR_HEIGHT = 72;
 const DEFAULT_ENTRANCE: EntranceAnim = 'animate__fadeIn';
 const DEFAULT_EXIT: ExitAnim = 'animate__fadeOut';
 
