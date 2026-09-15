@@ -23,6 +23,9 @@ import { PolicyRepository } from './policy.contract';
 // inithium:block:classes:imports:start
 import { ClassRepository } from './class.contract';
 // inithium:block:classes:imports:end
+// inithium:block:children:imports:start
+import { ChildRepository } from './child.contract';
+// inithium:block:children:imports:end
 // inithium:anchor:imports
 
 export interface DbConfig {
@@ -60,5 +63,8 @@ export interface DbProvider {
 // inithium:block:classes:members:start
   getClassRepository: () => ClassRepository;
 // inithium:block:classes:members:end
+// inithium:block:children:members:start
+  getChildRepository: () => ChildRepository;
+// inithium:block:children:members:end
   // inithium:anchor:members
 }

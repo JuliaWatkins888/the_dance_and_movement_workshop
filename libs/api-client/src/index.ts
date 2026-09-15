@@ -246,4 +246,27 @@ export type {
 } from './endpoints/classes.endpoints';
 
 // inithium:block:classes:exports:end
+// inithium:block:children:exports:start
+export {
+  childrenApi,
+  useListMyChildrenQuery,
+  useListChildrenAdminQuery,
+  useListChildParentCandidatesQuery,
+  useGetChildQuery,
+  useCreateChildMutation,
+  useUpdateChildMutation,
+  useDeleteChildMutation,
+  useGetChildrenCreatedOverTimeQuery,
+} from './endpoints/children.endpoints';
+export type {
+  ChildDto,
+  ChildParentCandidate,
+  ListChildrenAdminParams,
+  ListChildrenResult,
+  ChildWriteInput,
+  UpdateChildInput,
+  ChildAccountCount,
+} from './endpoints/children.endpoints';
+
+// inithium:block:children:exports:end
 // inithium:anchor:exports
