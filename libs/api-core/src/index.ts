@@ -33,6 +33,12 @@ import classesRouter from './routes/classes.route';
 // inithium:block:children:imports:start
 import childrenRouter from './routes/children.route';
 // inithium:block:children:imports:end
+// inithium:block:studio-offerings:imports:start
+import semestersRouter from './routes/semesters.route';
+import coursesRouter from './routes/courses.route';
+import workshopsRouter from './routes/workshops.route';
+import studioOfferingsRouter from './routes/studio-offerings.route';
+// inithium:block:studio-offerings:imports:end
 // inithium:anchor:imports
 
 export const registerCoreRoutes = (app: Express): void => {
@@ -70,6 +76,12 @@ export const registerCoreRoutes = (app: Express): void => {
 // inithium:block:children:routes:start
   app.use(childrenRouter);
 // inithium:block:children:routes:end
+// inithium:block:studio-offerings:routes:start
+  app.use(semestersRouter);
+  app.use(coursesRouter);
+  app.use(workshopsRouter);
+  app.use(studioOfferingsRouter);
+// inithium:block:studio-offerings:routes:end
   // inithium:anchor:routes
   console.log('✅ Core routes registered');
 };

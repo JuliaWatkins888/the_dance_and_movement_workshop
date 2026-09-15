@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import type { KeyboardEvent } from 'react';
-import { Box, Button, Input, Pill, Switch, Text, Textarea } from '@inithium/ui';
+import { Box, Button, Input, Switch, Text } from '@inithium/ui';
 import { useCreateClassMutation, useUpdateClassMutation } from '@inithium/api-client';
-import type { ClassDto, ClassWriteInput } from '@inithium/api-client';
+import type { ClassDto, ClassWriteInput, InstructorCandidate } from '@inithium/api-client';
 import type { DayOfWeek } from '@inithium/db';
+import { SemesterPicker } from './SemesterPicker';
+import { CoursePicker } from './CoursePicker';
+import { InstructorPicker } from './InstructorPicker';
 
 export interface ClassEditDialogProps {
   readonly mode: 'create' | 'edit';
@@ -18,86 +20,13 @@ const ALL_DAYS: DayOfWeek[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fr
 
 const toDateInputValue = (iso?: string): string => (iso ? iso.slice(0, 10) : '');
 
-interface TagListFieldProps {
-  readonly label: string;
-  readonly values: string[];
-  readonly onChange: (values: string[]) => void;
-  readonly placeholder?: string;
-}
-
-// A small local tag input (type + Enter/comma to add, click the x to remove) - categories and
-// instructors are open-ended lists with no fixed vocabulary (Jackrabbit's own export models up
-// to 3 free-text categories per class), so a fixed Select doesn't fit; this is intentionally
-// local to this dialog rather than a new @inithium/ui composite, the same "local until a second
-// consumer needs it" precedent StaffEditDialog's own PhotoSourceField follows.
-const TagListField = ({ label, values, onChange, placeholder }: TagListFieldProps) => {
-  const [draft, setDraft] = useState('');
-
-  const commitDraft = () => {
-    const trimmed = draft.trim();
-    setDraft('');
-    if (!trimmed || values.includes(trimmed)) return;
-    onChange([...values, trimmed]);
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' || event.key === ',') {
-      event.preventDefault();
-      commitDraft();
-    }
-  };
-
-  const removeTag = (tag: string) => onChange(values.filter((value) => value !== tag));
-
-  return (
-    <Box flex={{ direction: 'col', gap: 8 }} className="flex-1">
-      <Text as="span" textColor={{ color: 'surface', intensity: 900 }} className="text-sm font-medium">
-        {label}
-      </Text>
-      <Box flex={{ direction: 'row', gap: 8, align: 'center' }}>
-        <Input
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={commitDraft}
-          placeholder={placeholder}
-          className="flex-1"
-        />
-        <Button type="button" variant={{ kind: 'outlined', color: 'primary' }} onClick={commitDraft}>
-          Add
-        </Button>
-      </Box>
-      {values.length > 0 ? (
-        <Box flex={{ direction: 'row', gap: 6 }} className="flex-wrap">
-          {values.map((value) => (
-            <Pill key={value} color={{ color: 'surface', intensity: 200 }}>
-              <span className="inline-flex items-center gap-1.5">
-                {value}
-                <button
-                  type="button"
-                  onClick={() => removeTag(value)}
-                  aria-label={`Remove ${value}`}
-                  className="text-surface-500 hover:text-red-600"
-                >
-                  ×
-                </button>
-              </span>
-            </Pill>
-          ))}
-        </Box>
-      ) : null}
-    </Box>
-  );
-};
-
 interface DaysOfWeekFieldProps {
   readonly values: DayOfWeek[];
   readonly onChange: (values: DayOfWeek[]) => void;
 }
 
 const DaysOfWeekField = ({ values, onChange }: DaysOfWeekFieldProps) => {
-  const toggleDay = (day: DayOfWeek) =>
-    onChange(values.includes(day) ? values.filter((value) => value !== day) : [...values, day]);
+  const toggleDay = (day: DayOfWeek) => onChange(values.includes(day) ? values.filter((value) => value !== day) : [...values, day]);
 
   return (
     <Box flex={{ direction: 'col', gap: 8 }}>
@@ -124,20 +53,22 @@ const DaysOfWeekField = ({ values, onChange }: DaysOfWeekFieldProps) => {
   );
 };
 
+// Cascading Semester -> Course choice: the dialog holds both, but only courseId is ever part of
+// the submit payload - semesterId exists purely to scope which Courses CoursePicker offers (a
+// Class's semester is always whatever its chosen Course's own semester is, resolved server-side).
 export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogProps) => {
   const [createClass, { isLoading: isCreating }] = useCreateClassMutation();
   const [updateClass, { isLoading: isUpdating }] = useUpdateClassMutation();
   const isLoading = isCreating || isUpdating;
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
 
-  const [name, setName] = useState(initialClass?.name ?? '');
-  const [description, setDescription] = useState(initialClass?.description ?? '');
-  const [categories, setCategories] = useState<string[]>(initialClass?.categories ?? []);
-  const [instructors, setInstructors] = useState<string[]>(initialClass?.instructors ?? []);
+  const [semesterId, setSemesterId] = useState(initialClass?.semesterId ?? '');
+  const [courseId, setCourseId] = useState(initialClass?.courseId ?? '');
+  const [variantLabel, setVariantLabel] = useState(initialClass?.variantLabel ?? '');
+  const [instructors, setInstructors] = useState<InstructorCandidate[]>(initialClass?.instructors ?? []);
   const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>(initialClass?.daysOfWeek ?? []);
   const [startTime, setStartTime] = useState(initialClass?.startTime ?? '');
   const [endTime, setEndTime] = useState(initialClass?.endTime ?? '');
-  const [session, setSession] = useState(initialClass?.session ?? '');
   const [registrationStartDate, setRegistrationStartDate] = useState(toDateInputValue(initialClass?.registrationStartDate));
   const [startDate, setStartDate] = useState(toDateInputValue(initialClass?.startDate));
   const [endDate, setEndDate] = useState(toDateInputValue(initialClass?.endDate));
@@ -149,15 +80,16 @@ export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogP
   const [enrolled, setEnrolled] = useState(String(initialClass?.enrolled ?? 0));
   const [isPublished, setIsPublished] = useState(initialClass?.isPublished ?? true);
 
+  const handleSemesterChange = (nextSemesterId: string) => {
+    setSemesterId(nextSemesterId);
+    setCourseId('');
+  };
+
   const handleSubmit = async () => {
     setSubmitError(undefined);
 
-    if (!name.trim()) {
-      setSubmitError('Name is required.');
-      return;
-    }
-    if (categories.length === 0) {
-      setSubmitError('Add at least one category.');
+    if (!courseId) {
+      setSubmitError('Choose a semester and course.');
       return;
     }
     if (daysOfWeek.length === 0) {
@@ -173,14 +105,12 @@ export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogP
     const parsedMaxAge = maxAgeYears.trim() ? Number(maxAgeYears) : undefined;
 
     const commonFields: ClassWriteInput = {
-      name: name.trim(),
-      description: description.trim() || undefined,
-      categories,
-      instructors,
+      courseId,
+      variantLabel: variantLabel.trim() || undefined,
+      instructorIds: instructors.map((instructor) => instructor.id),
       daysOfWeek,
       startTime,
       endTime,
-      session: session.trim(),
       registrationStartDate: registrationStartDate || undefined,
       startDate,
       endDate,
@@ -207,39 +137,37 @@ export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogP
 
   return (
     <Box flex={{ direction: 'col', gap: 16 }}>
-      <Input label="Class Name" required value={name} onChange={(event) => setName(event.target.value)} />
+      <Box flex={{ direction: 'row', gap: 16 }}>
+        <Box className="flex-1">
+          <SemesterPicker value={semesterId} onValueChange={handleSemesterChange} />
+        </Box>
+        <Box className="flex-1">
+          <CoursePicker semesterId={semesterId} value={courseId} onValueChange={setCourseId} />
+        </Box>
+      </Box>
 
-      <Textarea
-        label="Description"
-        value={description}
-        onChange={(event) => setDescription(event.target.value)}
-        rows={4}
+      <Input
+        label="Variant Label"
+        placeholder="e.g. Tuesdays & Thursdays, Ages 7-10"
+        helperText="Shown alongside the course name to tell this section apart from others."
+        value={variantLabel}
+        onChange={(event) => setVariantLabel(event.target.value)}
       />
 
-      <Box flex={{ direction: 'row', gap: 16 }}>
-        <TagListField label="Categories *" values={categories} onChange={setCategories} placeholder="e.g. Ballet" />
-        <TagListField label="Instructors" values={instructors} onChange={setInstructors} placeholder="e.g. Lila Hodgin" />
-      </Box>
+      <InstructorPicker selected={instructors} onChange={setInstructors} />
 
       <DaysOfWeekField values={daysOfWeek} onChange={setDaysOfWeek} />
 
       <Box flex={{ direction: 'row', gap: 12 }}>
         <Input label="Start Time" type="time" required value={startTime} onChange={(event) => setStartTime(event.target.value)} className="flex-1" />
         <Input label="End Time" type="time" required value={endTime} onChange={(event) => setEndTime(event.target.value)} className="flex-1" />
-        <Input
-          label="Session"
-          required
-          placeholder="e.g. Fall 2026"
-          value={session}
-          onChange={(event) => setSession(event.target.value)}
-          className="flex-1"
-        />
       </Box>
 
       <Box flex={{ direction: 'row', gap: 12 }}>
         <Input
           label="Registration Opens"
           type="date"
+          helperText="Leave blank to use the semester's default."
           value={registrationStartDate}
           onChange={(event) => setRegistrationStartDate(event.target.value)}
           className="flex-1"
@@ -249,42 +177,13 @@ export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogP
       </Box>
 
       <Box flex={{ direction: 'row', gap: 12 }}>
-        <Input
-          label="Min Age (years)"
-          type="number"
-          min={0}
-          value={minAgeYears}
-          onChange={(event) => setMinAgeYears(event.target.value)}
-          className="flex-1"
-        />
-        <Input
-          label="Max Age (years)"
-          type="number"
-          min={0}
-          value={maxAgeYears}
-          onChange={(event) => setMaxAgeYears(event.target.value)}
-          className="flex-1"
-        />
+        <Input label="Min Age (years)" type="number" min={0} value={minAgeYears} onChange={(event) => setMinAgeYears(event.target.value)} className="flex-1" />
+        <Input label="Max Age (years)" type="number" min={0} value={maxAgeYears} onChange={(event) => setMaxAgeYears(event.target.value)} className="flex-1" />
       </Box>
 
       <Box flex={{ direction: 'row', gap: 12 }}>
-        <Input
-          label="Price"
-          type="number"
-          min={0}
-          step="0.01"
-          required
-          value={priceAmount}
-          onChange={(event) => setPriceAmount(event.target.value)}
-          className="flex-1"
-        />
-        <Input
-          label="Billing Cycle"
-          placeholder="e.g. Monthly"
-          value={billingCycle}
-          onChange={(event) => setBillingCycle(event.target.value)}
-          className="flex-1"
-        />
+        <Input label="Price" type="number" min={0} step="0.01" required value={priceAmount} onChange={(event) => setPriceAmount(event.target.value)} className="flex-1" />
+        <Input label="Billing Cycle" placeholder="e.g. Monthly" value={billingCycle} onChange={(event) => setBillingCycle(event.target.value)} className="flex-1" />
       </Box>
 
       <Box flex={{ direction: 'row', gap: 12 }}>
@@ -300,7 +199,7 @@ export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogP
         />
       </Box>
 
-      <Switch label="Published (visible on the public Classes page)" checked={isPublished} onCheckedChange={setIsPublished} />
+      <Switch label="Published (visible on the public site)" checked={isPublished} onCheckedChange={setIsPublished} />
 
       {submitError ? (
         <Text as="p" textColor={{ color: 'red', intensity: 600 }} className="text-sm">

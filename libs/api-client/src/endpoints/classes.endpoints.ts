@@ -2,20 +2,27 @@ import type { ApiResponse } from '@inithium/api-utils';
 import type { ClassSearchField, DayOfWeek } from '@inithium/db';
 import { baseApi } from '../baseApi';
 
-// Frontend-facing shape - dates cross the HTTP boundary as ISO strings, mirroring every other
-// plugin's own Dto precedent (see StaffMemberDto/PolicyCategoryDto). `openings` is computed
-// server-side (classes.route.ts's toClassDto) from capacity/enrolled so every consumer reads the
-// same derived value rather than re-deriving it.
-export interface ClassDto {
+// Resolved server-side (classes.route.ts's toClassDto) from instructorIds via Staff -> User -
+// arrives display-ready, the same precedent StaffMemberDto's firstName/lastName already follows.
+export interface ClassInstructorSummary {
   id: string;
   name: string;
-  description?: string;
-  categories: string[];
-  instructors: string[];
+  photoUrl?: string;
+}
+
+// Frontend-facing shape - dates cross the HTTP boundary as ISO strings, mirroring every other
+// plugin's own Dto precedent. courseName/courseDescription/semesterId/semesterName are resolved
+// server-side via the 2-hop courseId -> Course -> semesterId -> Semester chain (see
+// classes.route.ts's own comment on why that resolution is 2 hops deep). `openings` is computed
+// server-side from capacity/enrolled so every consumer reads the same derived value.
+export interface ClassDto {
+  id: string;
+  courseId: string;
+  variantLabel?: string;
+  instructorIds: string[];
   daysOfWeek: DayOfWeek[];
   startTime: string;
   endTime: string;
-  session: string;
   registrationStartDate?: string;
   startDate: string;
   endDate: string;
@@ -29,6 +36,15 @@ export interface ClassDto {
   isPublished: boolean;
   createdAt: string;
   updatedAt: string;
+  courseName: string;
+  courseDescription?: string;
+  semesterId: string;
+  semesterName: string;
+  instructors: ClassInstructorSummary[];
+}
+
+export interface ListPublicClassesParams {
+  courseId?: string;
 }
 
 export interface ListClassesAdminParams {
@@ -36,6 +52,7 @@ export interface ListClassesAdminParams {
   pageSize: number;
   search?: string;
   searchField?: ClassSearchField;
+  courseId?: string;
 }
 
 export interface ListClassesResult {
@@ -47,14 +64,12 @@ export interface ListClassesResult {
 }
 
 export interface ClassWriteInput {
-  name: string;
-  description?: string;
-  categories: string[];
-  instructors: string[];
+  courseId: string;
+  variantLabel?: string;
+  instructorIds: string[];
   daysOfWeek: DayOfWeek[];
   startTime: string;
   endTime: string;
-  session: string;
   registrationStartDate?: string;
   startDate: string;
   endDate: string;
@@ -79,18 +94,22 @@ const buildListResult = (response: ApiResponse<ClassDto[]>): ListClassesResult =
 
 export const classesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Unpaged - the public ClassesPage fetches the whole published catalog once and does
-    // search/filter/pagination client-side, mirroring policiesApi.listPolicies.
-    listPublicClasses: builder.query<ClassDto[], void>({
-      query: () => '/api/classes',
+    // Unpaged - the public Course Detail page fetches one Course's variants (via ?courseId=) and
+    // does no further pagination, mirroring policiesApi.listPolicies' "small catalog" precedent.
+    listPublicClasses: builder.query<ClassDto[], ListPublicClassesParams | void>({
+      query: (params) => {
+        const query = params?.courseId ? `?${new URLSearchParams({ courseId: params.courseId })}` : '';
+        return `/api/classes${query}`;
+      },
       transformResponse: (response: ApiResponse<ClassDto[]>) => response.data,
       providesTags: ['Class'],
     }),
     listClassesAdmin: builder.query<ListClassesResult, ListClassesAdminParams>({
-      query: ({ page, pageSize, search, searchField }) => {
+      query: ({ page, pageSize, search, searchField, courseId }) => {
         const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
         if (search) params.set('search', search);
         if (searchField) params.set('searchField', searchField);
+        if (courseId) params.set('courseId', courseId);
         return `/api/classes/admin?${params.toString()}`;
       },
       transformResponse: buildListResult,

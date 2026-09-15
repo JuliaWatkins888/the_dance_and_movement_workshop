@@ -39,6 +39,7 @@ export const CmsShell = ({ currentUser, onLogout }: CmsShellProps) => {
                 <Route path="/cms" element={<Navigate to={`/cms/${firstModuleId}`} replace />} />
               ) : null}
               <Route path="/cms/:moduleId" element={<ModuleRenderer />} />
+              <Route path="/cms/:moduleId/:childId" element={<ModuleRenderer />} />
             </Routes>
           </Box>
         </Box>

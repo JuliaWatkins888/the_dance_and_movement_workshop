@@ -40,11 +40,16 @@ import {
 } from './contracts/policy.contract';
 // inithium:block:policy:imports:end
 // inithium:block:classes:imports:start
-import { CreateClassInput, FindManyClassesOptions, UpdateClassInput } from './contracts/class.contract';
+import { CreateClassInput, FindManyClassesOptions, FindPublishedClassesOptions, UpdateClassInput } from './contracts/class.contract';
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import { CreateChildInput, FindManyChildrenOptions, UpdateChildInput } from './contracts/child.contract';
 // inithium:block:children:imports:end
+// inithium:block:studio-offerings:imports:start
+import { CreateSemesterInput, FindManySemestersOptions, UpdateSemesterInput } from './contracts/semester.contract';
+import { CreateCourseInput, FindManyCoursesOptions, UpdateCourseInput } from './contracts/course.contract';
+import { CreateWorkshopInput, FindManyWorkshopsOptions, UpdateWorkshopInput } from './contracts/workshop.contract';
+// inithium:block:studio-offerings:imports:end
 // inithium:anchor:imports
 import { activeProvider as defaultProvider } from './providers/active-provider';
 
@@ -210,10 +215,12 @@ export const deletePolicyItem = (categoryId: string, itemId: string) =>
 // inithium:block:classes:repositories:start
 export const getClassRepository = () => activeProvider.getClassRepository();
 export const listClasses = (options: FindManyClassesOptions) => getClassRepository().findMany(options);
-export const listPublishedClasses = () => getClassRepository().findPublished();
+export const listPublishedClasses = (options?: FindPublishedClassesOptions) => getClassRepository().findPublished(options);
 export const createClass = (input: CreateClassInput) => getClassRepository().create(input);
 export const updateClass = (id: string, input: UpdateClassInput) => getClassRepository().update(id, input);
 export const deleteClass = (id: string) => getClassRepository().delete(id);
+export const countClassesByCourseId = (courseId: string) => getClassRepository().countByCourseId(courseId);
+export const countClassesByCourseIds = (courseIds: string[]) => getClassRepository().countByCourseIds(courseIds);
 
 // inithium:block:classes:repositories:end
 // inithium:block:children:repositories:start
@@ -227,6 +234,32 @@ export const deleteChild = (id: string) => getChildRepository().delete(id);
 export const getChildrenCreatedByDay = () => getChildRepository().countCreatedByDay();
 
 // inithium:block:children:repositories:end
+// inithium:block:studio-offerings:repositories:start
+export const getSemesterRepository = () => activeProvider.getSemesterRepository();
+export const listSemesters = (options: FindManySemestersOptions) => getSemesterRepository().findMany(options);
+export const getSemesterById = (id: string) => getSemesterRepository().findById(id);
+export const createSemester = (input: CreateSemesterInput) => getSemesterRepository().create(input);
+export const updateSemester = (id: string, input: UpdateSemesterInput) => getSemesterRepository().update(id, input);
+export const deleteSemester = (id: string) => getSemesterRepository().delete(id);
+
+export const getCourseRepository = () => activeProvider.getCourseRepository();
+export const listCourses = (options: FindManyCoursesOptions) => getCourseRepository().findMany(options);
+export const listPublishedCourses = () => getCourseRepository().findPublished();
+export const getCourseById = (id: string) => getCourseRepository().findById(id);
+export const createCourse = (input: CreateCourseInput) => getCourseRepository().create(input);
+export const updateCourse = (id: string, input: UpdateCourseInput) => getCourseRepository().update(id, input);
+export const deleteCourse = (id: string) => getCourseRepository().delete(id);
+export const countCoursesBySemesterId = (semesterId: string) => getCourseRepository().countBySemesterId(semesterId);
+
+export const getWorkshopRepository = () => activeProvider.getWorkshopRepository();
+export const listWorkshops = (options: FindManyWorkshopsOptions) => getWorkshopRepository().findMany(options);
+export const listPublishedWorkshops = () => getWorkshopRepository().findPublished();
+export const createWorkshop = (input: CreateWorkshopInput) => getWorkshopRepository().create(input);
+export const updateWorkshop = (id: string, input: UpdateWorkshopInput) => getWorkshopRepository().update(id, input);
+export const deleteWorkshop = (id: string) => getWorkshopRepository().delete(id);
+export const countWorkshopsBySemesterId = (semesterId: string) => getWorkshopRepository().countBySemesterId(semesterId);
+
+// inithium:block:studio-offerings:repositories:end
 // inithium:anchor:repositories
 
 export type { DbProvider, DbConfig } from './contracts/db-provider.contract';
@@ -354,6 +387,7 @@ export type {
   DayOfWeek,
   ClassSearchField,
   FindManyClassesOptions,
+  FindPublishedClassesOptions,
   ClassRepository,
 } from './contracts/class.contract';
 // inithium:block:classes:type-exports:end
@@ -371,6 +405,36 @@ export type {
   ChildRepository,
 } from './contracts/child.contract';
 // inithium:block:children:type-exports:end
+// inithium:block:studio-offerings:type-exports:start
+export type {
+  SemesterEntity,
+  CreateSemesterInput,
+  UpdateSemesterInput,
+  SemesterSearchField,
+  FindManySemestersOptions,
+  SemesterRepository,
+} from './contracts/semester.contract';
+export { COURSE_IMAGE_SOURCE_TYPES } from './contracts/course.contract';
+export type {
+  CourseEntity,
+  CreateCourseInput,
+  UpdateCourseInput,
+  CourseSearchField,
+  CourseImageSourceType,
+  FindManyCoursesOptions,
+  CourseRepository,
+} from './contracts/course.contract';
+export type {
+  WorkshopEntity,
+  WorkshopOccurrence,
+  CreateWorkshopOccurrenceInput,
+  CreateWorkshopInput,
+  UpdateWorkshopInput,
+  WorkshopSearchField,
+  FindManyWorkshopsOptions,
+  WorkshopRepository,
+} from './contracts/workshop.contract';
+// inithium:block:studio-offerings:type-exports:end
 // inithium:anchor:type-exports
 export { ensureSeededPages } from './page-seeds/ensureSeededPages';
 export { pruneOrphanedPluginPages } from './page-seeds/pruneOrphanedPluginPages';

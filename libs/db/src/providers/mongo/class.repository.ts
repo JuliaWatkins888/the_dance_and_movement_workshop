@@ -4,6 +4,7 @@ import {
   ClassRepository,
   CreateClassInput,
   FindManyClassesOptions,
+  FindPublishedClassesOptions,
   UpdateClassInput,
 } from '../../contracts/class.contract';
 import type { PaginatedResult } from '../../contracts/pagination.contract';
@@ -12,14 +13,12 @@ import { ClassDocument } from '../../schemas/class.schema';
 
 const mapToClassEntity = (doc: ClassDocument): ClassEntity => ({
   id: doc._id.toString(),
-  name: doc.name,
-  description: doc.description,
-  categories: doc.categories,
-  instructors: doc.instructors,
+  courseId: doc.courseId,
+  variantLabel: doc.variantLabel,
+  instructorIds: doc.instructorIds,
   daysOfWeek: doc.daysOfWeek,
   startTime: doc.startTime,
   endTime: doc.endTime,
-  session: doc.session,
   registrationStartDate: doc.registrationStartDate,
   startDate: doc.startDate,
   endDate: doc.endDate,
@@ -36,22 +35,29 @@ const mapToClassEntity = (doc: ClassDocument): ClassEntity => ({
 
 export const createMongoClassRepository = (model: Model<ClassDocument>): ClassRepository => ({
   findMany: async (options: FindManyClassesOptions): Promise<PaginatedResult<ClassEntity>> => {
-    const { page, pageSize, search, searchField } = options;
+    const { page, pageSize, search, searchField, courseId } = options;
     const filter: QueryFilter<ClassDocument> = {};
+    if (courseId) {
+      filter.courseId = courseId;
+    }
     if (search && searchField) {
       filter[searchField] = { $regex: escapeRegExp(search), $options: 'i' };
     }
 
     const skip = (page - 1) * pageSize;
     const [docs, total] = await Promise.all([
-      model.find(filter).sort({ startDate: 1, name: 1 }).skip(skip).limit(pageSize).exec(),
+      model.find(filter).sort({ startDate: 1 }).skip(skip).limit(pageSize).exec(),
       model.countDocuments(filter).exec(),
     ]);
 
     return { items: docs.map(mapToClassEntity), total, page, pageSize };
   },
-  findPublished: async (): Promise<ClassEntity[]> => {
-    const docs = await model.find({ isPublished: true }).sort({ startDate: 1, name: 1 }).exec();
+  findPublished: async (options?: FindPublishedClassesOptions): Promise<ClassEntity[]> => {
+    const filter: QueryFilter<ClassDocument> = { isPublished: true };
+    if (options?.courseId) {
+      filter.courseId = options.courseId;
+    }
+    const docs = await model.find(filter).sort({ startDate: 1 }).exec();
     return docs.map(mapToClassEntity);
   },
   create: async (input: CreateClassInput): Promise<ClassEntity> => {
@@ -66,4 +72,6 @@ export const createMongoClassRepository = (model: Model<ClassDocument>): ClassRe
     const result = await model.findByIdAndDelete(id).exec();
     return result !== null;
   },
+  countByCourseId: async (courseId: string): Promise<number> => model.countDocuments({ courseId }).exec(),
+  countByCourseIds: async (courseIds: string[]): Promise<number> => model.countDocuments({ courseId: { $in: courseIds } }).exec(),
 });

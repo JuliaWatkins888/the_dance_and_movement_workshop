@@ -3,14 +3,12 @@ import { DAYS_OF_WEEK } from '../contracts/class.contract';
 import type { DayOfWeek } from '../contracts/class.contract';
 
 export interface ClassDocument extends Document {
-  name: string;
-  description?: string;
-  categories: string[];
-  instructors: string[];
+  courseId: string;
+  variantLabel?: string;
+  instructorIds: string[];
   daysOfWeek: DayOfWeek[];
   startTime: string;
   endTime: string;
-  session: string;
   registrationStartDate?: Date;
   startDate: Date;
   endDate: Date;
@@ -27,14 +25,12 @@ export interface ClassDocument extends Document {
 
 const classSchema = new Schema<ClassDocument>(
   {
-    name: { type: String, required: true, index: true },
-    description: { type: String, required: false },
-    categories: { type: [String], required: true, default: [], index: true },
-    instructors: { type: [String], required: true, default: [] },
+    courseId: { type: String, required: true, index: true },
+    variantLabel: { type: String, required: false, index: true },
+    instructorIds: { type: [String], required: true, default: [] },
     daysOfWeek: { type: [String], required: true, enum: DAYS_OF_WEEK, default: [], index: true },
     startTime: { type: String, required: true },
     endTime: { type: String, required: true },
-    session: { type: String, required: true },
     registrationStartDate: { type: Date, required: false },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },

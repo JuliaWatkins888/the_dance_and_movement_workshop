@@ -214,6 +214,36 @@ router.get(
   }),
 );
 
+// Gated on studio-offerings:manage, deliberately not staff:manage - whoever manages Course/Class/
+// Workshop offerings shouldn't need full staff-profile-management rights just to assign an
+// instructor. Unlike /api/staff/user-candidates above, there's no exclusion-set logic here - a
+// staff member can be the instructor for any number of classes/workshops, unlike the one-record-
+// per-user constraint that route's exclusion set enforces.
+router.get(
+  '/api/staff/instructor-candidates',
+  requireAuth,
+  requirePermission('studio-offerings:manage'),
+  asyncHandler(async (req: Request, res: Response) => {
+    const rawSearch = typeof req.query['search'] === 'string' ? req.query['search'].trim().toLowerCase() : '';
+    const CANDIDATE_FETCH_LIMIT = 200;
+
+    const result = await listStaff({ page: 1, pageSize: CANDIDATE_FETCH_LIMIT });
+    const candidates = await Promise.all(
+      result.items.map(async (staff) => {
+        const user = await getUserRepository().findById(staff.userId);
+        return {
+          id: staff.id,
+          name: `${user?.firstName ?? ''}${user?.lastName ? ` ${user.lastName}` : ''}`.trim(),
+          photoUrl: staff.photoUrl,
+        };
+      }),
+    );
+
+    const matchesSearch = (candidate: { name: string }): boolean => !rawSearch || candidate.name.toLowerCase().includes(rawSearch);
+    res.status(200).json(createSuccessResponse(candidates.filter(matchesSearch)));
+  }),
+);
+
 router.post(
   '/api/staff/upload',
   requireAuth,
