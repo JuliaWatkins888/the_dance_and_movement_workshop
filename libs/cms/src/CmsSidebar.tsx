@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Box, Button, Icon, IconButton } from '@inithium/ui';
+import { Box, Button, Icon } from '@inithium/ui';
 import { cmsModules } from './modules/registry';
 import { canAccessCmsResource, useCmsCurrentUser } from './CmsCurrentUserContext';
 
@@ -14,8 +14,10 @@ const COLLAPSED_WIDTH = 'w-16';
 
 // Module links + the collapse toggle, formatted identically (icon left, label right, label
 // hidden while collapsed) so the toggle reads as one more row in the same list rather than a
-// separate control. A module with `children` additionally renders a disclosure toggle and, when
-// expanded, a nested list of child links.
+// separate control. A module with `children` renders its label and disclosure caret inside one
+// single Link - clicking either always navigates to the module's own landing page AND ensures
+// the group is expanded, rather than the label and caret being two separate controls with two
+// different effects (which read as two buttons doing "the same thing" when they weren't).
 export const CmsSidebar = ({ isCollapsed, onToggleCollapsed }: CmsSidebarProps) => {
   const currentUser = useCmsCurrentUser();
   const location = useLocation();
@@ -23,26 +25,14 @@ export const CmsSidebar = ({ isCollapsed, onToggleCollapsed }: CmsSidebarProps) 
 
   const activeModuleId = location.pathname.split('/')[2];
 
+  const expand = (moduleId: string) => setExpandedIds((prev) => (prev.has(moduleId) ? prev : new Set(prev).add(moduleId)));
+
   // Auto-expand whichever module's own URL is currently active, so a directly-loaded child route
   // (e.g. a bookmarked /cms/studio-offerings/classes) shows its parent group already open instead
-  // of collapsed with no visual explanation for where the current page lives. Only ever adds -
-  // manually collapsing a group the user isn't currently on still works afterward.
+  // of collapsed with no visual explanation for where the current page lives.
   useEffect(() => {
-    if (!activeModuleId) return;
-    setExpandedIds((prev) => (prev.has(activeModuleId) ? prev : new Set(prev).add(activeModuleId)));
+    if (activeModuleId) expand(activeModuleId);
   }, [activeModuleId]);
-
-  const toggleExpanded = (moduleId: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(moduleId)) {
-        next.delete(moduleId);
-      } else {
-        next.add(moduleId);
-      }
-      return next;
-    });
-  };
 
   const visibleModules = cmsModules.filter((cmsModule) =>
     canAccessCmsResource(currentUser, cmsModule.requiredCapability)
@@ -65,28 +55,25 @@ export const CmsSidebar = ({ isCollapsed, onToggleCollapsed }: CmsSidebarProps) 
 
           return (
             <Box key={cmsModule.id} flex={{ direction: 'col', gap: 2 }}>
-              <Box flex={{ direction: 'row', align: 'center', gap: 2 }}>
-                <Button
-                  asChild
-                  variant={{ kind: 'ghost', color: 'surface' }}
-                  textColor={{ color: 'surface', intensity: 950 }}
-                  className={`flex-1 ${isCollapsed ? 'justify-center' : 'justify-start'}`}
-                  aria-label={cmsModule.navLabel}
+              <Button
+                asChild
+                variant={{ kind: 'ghost', color: 'surface' }}
+                textColor={{ color: 'surface', intensity: 950 }}
+                className={isCollapsed ? 'justify-center' : 'justify-start'}
+                aria-label={cmsModule.navLabel}
+              >
+                <Link
+                  to={`/cms/${cmsModule.id}`}
+                  className="flex flex-row items-center gap-2"
+                  onClick={() => expand(cmsModule.id)}
                 >
-                  <Link to={`/cms/${cmsModule.id}`} className="flex flex-row items-center gap-2">
-                    <Icon name={cmsModule.icon} size={20} />
-                    {isCollapsed ? null : cmsModule.navLabel}
-                  </Link>
-                </Button>
-
-                {visibleChildren.length > 0 && !isCollapsed ? (
-                  <IconButton
-                    icon={isExpanded ? 'CaretDown' : 'CaretRight'}
-                    label={isExpanded ? `Collapse ${cmsModule.navLabel}` : `Expand ${cmsModule.navLabel}`}
-                    onClick={() => toggleExpanded(cmsModule.id)}
-                  />
-                ) : null}
-              </Box>
+                  <Icon name={cmsModule.icon} size={20} />
+                  {isCollapsed ? null : cmsModule.navLabel}
+                  {visibleChildren.length > 0 && !isCollapsed ? (
+                    <Icon name={isExpanded ? 'CaretDown' : 'CaretRight'} size={16} className="ml-auto" />
+                  ) : null}
+                </Link>
+              </Button>
 
               {visibleChildren.length > 0 && isExpanded && !isCollapsed ? (
                 <Box flex={{ direction: 'col', gap: 2 }} className="ml-4">

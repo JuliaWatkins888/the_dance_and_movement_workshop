@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Banner, Box, Button, Loader, Pill, Select, SelectItem, Text, useElementSize, useNavigateWithTransition } from '@inithium/ui';
+import { Banner, Box, Button, Loader, Pill, Select, SelectItem, Text, useElementSize } from '@inithium/ui';
 import { useListPublicClassesQuery, useListPublicCoursesQuery, usePageParams } from '@inithium/api-client';
 import type { ClassDto } from '@inithium/api-client';
 import type { DayOfWeek } from '@inithium/db';
@@ -111,7 +111,6 @@ const ClassVariantCard = ({ classItem }: ClassVariantCardProps) => (
 
 export const CourseDetailPage = () => {
   const { courseId } = usePageParams();
-  const navigate = useNavigateWithTransition();
   // Full-bleed banner, so it spans a wide range of viewport widths - measures its own real
   // rendered width and feeds it back into Banner's mesh generation to avoid the triangle
   // stretching/distortion a fluid 100%-width Banner gets by default (see Banner.tsx's own
@@ -165,12 +164,6 @@ export const CourseDetailPage = () => {
 
   return (
     <Box flex={{ direction: 'col' }}>
-      <Box padding={{ base: 32 }} className="pb-0">
-        <Button variant={{ kind: 'ghost', color: 'surface' }} onClick={() => navigate('/courses')} className="self-start">
-          ← Back to all classes
-        </Button>
-      </Box>
-
       <div ref={bannerSizeRef} className="w-full" style={{ height: `${DETAIL_BANNER_HEIGHT}px` }}>
         <Banner
           imageUrl={course.imageUrl}
