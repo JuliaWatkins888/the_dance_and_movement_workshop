@@ -26,6 +26,11 @@ import { ClassRepository } from './class.contract';
 // inithium:block:children:imports:start
 import { ChildRepository } from './child.contract';
 // inithium:block:children:imports:end
+// inithium:block:studio-offerings:imports:start
+import { SemesterRepository } from './semester.contract';
+import { CourseRepository } from './course.contract';
+import { WorkshopRepository } from './workshop.contract';
+// inithium:block:studio-offerings:imports:end
 // inithium:anchor:imports
 
 export interface DbConfig {
@@ -66,5 +71,10 @@ export interface DbProvider {
 // inithium:block:children:members:start
   getChildRepository: () => ChildRepository;
 // inithium:block:children:members:end
+// inithium:block:studio-offerings:members:start
+  getSemesterRepository: () => SemesterRepository;
+  getCourseRepository: () => CourseRepository;
+  getWorkshopRepository: () => WorkshopRepository;
+// inithium:block:studio-offerings:members:end
   // inithium:anchor:members
 }

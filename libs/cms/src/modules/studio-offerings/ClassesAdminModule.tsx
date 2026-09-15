@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, IconButton, ListRow, Pagination, Pill, SearchFilterBar, Text, dialog, useSelection } from '@inithium/ui';
-import { useDeleteClassMutation, useListClassesAdminQuery } from '@inithium/api-client';
+import { Box, Button, IconButton, ListRow, Pagination, Pill, SearchFilterBar, Select, SelectItem, Text, dialog, useSelection } from '@inithium/ui';
+import { useDeleteClassMutation, useListClassesAdminQuery, useListCoursesAdminQuery, useListSemestersAdminQuery } from '@inithium/api-client';
 import type { ClassDto } from '@inithium/api-client';
 import type { ClassSearchField } from '@inithium/db';
 import { ClassEditDialog } from './ClassEditDialog';
@@ -8,8 +8,9 @@ import { ClassEditDialog } from './ClassEditDialog';
 const PAGE_SIZE = 10;
 const SEARCH_DEBOUNCE_MS = 300;
 const DIALOG_WIDTH = 720;
+const ALL_VALUE = 'all';
 
-const FIELD_OPTIONS: { value: ClassSearchField; label: string }[] = [{ value: 'name', label: 'Name' }];
+const FIELD_OPTIONS: { value: ClassSearchField; label: string }[] = [{ value: 'variantLabel', label: 'Variant Label' }];
 
 const formatTime12h = (time: string): string => {
   const [hoursRaw, minutes] = time.split(':');
@@ -23,14 +24,16 @@ const formatSummary = (classItem: ClassDto): string => {
   const days = classItem.daysOfWeek.join('/');
   const schedule = `${days} ${formatTime12h(classItem.startTime)}–${formatTime12h(classItem.endTime)}`;
   const price = `$${classItem.priceAmount}${classItem.billingCycle.toLowerCase() === 'monthly' ? '/mo' : ` (${classItem.billingCycle})`}`;
-  return `${schedule} · ${classItem.session} · ${price} · ${classItem.openings} open`;
+  return `${classItem.courseName}${classItem.variantLabel ? ` · ${classItem.variantLabel}` : ''} · ${schedule} · ${price} · ${classItem.openings} open`;
 };
 
 export const ClassesAdminModule = () => {
   const [page, setPage] = useState(1);
-  const [searchField, setSearchField] = useState<ClassSearchField>('name');
+  const [searchField, setSearchField] = useState<ClassSearchField>('variantLabel');
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [semesterFilter, setSemesterFilter] = useState(ALL_VALUE);
+  const [courseFilter, setCourseFilter] = useState(ALL_VALUE);
 
   useEffect(() => {
     const timeout = setTimeout(() => setDebouncedSearch(searchInput), SEARCH_DEBOUNCE_MS);
@@ -39,13 +42,24 @@ export const ClassesAdminModule = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, searchField]);
+  }, [debouncedSearch, searchField, courseFilter]);
 
+  useEffect(() => {
+    setCourseFilter(ALL_VALUE);
+  }, [semesterFilter]);
+
+  const { data: semesterOptions } = useListSemestersAdminQuery({ page: 1, pageSize: 100 });
+  const { data: courseOptions } = useListCoursesAdminQuery({
+    page: 1,
+    pageSize: 100,
+    semesterId: semesterFilter === ALL_VALUE ? undefined : semesterFilter,
+  });
   const { data, isLoading, refetch } = useListClassesAdminQuery({
     page,
     pageSize: PAGE_SIZE,
     search: debouncedSearch || undefined,
     searchField,
+    courseId: courseFilter === ALL_VALUE ? undefined : courseFilter,
   });
   const [deleteClass] = useDeleteClassMutation();
   const selection = useSelection();
@@ -77,14 +91,14 @@ export const ClassesAdminModule = () => {
           }}
         />
       ),
-      { title: `Edit "${classItem.name}"`, width: DIALOG_WIDTH },
+      { title: `Edit "${classItem.courseName}${classItem.variantLabel ? ` – ${classItem.variantLabel}` : ''}"`, width: DIALOG_WIDTH },
     );
   };
 
   const handleDelete = async (classItem: ClassDto) => {
     const confirmed = await dialog.confirm({
       title: 'Delete this class?',
-      description: `This removes "${classItem.name}" (${classItem.session}) from the catalog. This cannot be undone.`,
+      description: `This removes "${classItem.courseName}${classItem.variantLabel ? ` – ${classItem.variantLabel}` : ''}" from the catalog. This cannot be undone.`,
       confirmLabel: 'Delete',
       cancelLabel: 'Cancel',
       confirmVariant: { kind: 'filled', color: 'red' },
@@ -126,14 +140,36 @@ export const ClassesAdminModule = () => {
         </Box>
       </Box>
 
-      <SearchFilterBar
-        searchValue={searchInput}
-        onSearchChange={setSearchInput}
-        searchField={searchField}
-        onSearchFieldChange={(value) => setSearchField(value as ClassSearchField)}
-        fieldOptions={FIELD_OPTIONS}
-        placeholder="Search by name..."
-      />
+      <Box flex={{ direction: 'col', gap: 12 }}>
+        <Box className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Select value={semesterFilter} onValueChange={setSemesterFilter} placeholder="Semester">
+            <SelectItem value={ALL_VALUE}>All Semesters</SelectItem>
+            {(semesterOptions?.items ?? []).map((semester) => (
+              <SelectItem key={semester.id} value={semester.id}>
+                {semester.name}
+              </SelectItem>
+            ))}
+          </Select>
+
+          <Select value={courseFilter} onValueChange={setCourseFilter} placeholder="Course">
+            <SelectItem value={ALL_VALUE}>All Courses</SelectItem>
+            {(courseOptions?.items ?? []).map((course) => (
+              <SelectItem key={course.id} value={course.id}>
+                {course.name}
+              </SelectItem>
+            ))}
+          </Select>
+        </Box>
+
+        <SearchFilterBar
+          searchValue={searchInput}
+          onSearchChange={setSearchInput}
+          searchField={searchField}
+          onSearchFieldChange={(value) => setSearchField(value as ClassSearchField)}
+          fieldOptions={FIELD_OPTIONS}
+          placeholder="Search by variant label..."
+        />
+      </Box>
 
       <Box flex={{ direction: 'col' }} borderColor={{ color: 'surface', intensity: 200 }} className="rounded border">
         {isLoading ? (
@@ -150,13 +186,11 @@ export const ClassesAdminModule = () => {
               onSelectedChange={() => selection.toggle(classItem.id)}
               trailing={
                 <>
-                  {!classItem.isPublished ? (
-                    <Pill color={{ color: 'surface', intensity: 300 }}>Draft</Pill>
-                  ) : null}
-                  <IconButton icon="PencilSimple" label={`Edit ${classItem.name}`} onClick={() => openEditDialog(classItem)} />
+                  {!classItem.isPublished ? <Pill color={{ color: 'surface', intensity: 300 }}>Draft</Pill> : null}
+                  <IconButton icon="PencilSimple" label={`Edit ${classItem.courseName}`} onClick={() => openEditDialog(classItem)} />
                   <IconButton
                     icon="Trash"
-                    label={`Delete ${classItem.name}`}
+                    label={`Delete ${classItem.courseName}`}
                     textColor={{ color: 'red', intensity: 600 }}
                     onClick={() => handleDelete(classItem)}
                   />
@@ -164,7 +198,8 @@ export const ClassesAdminModule = () => {
               }
             >
               <Text as="span" textColor={{ color: 'surface', intensity: 950 }} className="font-medium">
-                {classItem.name}
+                {classItem.courseName}
+                {classItem.variantLabel ? ` – ${classItem.variantLabel}` : ''}
               </Text>
               <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
                 {formatSummary(classItem)}

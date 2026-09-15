@@ -71,6 +71,14 @@ export interface UploadStaffPhotoLocalResult {
   storageKey: string;
 }
 
+// Minimal view of a staff member eligible to be assigned as an instructor - see
+// staff.route.ts's /api/staff/instructor-candidates, which never returns a full StaffMemberDto.
+export interface InstructorCandidate {
+  id: string;
+  name: string;
+  photoUrl?: string;
+}
+
 const buildListResult = (response: ApiResponse<StaffMemberDto[]>): ListStaffResult => ({
   items: response.data,
   page: (response.meta?.['page'] as number) ?? 1,
@@ -104,6 +112,14 @@ export const staffApi = baseApi.injectEndpoints({
       transformResponse: (response: ApiResponse<StaffUserCandidate[]>) => response.data,
       providesTags: ['Staff'],
     }),
+    listInstructorCandidates: builder.query<InstructorCandidate[], { search?: string }>({
+      query: ({ search }) => {
+        const query = search ? `?${new URLSearchParams({ search })}` : '';
+        return `/api/staff/instructor-candidates${query}`;
+      },
+      transformResponse: (response: ApiResponse<InstructorCandidate[]>) => response.data,
+      providesTags: ['Staff'],
+    }),
     // fetchBaseQuery passes a FormData body through untouched (no JSON.stringify, the browser
     // sets the multipart boundary), matching gallery.endpoints.ts's own uploadGalleryImageLocal.
     uploadStaffPhotoLocal: builder.mutation<UploadStaffPhotoLocalResult, { file: File }>({
@@ -135,6 +151,7 @@ export const {
   useListPublicStaffQuery,
   useListStaffAdminQuery,
   useListStaffUserCandidatesQuery,
+  useListInstructorCandidatesQuery,
   useUploadStaffPhotoLocalMutation,
   useCreateStaffMemberMutation,
   useUpdateStaffMemberMutation,

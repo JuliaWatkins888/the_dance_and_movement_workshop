@@ -20,9 +20,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:policy:contributor:start
   'policies:manage',
 // inithium:block:policy:contributor:end
-// inithium:block:classes:contributor:start
-  'classes:manage',
-// inithium:block:classes:contributor:end
+// inithium:block:studio-offerings:contributor:start
+  'studio-offerings:manage',
+// inithium:block:studio-offerings:contributor:end
 // inithium:block:children:contributor:start
   'children:manage',
 // inithium:block:children:contributor:end
@@ -47,9 +47,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:policy:editor:start
   'policies:manage',
 // inithium:block:policy:editor:end
-// inithium:block:classes:editor:start
-  'classes:manage',
-// inithium:block:classes:editor:end
+// inithium:block:studio-offerings:editor:start
+  'studio-offerings:manage',
+// inithium:block:studio-offerings:editor:end
 // inithium:block:children:editor:start
   'children:manage',
 // inithium:block:children:editor:end
@@ -81,9 +81,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:policy:admin:start
   'policies:manage',
 // inithium:block:policy:admin:end
-// inithium:block:classes:admin:start
-  'classes:manage',
-// inithium:block:classes:admin:end
+// inithium:block:studio-offerings:admin:start
+  'studio-offerings:manage',
+// inithium:block:studio-offerings:admin:end
 // inithium:block:children:admin:start
   'children:manage',
 // inithium:block:children:admin:end

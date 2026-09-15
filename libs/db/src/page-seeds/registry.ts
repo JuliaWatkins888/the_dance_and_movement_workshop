@@ -16,9 +16,11 @@ import staffPageSeed from './staff.page-seed';
 // inithium:block:policy:imports:start
 import policiesPageSeed from './policies.page-seed';
 // inithium:block:policy:imports:end
-// inithium:block:classes:imports:start
-import classesPageSeed from './classes.page-seed';
-// inithium:block:classes:imports:end
+// inithium:block:studio-offerings:imports:start
+import coursesPageSeed from './courses.page-seed';
+import courseDetailPageSeed from './course-detail.page-seed';
+import workshopsPageSeed from './workshops.page-seed';
+// inithium:block:studio-offerings:imports:end
 // inithium:anchor:imports
 
 // Every page the app should always have a Page DB record for, reconciled once at API startup by
@@ -49,8 +51,10 @@ export const pageSeeds: CreatePageInput[] = [
 // inithium:block:policy:seeds:start
   policiesPageSeed,
 // inithium:block:policy:seeds:end
-// inithium:block:classes:seeds:start
-  classesPageSeed,
-// inithium:block:classes:seeds:end
+// inithium:block:studio-offerings:seeds:start
+  coursesPageSeed,
+  courseDetailPageSeed,
+  workshopsPageSeed,
+// inithium:block:studio-offerings:seeds:end
   // inithium:anchor:seeds
 ];

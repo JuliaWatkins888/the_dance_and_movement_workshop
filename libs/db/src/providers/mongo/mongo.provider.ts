@@ -56,6 +56,17 @@ import { ChildRepository } from '../../contracts/child.contract';
 import { createMongoChildRepository } from './child.repository';
 import { ChildModel } from '../../schemas/child.schema';
 // inithium:block:children:imports:end
+// inithium:block:studio-offerings:imports:start
+import { SemesterRepository } from '../../contracts/semester.contract';
+import { CourseRepository } from '../../contracts/course.contract';
+import { WorkshopRepository } from '../../contracts/workshop.contract';
+import { createMongoSemesterRepository } from './semester.repository';
+import { createMongoCourseRepository } from './course.repository';
+import { createMongoWorkshopRepository } from './workshop.repository';
+import { SemesterModel } from '../../schemas/semester.schema';
+import { CourseModel } from '../../schemas/course.schema';
+import { WorkshopModel } from '../../schemas/workshop.schema';
+// inithium:block:studio-offerings:imports:end
 // inithium:anchor:imports
 
 const userRepository = createMongoUserRepository(UserModel);
@@ -86,6 +97,11 @@ const classRepository = createMongoClassRepository(ClassModel);
 // inithium:block:children:repository-instances:start
 const childRepository = createMongoChildRepository(ChildModel);
 // inithium:block:children:repository-instances:end
+// inithium:block:studio-offerings:repository-instances:start
+const semesterRepository = createMongoSemesterRepository(SemesterModel);
+const courseRepository = createMongoCourseRepository(CourseModel);
+const workshopRepository = createMongoWorkshopRepository(WorkshopModel);
+// inithium:block:studio-offerings:repository-instances:end
 // inithium:anchor:repository-instances
 
 export const mongoProvider: DbProvider = {
@@ -130,5 +146,10 @@ export const mongoProvider: DbProvider = {
 // inithium:block:children:members:start
   getChildRepository: (): ChildRepository => childRepository,
 // inithium:block:children:members:end
+// inithium:block:studio-offerings:members:start
+  getSemesterRepository: (): SemesterRepository => semesterRepository,
+  getCourseRepository: (): CourseRepository => courseRepository,
+  getWorkshopRepository: (): WorkshopRepository => workshopRepository,
+// inithium:block:studio-offerings:members:end
   // inithium:anchor:members
 };

@@ -138,6 +138,7 @@ export {
   useListPublicStaffQuery,
   useListStaffAdminQuery,
   useListStaffUserCandidatesQuery,
+  useListInstructorCandidatesQuery,
   useUploadStaffPhotoLocalMutation,
   useCreateStaffMemberMutation,
   useUpdateStaffMemberMutation,
@@ -146,6 +147,7 @@ export {
 export type {
   StaffMemberDto,
   StaffUserCandidate,
+  InstructorCandidate,
   ListPublicStaffParams,
   ListStaffAdminParams,
   ListStaffResult,
@@ -239,6 +241,8 @@ export {
 } from './endpoints/classes.endpoints';
 export type {
   ClassDto,
+  ClassInstructorSummary,
+  ListPublicClassesParams,
   ListClassesAdminParams,
   ListClassesResult,
   ClassWriteInput,
@@ -269,4 +273,64 @@ export type {
 } from './endpoints/children.endpoints';
 
 // inithium:block:children:exports:end
+// inithium:block:studio-offerings:exports:start
+export {
+  semestersApi,
+  useListSemestersAdminQuery,
+  useCreateSemesterMutation,
+  useUpdateSemesterMutation,
+  useDeleteSemesterMutation,
+} from './endpoints/semesters.endpoints';
+export type {
+  SemesterDto,
+  ListSemestersAdminParams,
+  ListSemestersResult,
+  SemesterWriteInput,
+  UpdateSemesterInput,
+} from './endpoints/semesters.endpoints';
+
+export {
+  coursesApi,
+  useListPublicCoursesQuery,
+  useListCoursesAdminQuery,
+  useUploadCourseImageLocalMutation,
+  useCreateCourseMutation,
+  useUpdateCourseMutation,
+  useDeleteCourseMutation,
+} from './endpoints/courses.endpoints';
+export type {
+  CourseDto,
+  ListCoursesAdminParams,
+  ListCoursesResult,
+  CourseWriteInput,
+  UpdateCourseInput,
+  UploadCourseImageLocalResult,
+} from './endpoints/courses.endpoints';
+
+export {
+  workshopsApi,
+  useListPublicWorkshopsQuery,
+  useListWorkshopsAdminQuery,
+  useCreateWorkshopMutation,
+  useUpdateWorkshopMutation,
+  useDeleteWorkshopMutation,
+} from './endpoints/workshops.endpoints';
+export type {
+  WorkshopDto,
+  WorkshopInstructorSummary,
+  WorkshopOccurrenceDto,
+  WorkshopOccurrenceWriteInput,
+  ListWorkshopsAdminParams,
+  ListWorkshopsResult,
+  WorkshopWriteInput,
+  UpdateWorkshopInput,
+} from './endpoints/workshops.endpoints';
+
+export { pickCurrentSemester } from './utils/pickCurrentSemester';
+export type { SemesterLike } from './utils/pickCurrentSemester';
+
+export { studioOfferingsStatsApi, useGetStudioOfferingsStatsQuery } from './endpoints/studio-offerings-stats.endpoints';
+export type { StudioOfferingsStatsDto } from './endpoints/studio-offerings-stats.endpoints';
+
+// inithium:block:studio-offerings:exports:end
 // inithium:anchor:exports
