@@ -1,0 +1,2415 @@
+[
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c811349f8"
+    },
+    "startTime": "12:00",
+    "daysOfWeek": [
+      "Saturday"
+    ],
+    "name": "Essential Level Spiral Body Techniques\u00ae",
+    "session": "Winter/Spring 2027",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Contemporary"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Essential Level Spiral Body Techniques\u00ae (SBT) classes introduce and develop foundational movement principles, emphasizing increasing whole-self dancing, articulation and coordinated availability of the ball-and-socket joints, and moving with a dynamic center through the release and reengagement of musculature. SBT, developed by choreographer and movement educator Molly Shanahan, PhD, offers an alternative to traditional Western dance training, which often prioritizes rigid form, perfection, and pain. Dancers are typically taught to \u201chold their center,\u201d pull \u201cin and up,\u201d and imitate idealized shapes\u2014ignoring their body\u2019s uniqueness and accepting pain as normal. This approach can be abusive, reinforcing narrow body ideals and teaching dancers that suffering equals success.\r\nSBT rejects these norms. It views all bodies as dynamic, adaptive systems and encourages movement based on complexity, imagery, and individual expression. It redefines virtuosity\u2014not as machine-like precision, fluid.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "13:15",
+    "enrolled": 0,
+    "instructors": [
+      "Amy Guilmette"
+    ],
+    "isPublished": true,
+    "priceAmount": 70,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c811349f9"
+    },
+    "name": "Dance Buddies",
+    "startTime": "16:00",
+    "session": "Winter/Spring 2027",
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Parent Tot"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Dance Buddies is an interactive dance class designed for young children and their grown-ups! This class encourages creativity, coordination, and connection through playful movement and bonding time. Grown-ups and little ones will explore basic dance skills together through obstacle courses, play with props, and dance games. It\u2019s the perfect way to build confidence and spark imagination! \r\n\r\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet or jazz shoes are required, either style and any color will be accepted.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "16:30",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 3,
+    "minAgeYears": 1,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c811349fa"
+    },
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "startTime": "10:00",
+    "session": "Winter/Spring 2027",
+    "name": "Dance Buddies",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Parent Tot"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Dance Buddies is an interactive dance class designed for young children and their grown-ups! This class encourages creativity, coordination, and connection through playful movement and bonding time. Grown-ups and little ones will explore basic dance skills together through obstacle courses, play with props, and dance games. It\u2019s the perfect way to build confidence and spark imagination!\r\n\r\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet or jazz shoes are required, either style and any color will be accepted.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "10:30",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 3,
+    "minAgeYears": 1,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c811349fb"
+    },
+    "session": "Fall 2026",
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "name": "Dance Buddies",
+    "startTime": "10:00",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Parent Tot"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Dance Buddies is an interactive dance class designed for young children and their grown-ups! This class encourages creativity, coordination, and connection through playful movement and bonding time. Grown-ups and little ones will explore basic dance skills together through obstacle courses, play with props, and dance games. It\u2019s the perfect way to build confidence and spark imagination!\n\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet or jazz shoes are required, either style and any color will be accepted.",
+    "endDate": {
+      "$date": "2027-12-14T00:00:00Z"
+    },
+    "endTime": "10:30",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 3,
+    "minAgeYears": 1,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-14T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c811349fd"
+    },
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "name": "Dance Buddies",
+    "session": "Fall 2026",
+    "startTime": "10:00",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Parent Tot"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Dance Buddies is an interactive dance class designed for young children and their grown-ups! This class encourages creativity, coordination, and connection through playful movement and bonding time. Grown-ups and little ones will explore basic dance skills together through obstacle courses, play with props, and dance games. It\u2019s the perfect way to build confidence and spark imagination!\r\n\r\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet or jazz shoes are required, either style and any color will be accepted.",
+    "endDate": {
+      "$date": "2027-12-16T00:00:00Z"
+    },
+    "endTime": "10:30",
+    "enrolled": 1,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 3,
+    "minAgeYears": 1,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-16T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c811349fe"
+    },
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "startTime": "16:00",
+    "session": "Fall 2026",
+    "name": "Dance Buddies",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Parent Tot"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Dance Buddies is an interactive dance class designed for young children and their grown-ups! This class encourages creativity, coordination, and connection through playful movement and bonding time. Grown-ups and little ones will explore basic dance skills together through obstacle courses, play with props, and dance games. It\u2019s the perfect way to build confidence and spark imagination! \r\n\r\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet or jazz shoes are required, either style and any color will be accepted.",
+    "endDate": {
+      "$date": "2027-12-17T00:00:00Z"
+    },
+    "endTime": "16:30",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 3,
+    "minAgeYears": 1,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-17T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c811349ff"
+    },
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "startTime": "10:00",
+    "session": "Winter/Spring 2027",
+    "name": "Dance Buddies",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Parent Tot"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Dance Buddies is an interactive dance class designed for young children and their grown-ups! This class encourages creativity, coordination, and connection through playful movement and bonding time. Grown-ups and little ones will explore basic dance skills together through obstacle courses, play with props, and dance games. It\u2019s the perfect way to build confidence and spark imagination!\n\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet or jazz shoes are required, either style and any color will be accepted.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "10:30",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 3,
+    "minAgeYears": 1,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a00"
+    },
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "startTime": "10:30",
+    "session": "Winter/Spring 2027",
+    "name": "Mini Movers",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Creative Movement"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Join us for a high-energy class where toddlers (ages 2.5 \u2013 4 years) can explore the art of dance! Our Mini Movers class is designed to encourage creativity, improve coordination, and build confidence through fun, interactive dance activities. Each week, students will have the chance to express themselves while developing important motor skills, balance, and social abilities. With playful songs, imaginative games, and plenty of wiggle time, your toddler will love every moment of this introductory dance class.\n\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "11:00",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 4,
+    "minAgeYears": 2.5,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a01"
+    },
+    "session": "Fall 2026",
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "name": "Mini Movers",
+    "startTime": "16:30",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Creative Movement"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Join us for a high-energy class where toddlers (ages 2.5 \u2013 4 years) can explore the art of dance! Our Mini Movers class is designed to encourage creativity, improve coordination, and build confidence through fun, interactive dance activities. Each week, students will have the chance to express themselves while developing important motor skills, balance, and social abilities. With playful songs, imaginative games, and plenty of wiggle time, your toddler will love every moment of this introductory dance class. \r\n\r\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-12-17T00:00:00Z"
+    },
+    "endTime": "17:00",
+    "enrolled": 2,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 4,
+    "minAgeYears": 2.5,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-17T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a02"
+    },
+    "session": "Fall 2026",
+    "name": "Mini Movers",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "startTime": "10:30",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Creative Movement"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Join us for a high-energy class where toddlers (ages 2.5 \u2013 4 years) can explore the art of dance! Our Mini Movers class is designed to encourage creativity, improve coordination, and build confidence through fun, interactive dance activities. Each week, students will have the chance to express themselves while developing important motor skills, balance, and social abilities. With playful songs, imaginative games, and plenty of wiggle time, your toddler will love every moment of this introductory dance class. \r\n\r\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-12-16T00:00:00Z"
+    },
+    "endTime": "11:00",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 4,
+    "minAgeYears": 2.5,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-16T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a03"
+    },
+    "session": "Fall 2026",
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "name": "Mini Movers",
+    "startTime": "10:30",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Creative Movement"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Join us for a high-energy class where toddlers (ages 2.5 \u2013 4 years) can explore the art of dance! Our Mini Movers class is designed to encourage creativity, improve coordination, and build confidence through fun, interactive dance activities. Each week, students will have the chance to express themselves while developing important motor skills, balance, and social abilities. With playful songs, imaginative games, and plenty of wiggle time, your toddler will love every moment of this introductory dance class.\n\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-12-14T00:00:00Z"
+    },
+    "endTime": "11:00",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 4,
+    "minAgeYears": 2.5,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-14T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a04"
+    },
+    "session": "Fall 2026",
+    "name": "Mini Movers",
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "startTime": "16:00",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Creative Movement"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Join us for a high-energy class where toddlers (ages 2.5 \u2013 4 years) can explore the art of dance! Our Mini Movers class is designed to encourage creativity, improve coordination, and build confidence through fun, interactive dance activities. Each week, students will have the chance to express themselves while developing important motor skills, balance, and social abilities. With playful songs, imaginative games, and plenty of wiggle time, your toddler will love every moment of this introductory dance class.\n\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-12-15T00:00:00Z"
+    },
+    "endTime": "16:30",
+    "enrolled": 0,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 4,
+    "minAgeYears": 2.5,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-14T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a05"
+    },
+    "session": "Winter/Spring 2027",
+    "name": "Mini Movers",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "startTime": "10:30",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Creative Movement"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Join us for a high-energy class where toddlers (ages 2.5 \u2013 4 years) can explore the art of dance! Our Mini Movers class is designed to encourage creativity, improve coordination, and build confidence through fun, interactive dance activities. Each week, students will have the chance to express themselves while developing important motor skills, balance, and social abilities. With playful songs, imaginative games, and plenty of wiggle time, your toddler will love every moment of this introductory dance class. \r\n\r\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "11:00",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 4,
+    "minAgeYears": 2.5,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a06"
+    },
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "startTime": "16:00",
+    "session": "Winter/Spring 2027",
+    "name": "Mini Movers",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Creative Movement"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Join us for a high-energy class where toddlers (ages 2.5 \u2013 4 years) can explore the art of dance! Our Mini Movers class is designed to encourage creativity, improve coordination, and build confidence through fun, interactive dance activities. Each week, students will have the chance to express themselves while developing important motor skills, balance, and social abilities. With playful songs, imaginative games, and plenty of wiggle time, your toddler will love every moment of this introductory dance class.\n\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "16:30",
+    "enrolled": 0,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 4,
+    "minAgeYears": 2.5,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a07"
+    },
+    "startTime": "16:30",
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "name": "Mini Movers",
+    "session": "Winter/Spring 2027",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Creative Movement"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Join us for a high-energy class where toddlers (ages 2.5 \u2013 4 years) can explore the art of dance! Our Mini Movers class is designed to encourage creativity, improve coordination, and build confidence through fun, interactive dance activities. Each week, students will have the chance to express themselves while developing important motor skills, balance, and social abilities. With playful songs, imaginative games, and plenty of wiggle time, your toddler will love every moment of this introductory dance class. \r\n\r\nDress Code: Tighter fitting t-shirts or tank tops and leggings or sweatpants. NO denim. Leotards, tutus, skirts and tights (traditional dance attire) are more than welcome! Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "17:00",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 4,
+    "minAgeYears": 2.5,
+    "priceAmount": 40,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a08"
+    },
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "name": "Petite Performers - Ballet/Tap",
+    "session": "Winter/Spring 2027",
+    "startTime": "17:00",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Ballet/Tap Combo class, where the elegance of ballet meets the rhythm of tap! This class combines the grace and discipline of ballet with the rhythm and energy of tap dance. Young dancers will build coordination, balance, and musicality, all while having fun! Ballet basics teach poise and flexibility, while tap introduces rhythm and timing through lively, percussive movements. \r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights (traditional dance attire) only. Any color or pattern, as long as it\u2019s proper ballet/dance attire. Please have long hair pulled back in a ponytail or bun. For this class they need both ballet and tap shoes. Please have black tap shoes and either \u201cballet pink\u201d ballet shoes or skin colored.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "17:45",
+    "enrolled": 0,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a09"
+    },
+    "startTime": "16:30",
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "name": "Petite Performers - Ballet/Tap",
+    "session": "Winter/Spring 2027",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Ballet/Tap Combo class, where the elegance of ballet meets the rhythm of tap! This class combines the grace and discipline of ballet with the rhythm and energy of tap dance. Young dancers will build coordination, balance, and musicality, all while having fun! Ballet basics teach poise and flexibility, while tap introduces rhythm and timing through lively, percussive movements.\n\nDress Code: NO denim. Leotards, tutus, skirts and tights (traditional dance attire) only. Any color or pattern, as long as it\u2019s proper ballet/dance attire. Please have long hair pulled back in a ponytail or bun. For this class they need both ballet and tap shoes. Please have black tap shoes and either \u201cballet pink\u201d ballet shoes or skin colored.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "17:15",
+    "enrolled": 0,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a0a"
+    },
+    "session": "Winter/Spring 2027",
+    "name": "Petite Performers - Ballet/Tap",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "startTime": "11:00",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Ballet/Tap Combo class, where the elegance of ballet meets the rhythm of tap! This class combines the grace and discipline of ballet with the rhythm and energy of tap dance. Young dancers will build coordination, balance, and musicality, all while having fun! Ballet basics teach poise and flexibility, while tap introduces rhythm and timing through lively, percussive movements. \r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights (traditional dance attire) only. Any color or pattern, as long as it\u2019s proper ballet/dance attire. Please have long hair pulled back in a ponytail or bun. For this class they need both ballet and tap shoes. Please have black tap shoes and either \u201cballet pink\u201d ballet shoes or skin colored.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "11:45",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a0c"
+    },
+    "name": "Petite Performers - Ballet/Tap",
+    "startTime": "16:00",
+    "session": "Winter/Spring 2027",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Ballet/Tap Combo class, where the elegance of ballet meets the rhythm of tap! This class combines the grace and discipline of ballet with the rhythm and energy of tap dance. Young dancers will build coordination, balance, and musicality, all while having fun! Ballet basics teach poise and flexibility, while tap introduces rhythm and timing through lively, percussive movements. \r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights (traditional dance attire) only. Any color or pattern, as long as it\u2019s proper ballet/dance attire. Please have long hair pulled back in a ponytail or bun. For this class they need both ballet and tap shoes. Please have black tap shoes and either \u201cballet pink\u201d ballet shoes or skin colored.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "16:45",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830281bf9c38c81134a0d"
+    },
+    "session": "Fall 2026",
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "name": "Petite Performers - Ballet/Tap",
+    "startTime": "16:30",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Ballet/Tap Combo class, where the elegance of ballet meets the rhythm of tap! This class combines the grace and discipline of ballet with the rhythm and energy of tap dance. Young dancers will build coordination, balance, and musicality, all while having fun! Ballet basics teach poise and flexibility, while tap introduces rhythm and timing through lively, percussive movements.\n\nDress Code: NO denim. Leotards, tutus, skirts and tights (traditional dance attire) only. Any color or pattern, as long as it\u2019s proper ballet/dance attire. Please have long hair pulled back in a ponytail or bun. For this class they need both ballet and tap shoes. Please have black tap shoes and either \u201cballet pink\u201d ballet shoes or skin colored.",
+    "endDate": {
+      "$date": "2027-12-15T00:00:00Z"
+    },
+    "endTime": "17:15",
+    "enrolled": 0,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-15T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a0e"
+    },
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "startTime": "11:00",
+    "session": "Fall 2026",
+    "name": "Petite Performers - Ballet/Tap",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Ballet/Tap Combo class, where the elegance of ballet meets the rhythm of tap! This class combines the grace and discipline of ballet with the rhythm and energy of tap dance. Young dancers will build coordination, balance, and musicality, all while having fun! Ballet basics teach poise and flexibility, while tap introduces rhythm and timing through lively, percussive movements. \r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights (traditional dance attire) only. Any color or pattern, as long as it\u2019s proper ballet/dance attire. Please have long hair pulled back in a ponytail or bun. For this class they need both ballet and tap shoes. Please have black tap shoes and either \u201cballet pink\u201d ballet shoes or skin colored.",
+    "endDate": {
+      "$date": "2027-12-16T00:00:00Z"
+    },
+    "endTime": "11:45",
+    "enrolled": 1,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-16T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a0f"
+    },
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "startTime": "16:00",
+    "session": "Fall 2026",
+    "name": "Petite Performers - Ballet/Tap",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Ballet/Tap Combo class, where the elegance of ballet meets the rhythm of tap! This class combines the grace and discipline of ballet with the rhythm and energy of tap dance. Young dancers will build coordination, balance, and musicality, all while having fun! Ballet basics teach poise and flexibility, while tap introduces rhythm and timing through lively, percussive movements. \r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights (traditional dance attire) only. Any color or pattern, as long as it\u2019s proper ballet/dance attire. Please have long hair pulled back in a ponytail or bun. For this class they need both ballet and tap shoes. Please have black tap shoes and either \u201cballet pink\u201d ballet shoes or skin colored.",
+    "endDate": {
+      "$date": "2027-12-16T00:00:00Z"
+    },
+    "endTime": "16:45",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-16T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a10"
+    },
+    "startTime": "17:00",
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "name": "Petite Performers - Ballet/Tap",
+    "session": "Fall 2026",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Ballet/Tap Combo class, where the elegance of ballet meets the rhythm of tap! This class combines the grace and discipline of ballet with the rhythm and energy of tap dance. Young dancers will build coordination, balance, and musicality, all while having fun! Ballet basics teach poise and flexibility, while tap introduces rhythm and timing through lively, percussive movements. \r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights (traditional dance attire) only. Any color or pattern, as long as it\u2019s proper ballet/dance attire. Please have long hair pulled back in a ponytail or bun. For this class they need both ballet and tap shoes. Please have black tap shoes and either \u201cballet pink\u201d ballet shoes or skin colored.",
+    "endDate": {
+      "$date": "2027-12-17T00:00:00Z"
+    },
+    "endTime": "17:45",
+    "enrolled": 5,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-17T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a11"
+    },
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "startTime": "11:00",
+    "session": "Winter/Spring 2027",
+    "name": "Petite Performers - Jazz/Hip Hop",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Jazz/Hip Hop Combo class, where the pizazz of jazz meets hip hop\u2019s groove! This class combines the grace and discipline of jazz with the rhythm and energy of hip hop dance. Young dancers will build coordination, balance, and musicality, all while having fun! Jazz basics teach flexibility and balance, while hip hop introduces flow and stylized movement.\n\nDress Code: NO denim. Tighter fitting t-shirts or tank tops and leggings or sweatpants OR leotards with skin colored tights. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "11:45",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a12"
+    },
+    "session": "Winter/Spring 2027",
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "name": "Petite Performers - Jazz/Hip Hop",
+    "startTime": "16:00",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Jazz/Hip Hop Combo class, where the pizazz of jazz meets hip hop\u2019s groove! This class combines the grace and discipline of jazz with the rhythm and energy of hip hop dance. Young dancers will build coordination, balance, and musicality, all while having fun! Jazz basics teach flexibility and balance, while hip hop introduces flow and stylized movement.\n\nDress Code: NO denim. Tighter fitting t-shirts or tank tops and leggings or sweatpants OR leotards with skin colored tights. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "16:45",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a13"
+    },
+    "startTime": "16:45",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "name": "Petite Performers - Jazz/Hip Hop",
+    "session": "Fall 2026",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Jazz/Hip Hop Combo class, where the pizazz of jazz meets hip hop\u2019s groove! This class combines the grace and discipline of jazz with the rhythm and energy of hip hop dance. Young dancers will build coordination, balance, and musicality, all while having fun! Jazz basics teach flexibility and balance, while hip hop introduces flow and stylized movement. \r\n\r\nDress Code: NO denim. Tighter fitting t-shirts or tank tops and leggings or sweatpants OR leotards with skin colored tights. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-12-16T00:00:00Z"
+    },
+    "endTime": "17:30",
+    "enrolled": 0,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-16T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a14"
+    },
+    "session": "Fall 2026",
+    "name": "Petite Performers - Jazz/Hip Hop",
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "startTime": "17:15",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Jazz/Hip Hop Combo class, where the pizazz of jazz meets hip hop\u2019s groove! This class combines the grace and discipline of jazz with the rhythm and energy of hip hop dance. Young dancers will build coordination, balance, and musicality, all while having fun! Jazz basics teach flexibility and balance, while hip hop introduces flow and stylized movement.\n\nDress Code: NO denim. Tighter fitting t-shirts or tank tops and leggings or sweatpants OR leotards with skin colored tights. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-12-15T00:00:00Z"
+    },
+    "endTime": "18:00",
+    "enrolled": 2,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-15T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a15"
+    },
+    "name": "Petite Performers - Jazz/Hip Hop",
+    "startTime": "11:00",
+    "session": "Fall 2026",
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Jazz/Hip Hop Combo class, where the pizazz of jazz meets hip hop\u2019s groove! This class combines the grace and discipline of jazz with the rhythm and energy of hip hop dance. Young dancers will build coordination, balance, and musicality, all while having fun! Jazz basics teach flexibility and balance, while hip hop introduces flow and stylized movement.\n\nDress Code: NO denim. Tighter fitting t-shirts or tank tops and leggings or sweatpants OR leotards with skin colored tights. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-12-14T00:00:00Z"
+    },
+    "endTime": "11:45",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-14T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a16"
+    },
+    "startTime": "16:00",
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "name": "Petite Performers - Jazz/Hip Hop",
+    "session": "Fall 2026",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Jazz/Hip Hop Combo class, where the pizazz of jazz meets hip hop\u2019s groove! This class combines the grace and discipline of jazz with the rhythm and energy of hip hop dance. Young dancers will build coordination, balance, and musicality, all while having fun! Jazz basics teach flexibility and balance, while hip hop introduces flow and stylized movement.\n\nDress Code: NO denim. Tighter fitting t-shirts or tank tops and leggings or sweatpants OR leotards with skin colored tights. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-12-14T00:00:00Z"
+    },
+    "endTime": "16:45",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-14T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a17"
+    },
+    "session": "Winter/Spring 2027",
+    "name": "Petite Performers - Jazz/Hip Hop",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "startTime": "16:45",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Jazz/Hip Hop Combo class, where the pizazz of jazz meets hip hop\u2019s groove! This class combines the grace and discipline of jazz with the rhythm and energy of hip hop dance. Young dancers will build coordination, balance, and musicality, all while having fun! Jazz basics teach flexibility and balance, while hip hop introduces flow and stylized movement. \r\n\r\nDress Code: NO denim. Tighter fitting t-shirts or tank tops and leggings or sweatpants OR leotards with skin colored tights. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "17:30",
+    "enrolled": 0,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a18"
+    },
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "startTime": "17:15",
+    "session": "Winter/Spring 2027",
+    "name": "Petite Performers - Jazz/Hip Hop",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Petite Performers - Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Introduce your little one to the magic of dance in our Jazz/Hip Hop Combo class, where the pizazz of jazz meets hip hop\u2019s groove! This class combines the grace and discipline of jazz with the rhythm and energy of hip hop dance. Young dancers will build coordination, balance, and musicality, all while having fun! Jazz basics teach flexibility and balance, while hip hop introduces flow and stylized movement.\n\nDress Code: NO denim. Tighter fitting t-shirts or tank tops and leggings or sweatpants OR leotards with skin colored tights. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "18:00",
+    "enrolled": 0,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 6,
+    "minAgeYears": 4,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a19"
+    },
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "startTime": "16:45",
+    "session": "Winter/Spring 2027",
+    "name": "Ballet Ages 7-10",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Ballet"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This foundational class introduces dancers to the beauty and discipline of ballet in a welcoming and supportive environment. Students will learn basic ballet positions, steps, and terminology while developing coordination, posture, musicality, and confidence. Through age-appropriate technique, dancers build strength and a love for this classical style of dance. Perfect for first-time ballerinas and those ready to further their training. \n\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "17:30",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 10,
+    "minAgeYears": 7,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a1a"
+    },
+    "session": "Fall 2026",
+    "name": "Ballet Ages 7-10",
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "startTime": "16:45",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Ballet"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This foundational class introduces dancers to the beauty and discipline of ballet in a welcoming and supportive environment. Students will learn basic ballet positions, steps, and terminology while developing coordination, posture, musicality, and confidence. Through age-appropriate technique, dancers build strength and a love for this classical style of dance. Perfect for first-time ballerinas and those ready to further their training. \n\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2026-12-14T00:00:00Z"
+    },
+    "endTime": "17:30",
+    "enrolled": 1,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 10,
+    "minAgeYears": 7,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-14T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a1b"
+    },
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "startTime": "18:45",
+    "session": "Fall 2026",
+    "name": "Contemporary Ages 7-10",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Contemporary"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This expressive class blends elements of modern, ballet, and jazz techniques to help dancers explore movement with emotion, freedom, and creativity. Dancers will work on fluidity, floor work, improvisation, and dynamic transitions while building strength and artistry. Contemporary dance encourages personal expression and storytelling through movement, making each class a unique journey. Perfect for dancers looking to connect technique with emotion and explore their individual style.\n\nDress Code: Athletic wear or traditional dance attire. Socks, dance turners, or barefeet are all acceptable.",
+    "endDate": {
+      "$date": "2027-12-15T00:00:00Z"
+    },
+    "endTime": "19:30",
+    "enrolled": 0,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 10,
+    "minAgeYears": 7,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-15T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a1d"
+    },
+    "name": "Contemporary Ages 7-10",
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "startTime": "18:45",
+    "session": "Winter/Spring 2027",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Contemporary"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This expressive class blends elements of modern, ballet, and jazz techniques to help dancers explore movement with emotion, freedom, and creativity. Dancers will work on fluidity, floor work, improvisation, and dynamic transitions while building strength and artistry. Contemporary dance encourages personal expression and storytelling through movement, making each class a unique journey. Perfect for dancers looking to connect technique with emotion and explore their individual style.\n\nDress Code: Athletic wear or traditional dance attire. Socks, dance turners, or barefeet are all acceptable.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "19:30",
+    "enrolled": 0,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 10,
+    "minAgeYears": 7,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a1e"
+    },
+    "startTime": "18:00",
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "name": "Jazz Ages 7-10",
+    "session": "Winter/Spring 2027",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Jazz"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This high-energy class introduces dancers to the foundations of jazz technique in a fun and encouraging environment. Students will learn basic steps, isolations, kicks, turns, and simple combinations while developing musicality, coordination, and confidence. With upbeat music and dynamic movement, Beginning Jazz is perfect for dancers ready to explore rhythm, style, and self-expression.\n\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "18:45",
+    "enrolled": 0,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 10,
+    "minAgeYears": 7,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a1f"
+    },
+    "name": "Jazz Ages 7-10",
+    "startTime": "18:00",
+    "session": "Fall 2026",
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Jazz"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This high-energy class introduces dancers to the foundations of jazz technique in a fun and encouraging environment. Students will learn basic steps, isolations, kicks, turns, and simple combinations while developing musicality, coordination, and confidence. With upbeat music and dynamic movement, Beginning Jazz is perfect for dancers ready to explore rhythm, style, and self-expression.\n\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-12-15T00:00:00Z"
+    },
+    "endTime": "18:45",
+    "enrolled": 0,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 10,
+    "minAgeYears": 7,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-15T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a20"
+    },
+    "name": "Beginning Ballet Ages 11+",
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "startTime": "18:30",
+    "session": "Fall 2026",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Ballet"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This foundational class introduces dancers to the beauty and discipline of ballet in a welcoming and supportive environment. Students will learn basic ballet positions, steps, and terminology while developing coordination, posture, musicality, and confidence. Through age-appropriate technique, dancers build strength and a love for this classical style of dance. Perfect for first-time ballerinas and those ready to further their training. \r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2026-12-17T00:00:00Z"
+    },
+    "endTime": "19:30",
+    "enrolled": 0,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 60,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-17T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a21"
+    },
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "startTime": "18:30",
+    "session": "Winter/Spring 2027",
+    "name": "Beginning Ballet Ages 11+",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Ballet"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This foundational class introduces dancers to the beauty and discipline of ballet in a welcoming and supportive environment. Students will learn basic ballet positions, steps, and terminology while developing coordination, posture, musicality, and confidence. Through age-appropriate technique, dancers build strength and a love for this classical style of dance. Perfect for first-time ballerinas and those ready to further their training. \r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a ponytail or bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "19:30",
+    "enrolled": 0,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 60,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a22"
+    },
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "startTime": "17:45",
+    "session": "Winter/Spring 2027",
+    "name": "Beginning Jazz Ages 11+",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Jazz"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This high-energy class introduces dancers to the foundations of jazz technique in a fun and encouraging environment. Students will learn basic steps, isolations, kicks, turns, and simple combinations while developing musicality, coordination, and confidence. With upbeat music and dynamic movement, Beginning Jazz is perfect for dancers ready to explore rhythm, style, and self-expression.\r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "18:30",
+    "enrolled": 0,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a23"
+    },
+    "startTime": "17:45",
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "name": "Beginning Jazz Ages 11+",
+    "session": "Fall 2026",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Jazz"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This high-energy class introduces dancers to the foundations of jazz technique in a fun and encouraging environment. Students will learn basic steps, isolations, kicks, turns, and simple combinations while developing musicality, coordination, and confidence. With upbeat music and dynamic movement, Beginning Jazz is perfect for dancers ready to explore rhythm, style, and self-expression.\r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-12-17T00:00:00Z"
+    },
+    "endTime": "18:30",
+    "enrolled": 0,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-17T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a24"
+    },
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "startTime": "19:00",
+    "session": "Fall 2026",
+    "name": "Contemporary Ages 11+",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Contemporary"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This expressive class blends elements of modern, ballet, and jazz techniques to help dancers explore movement with emotion, freedom, and creativity. Dancers will work on fluidity, floor work, improvisation, and dynamic transitions while building strength and artistry. Contemporary dance encourages personal expression and storytelling through movement, making each class a unique journey. Perfect for dancers looking to connect technique with emotion and explore their individual style.\n\nDress Code: Athletic wear or traditional dance attire. Socks, dance turners, or barefeet are all acceptable.",
+    "endDate": {
+      "$date": "2027-12-14T00:00:00Z"
+    },
+    "endTime": "19:45",
+    "enrolled": 2,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-14T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa830291bf9c38c81134a25"
+    },
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "startTime": "19:00",
+    "session": "Winter/Spring 2027",
+    "name": "Contemporary Ages 11+",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Contemporary"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "This expressive class blends elements of modern, ballet, and jazz techniques to help dancers explore movement with emotion, freedom, and creativity. Dancers will work on fluidity, floor work, improvisation, and dynamic transitions while building strength and artistry. Contemporary dance encourages personal expression and storytelling through movement, making each class a unique journey. Perfect for dancers looking to connect technique with emotion and explore their individual style.\n\nDress Code: Athletic wear or traditional dance attire. Socks, dance turners, or barefeet are all acceptable.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "19:45",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a26"
+    },
+    "session": "Winter/Spring 2027",
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "name": "Intermediate Ballet and Pre-Pointe",
+    "startTime": "17:30",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Ballet"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "**For dancers ages 11+ and 3+ years of experience with teacher approval** \r\n\r\nThis class is designed for ballet dancers who strive to take their technique and strength to the next level. Students who take this class will be on track to go en pointe, if they choose. During the class, each dancer will participate in a full length ballet class, as well as participating in exercises that will strengthen the dancer to be able to handle pointe work. Whether the student's goal is pointe or not, these activities will increase their strength and give insight into their anatomy as they move through various styles of dance\r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "19:00",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 75,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a27"
+    },
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "name": "Intermediate Ballet and Pre-Pointe",
+    "session": "Fall 2026",
+    "startTime": "17:30",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Ballet"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "**For dancers ages 11+ and 3+ years of experience with teacher approval** \r\n\r\nThis class is designed for ballet dancers who strive to take their technique and strength to the next level. Students who take this class will be on track to go en pointe, if they choose. During the class, each dancer will participate in a full length ballet class, as well as participating in exercises that will strengthen the dancer to be able to handle pointe work. Whether the student's goal is pointe or not, these activities will increase their strength and give insight into their anatomy as they move through various styles of dance\r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a bun. Ballet shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-12-14T00:00:00Z"
+    },
+    "endTime": "19:00",
+    "enrolled": 1,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 75,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-14T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a28"
+    },
+    "startTime": "17:30",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "name": "Intermediate Ballet Pre-Pointe/Pointe",
+    "session": "Fall 2026",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Ballet"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "**For dancers ages 11+ and 3+ years of experience with teacher approval**\r\n\r\nThis class is designed for ballet dancers who strive to take their technique and strength to the next level. Students who take this class will go en pointe. During the class, each dancer will participate in a full length ballet class, as well as participating in pointe exercises. Teacher approval is required before signing up for the class. Students will need to schedule an evaluation with the teacher before registering.  \r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a bun. Ballet shoes AND pointe shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-12-16T00:00:00Z"
+    },
+    "endTime": "19:00",
+    "enrolled": 1,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 75,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-16T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a29"
+    },
+    "session": "Winter/Spring 2027",
+    "name": "Intermediate Ballet Pre-Pointe/Pointe",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "startTime": "17:30",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Ballet"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "**For dancers ages 11+ and 3+ years of experience with teacher approval**\r\n\r\nThis class is designed for ballet dancers who strive to take their technique and strength to the next level. Students who take this class will go en pointe. During the class, each dancer will participate in a full length ballet class, as well as participating in pointe exercises. Teacher approval is required before signing up for the class. Students will need to schedule an evaluation with the teacher before registering.  \r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a bun. Ballet shoes AND pointe shoes are required in \u201cballet pink\u201d OR color matched to skin tone.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "19:00",
+    "enrolled": 0,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 75,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a2a"
+    },
+    "session": "Winter/Spring 2027",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "name": "Intermediate Jazz 11+",
+    "startTime": "19:00",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Jazz"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "**For dancers with 4+ years of experience**\r\n\r\nThis class builds on foundational jazz technique with more complex combinations, increased speed, and greater focus on style and performance. Dancers will refine their skills through across-the-floor progressions, dynamic choreography, and strength-building exercises. Emphasis is placed on clean lines, control, musicality, and versatility. Ideal for dancers with four years of jazz training or equivalent experience.\r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "19:45",
+    "enrolled": 0,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a2b"
+    },
+    "name": "Intermediate Jazz 11+",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "startTime": "19:00",
+    "session": "Fall 2026",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Jazz"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "**For dancers with 4+ years of experience**\r\n\r\nThis class builds on foundational jazz technique with more complex combinations, increased speed, and greater focus on style and performance. Dancers will refine their skills through across-the-floor progressions, dynamic choreography, and strength-building exercises. Emphasis is placed on clean lines, control, musicality, and versatility. Ideal for dancers with four years of jazz training or equivalent experience.\r\n\r\nDress Code: NO denim. Leotards, tutus, skirts and tights in skin colored tone (traditional dance attire) are required. Please have long hair pulled back in a ponytail or bun. Black jazz shoes are required.",
+    "endDate": {
+      "$date": "2027-12-16T00:00:00Z"
+    },
+    "endTime": "19:45",
+    "enrolled": 2,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-16T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a2c"
+    },
+    "name": "Modern Ages 11+",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "startTime": "19:45",
+    "session": "Fall 2026",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Modern"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Modern Dance is a foundational concert dance technique that encourages dancers to move with intention, artistry, and authenticity. This class explores the principles of breath, weight, momentum, gravity, and expressive movement while developing a strong technical foundation.\r\n\r\nDress code: Athletic wear or traditional dance attire. Socks, dance turners, or bare feet are all acceptable.",
+    "endDate": {
+      "$date": "2027-12-16T00:00:00Z"
+    },
+    "endTime": "20:30",
+    "enrolled": 1,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-16T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a2d"
+    },
+    "session": "Winter/Spring 2027",
+    "daysOfWeek": [
+      "Wednesday"
+    ],
+    "name": "Modern Ages 11+",
+    "startTime": "19:45",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Modern"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Modern Dance is a foundational concert dance technique that encourages dancers to move with intention, artistry, and authenticity. This class explores the principles of breath, weight, momentum, gravity, and expressive movement while developing a strong technical foundation.\r\n\r\nDress code: Athletic wear or traditional dance attire. Socks, dance turners, or bare feet are all acceptable.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "20:30",
+    "enrolled": 0,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a2e"
+    },
+    "session": "Winter/Spring 2027",
+    "name": "Tap Ages 11+",
+    "daysOfWeek": [
+      "Monday"
+    ],
+    "startTime": "19:45",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Tap"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Get ready to make music with your feet! This energetic and upbeat class teaches rhythm, timing, and coordination through classic tap dance technique. Dancers will learn foundational steps, combinations, and terminology while developing musicality, precision, and performance skills. With a focus on clear sounds and creative expression, this class is perfect for dancers who love to move, groove, and make music with their feet!\n\nDress Code: Athletic wear or traditional dance attire. Black tap shoes are required.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "20:30",
+    "enrolled": 0,
+    "instructors": [
+      "Maci McClure",
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a2f"
+    },
+    "session": "Fall 2026",
+    "name": "Tap Ages 11+",
+    "daysOfWeek": [
+      "Friday"
+    ],
+    "startTime": "17:00",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Tap"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Get ready to make music with your feet! This energetic and upbeat class teaches rhythm, timing, and coordination through classic tap dance technique. Dancers will learn foundational steps, combinations, and terminology while developing musicality, precision, and performance skills. With a focus on clear sounds and creative expression, this class is perfect for dancers who love to move, groove, and make music with their feet!\n\nDress Code: Athletic wear or traditional dance attire. Black tap shoes are required.",
+    "endDate": {
+      "$date": "2027-12-17T00:00:00Z"
+    },
+    "endTime": "17:45",
+    "enrolled": 0,
+    "instructors": [
+      "Maci McClure",
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "maxAgeYears": 19,
+    "minAgeYears": 11,
+    "priceAmount": 50,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-18T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a30"
+    },
+    "session": "Fall 2026",
+    "name": "Essential Level Spiral Body Techniques\u00ae",
+    "daysOfWeek": [
+      "Saturday"
+    ],
+    "startTime": "12:00",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Contemporary"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Spiral Body Techniques\u00ae (SBT) is the dance and movement framework developed by choreographer Molly Shanahan. This class will be taught by Amy Guilmette, who is among the first cohorts of teachers certified as an Essential Level SBT teacher in 2024. www.mollyshanahanspiralbody.com.",
+    "endDate": {
+      "$date": "2027-12-19T00:00:00Z"
+    },
+    "endTime": "13:15",
+    "enrolled": 1,
+    "instructors": [
+      "Amy Guilmette"
+    ],
+    "isPublished": true,
+    "minAgeYears": 15,
+    "priceAmount": 70,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-19T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a31"
+    },
+    "daysOfWeek": [
+      "Friday"
+    ],
+    "name": "Slow Flow Yoga",
+    "session": "Fall 2026",
+    "startTime": "17:45",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Yoga"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Journey through our Slow Flow Yoga to end the week in bliss! This simple Yoga class is perfect for any age 16+. Modifications will always be available for those less mobile, and everyone is welcome no matter your knowledge on the subject!",
+    "endDate": {
+      "$date": "2027-12-17T00:00:00Z"
+    },
+    "endTime": "18:45",
+    "enrolled": 0,
+    "instructors": [
+      "Julia Watkins"
+    ],
+    "isPublished": true,
+    "minAgeYears": 16,
+    "priceAmount": 60,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-18T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a32"
+    },
+    "name": "Adult Ballet",
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "startTime": "19:30",
+    "session": "Winter/Spring 2027",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Ballet"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "For adult dancers of all levels\nWhether you're returning to ballet or trying it for the first time, this class offers a supportive, low-pressure environment where adults can enjoy the beauty and discipline of ballet. The class focuses on alignment, posture, flexibility, and grace through classic barre work and combinations. It\u2019s a great way to build strength, improve coordination, and reconnect with the joy of movement\u2014no tutu required!\n\nDress Code: Athletic wear or traditional dance attire. Ballet shoes or socks are required.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "20:30",
+    "enrolled": 0,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "minAgeYears": 18,
+    "priceAmount": 60,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a33"
+    },
+    "session": "Fall 2026",
+    "name": "Adult Ballet",
+    "daysOfWeek": [
+      "Tuesday"
+    ],
+    "startTime": "19:30",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Ballet"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "For adult dancers of all levels\nWhether you're returning to ballet or trying it for the first time, this class offers a supportive, low-pressure environment where adults can enjoy the beauty and discipline of ballet. The class focuses on alignment, posture, flexibility, and grace through classic barre work and combinations. It\u2019s a great way to build strength, improve coordination, and reconnect with the joy of movement\u2014no tutu required!\n\nDress Code: Athletic wear or traditional dance attire. Ballet shoes or socks are required.",
+    "endDate": {
+      "$date": "2027-12-15T00:00:00Z"
+    },
+    "endTime": "20:30",
+    "enrolled": 3,
+    "instructors": [
+      "Lila Hodgin"
+    ],
+    "isPublished": true,
+    "minAgeYears": 18,
+    "priceAmount": 60,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-15T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a35"
+    },
+    "startTime": "19:30",
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "name": "Adult Jazz/Contemporary",
+    "session": "Fall 2026",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Designed for adult dancers of all backgrounds, it combines the sharp, dynamic movement of jazz with the fluid, expressive qualities of contemporary dance. This class is the perfect blend of style, strength, and self-expression. Each class includes a full-body warm-up, technique-building exercises, and a combination that encourages creativity and musicality. Whether you're returning to dance or trying something new, you'll leave with a renewed passion for the art of dance.\r\n\r\nDress Code: Athletic wear or traditional dance attire. Socks, dance turners, or barefeet are all acceptable.",
+    "endDate": {
+      "$date": "2027-12-17T00:00:00Z"
+    },
+    "endTime": "20:30",
+    "enrolled": 1,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "minAgeYears": 18,
+    "priceAmount": 60,
+    "registrationStartDate": {
+      "$date": "2026-07-13T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2026-09-17T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8302a1bf9c38c81134a36"
+    },
+    "session": "Winter/Spring 2027",
+    "name": "Adult Jazz/Contemporary",
+    "daysOfWeek": [
+      "Thursday"
+    ],
+    "startTime": "19:30",
+    "billingCycle": "Monthly",
+    "capacity": 10,
+    "categories": [
+      "Combo"
+    ],
+    "createdAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    },
+    "description": "Designed for adult dancers of all backgrounds, it combines the sharp, dynamic movement of jazz with the fluid, expressive qualities of contemporary dance. This class is the perfect blend of style, strength, and self-expression. Each class includes a full-body warm-up, technique-building exercises, and a combination that encourages creativity and musicality. Whether you're returning to dance or trying something new, you'll leave with a renewed passion for the art of dance.\r\n\r\nDress Code: Athletic wear or traditional dance attire. Socks, dance turners, or barefeet are all acceptable.",
+    "endDate": {
+      "$date": "2027-05-15T00:00:00Z"
+    },
+    "endTime": "20:30",
+    "enrolled": 0,
+    "instructors": [
+      "Hannah Rivera"
+    ],
+    "isPublished": true,
+    "minAgeYears": 18,
+    "priceAmount": 60,
+    "registrationStartDate": {
+      "$date": "2026-10-01T00:00:00Z"
+    },
+    "startDate": {
+      "$date": "2027-01-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T17:34:32.252Z"
+    }
+  }
+]

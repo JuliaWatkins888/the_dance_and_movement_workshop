@@ -42,6 +42,9 @@ import {
 // inithium:block:classes:imports:start
 import { CreateClassInput, FindManyClassesOptions, UpdateClassInput } from './contracts/class.contract';
 // inithium:block:classes:imports:end
+// inithium:block:children:imports:start
+import { CreateChildInput, FindManyChildrenOptions, UpdateChildInput } from './contracts/child.contract';
+// inithium:block:children:imports:end
 // inithium:anchor:imports
 import { activeProvider as defaultProvider } from './providers/active-provider';
 
@@ -213,6 +216,17 @@ export const updateClass = (id: string, input: UpdateClassInput) => getClassRepo
 export const deleteClass = (id: string) => getClassRepository().delete(id);
 
 // inithium:block:classes:repositories:end
+// inithium:block:children:repositories:start
+export const getChildRepository = () => activeProvider.getChildRepository();
+export const listChildren = (options: FindManyChildrenOptions) => getChildRepository().findMany(options);
+export const getChildById = (id: string) => getChildRepository().findById(id);
+export const listChildrenByParentUserId = (parentUserId: string) => getChildRepository().findByParentUserId(parentUserId);
+export const createChild = (input: CreateChildInput) => getChildRepository().create(input);
+export const updateChild = (id: string, input: UpdateChildInput) => getChildRepository().update(id, input);
+export const deleteChild = (id: string) => getChildRepository().delete(id);
+export const getChildrenCreatedByDay = () => getChildRepository().countCreatedByDay();
+
+// inithium:block:children:repositories:end
 // inithium:anchor:repositories
 
 export type { DbProvider, DbConfig } from './contracts/db-provider.contract';
@@ -343,6 +357,20 @@ export type {
   ClassRepository,
 } from './contracts/class.contract';
 // inithium:block:classes:type-exports:end
+// inithium:block:children:type-exports:start
+export { CHILD_GENDERS } from './contracts/child.contract';
+export type {
+  ChildEntity,
+  CreateChildInput,
+  UpdateChildInput,
+  ChildGender,
+  ChildSearchField,
+  ChildRegistrationEntry,
+  ChildAccountCount,
+  FindManyChildrenOptions,
+  ChildRepository,
+} from './contracts/child.contract';
+// inithium:block:children:type-exports:end
 // inithium:anchor:type-exports
 export { ensureSeededPages } from './page-seeds/ensureSeededPages';
 export { pruneOrphanedPluginPages } from './page-seeds/pruneOrphanedPluginPages';

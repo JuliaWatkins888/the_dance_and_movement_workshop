@@ -51,6 +51,11 @@ import { ClassRepository } from '../../contracts/class.contract';
 import { createMongoClassRepository } from './class.repository';
 import { ClassModel } from '../../schemas/class.schema';
 // inithium:block:classes:imports:end
+// inithium:block:children:imports:start
+import { ChildRepository } from '../../contracts/child.contract';
+import { createMongoChildRepository } from './child.repository';
+import { ChildModel } from '../../schemas/child.schema';
+// inithium:block:children:imports:end
 // inithium:anchor:imports
 
 const userRepository = createMongoUserRepository(UserModel);
@@ -78,6 +83,9 @@ const policyRepository = createMongoPolicyRepository(PolicyCategoryModel);
 // inithium:block:classes:repository-instances:start
 const classRepository = createMongoClassRepository(ClassModel);
 // inithium:block:classes:repository-instances:end
+// inithium:block:children:repository-instances:start
+const childRepository = createMongoChildRepository(ChildModel);
+// inithium:block:children:repository-instances:end
 // inithium:anchor:repository-instances
 
 export const mongoProvider: DbProvider = {
@@ -119,5 +127,8 @@ export const mongoProvider: DbProvider = {
 // inithium:block:classes:members:start
   getClassRepository: (): ClassRepository => classRepository,
 // inithium:block:classes:members:end
+// inithium:block:children:members:start
+  getChildRepository: (): ChildRepository => childRepository,
+// inithium:block:children:members:end
   // inithium:anchor:members
 };
