@@ -4,6 +4,7 @@ import {
   ClassRepository,
   CreateClassInput,
   FindManyClassesOptions,
+  FindManyClassesUnpagedOptions,
   FindPublishedClassesOptions,
   UpdateClassInput,
 } from '../../contracts/class.contract';
@@ -51,6 +52,19 @@ export const createMongoClassRepository = (model: Model<ClassDocument>): ClassRe
     ]);
 
     return { items: docs.map(mapToClassEntity), total, page, pageSize };
+  },
+  findManyUnpaged: async (options: FindManyClassesUnpagedOptions): Promise<ClassEntity[]> => {
+    const { search, searchField, courseId } = options;
+    const filter: QueryFilter<ClassDocument> = {};
+    if (courseId) {
+      filter.courseId = courseId;
+    }
+    if (search && searchField) {
+      filter[searchField] = { $regex: escapeRegExp(search), $options: 'i' };
+    }
+
+    const docs = await model.find(filter).exec();
+    return docs.map(mapToClassEntity);
   },
   findPublished: async (options?: FindPublishedClassesOptions): Promise<ClassEntity[]> => {
     const filter: QueryFilter<ClassDocument> = { isPublished: true };

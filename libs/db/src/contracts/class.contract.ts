@@ -55,10 +55,23 @@ export interface FindPublishedClassesOptions {
   courseId?: string;
 }
 
+export interface FindManyClassesUnpagedOptions {
+  search?: string;
+  searchField?: ClassSearchField;
+  courseId?: string;
+}
+
 export interface ClassRepository {
   // Admin listing - every class regardless of isPublished, paginated + searchable, optionally
   // narrowed to one Course.
   findMany: (options: FindManyClassesOptions) => Promise<PaginatedResult<ClassEntity>>;
+  // Same filter as findMany but unpaged - Class has no name of its own to sort by at the DB level
+  // (its "alphabetical" identity is its parent Course's name, which only the route layer can
+  // resolve - see classes.route.ts's toClassDto), so the admin route fetches the full matching
+  // set here, sorts by the resolved courseName there, and paginates that sorted array in JS. Small
+  // catalog, same "fetch whole, process in application code" precedent this codebase already uses
+  // for every public listing.
+  findManyUnpaged: (options: FindManyClassesUnpagedOptions) => Promise<ClassEntity[]>;
   findPublished: (options?: FindPublishedClassesOptions) => Promise<ClassEntity[]>;
   create: (input: CreateClassInput) => Promise<ClassEntity>;
   update: (id: string, input: UpdateClassInput) => Promise<ClassEntity | null>;

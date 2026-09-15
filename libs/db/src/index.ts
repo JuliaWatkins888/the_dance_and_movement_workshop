@@ -40,7 +40,7 @@ import {
 } from './contracts/policy.contract';
 // inithium:block:policy:imports:end
 // inithium:block:classes:imports:start
-import { CreateClassInput, FindManyClassesOptions, FindPublishedClassesOptions, UpdateClassInput } from './contracts/class.contract';
+import { CreateClassInput, FindManyClassesOptions, FindManyClassesUnpagedOptions, FindPublishedClassesOptions, UpdateClassInput } from './contracts/class.contract';
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import { CreateChildInput, FindManyChildrenOptions, UpdateChildInput } from './contracts/child.contract';
@@ -215,6 +215,7 @@ export const deletePolicyItem = (categoryId: string, itemId: string) =>
 // inithium:block:classes:repositories:start
 export const getClassRepository = () => activeProvider.getClassRepository();
 export const listClasses = (options: FindManyClassesOptions) => getClassRepository().findMany(options);
+export const listClassesUnpaged = (options: FindManyClassesUnpagedOptions) => getClassRepository().findManyUnpaged(options);
 export const listPublishedClasses = (options?: FindPublishedClassesOptions) => getClassRepository().findPublished(options);
 export const createClass = (input: CreateClassInput) => getClassRepository().create(input);
 export const updateClass = (id: string, input: UpdateClassInput) => getClassRepository().update(id, input);
@@ -387,6 +388,7 @@ export type {
   DayOfWeek,
   ClassSearchField,
   FindManyClassesOptions,
+  FindManyClassesUnpagedOptions,
   FindPublishedClassesOptions,
   ClassRepository,
 } from './contracts/class.contract';

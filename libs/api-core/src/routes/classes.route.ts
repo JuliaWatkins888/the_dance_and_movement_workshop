@@ -3,7 +3,7 @@ import type { Request, Response, Router as RouterType } from 'express';
 import { asyncHandler, createSuccessResponse, NotFoundError, ValidationError } from '@inithium/api-utils';
 import { requireAuth } from '@inithium/auth';
 import { requirePermission } from '@inithium/permissions';
-import { createClass, deleteClass, getCourseById, getSemesterById, listClasses, listPublishedClasses, updateClass } from '@inithium/db';
+import { createClass, deleteClass, getCourseById, getSemesterById, listClassesUnpaged, listPublishedClasses, updateClass } from '@inithium/db';
 import type { ClassEntity, ClassSearchField } from '@inithium/db';
 import { createClassSchema, updateClassSchema } from '../schemas/classes.schema';
 import { resolveInstructorSummaries } from '../shared/resolveInstructorSummaries';
@@ -41,6 +41,14 @@ const toClassDto = async (classItem: ClassEntity) => {
   };
 };
 
+// Alphabetized the same way coursesApi's own listCoursesAdmin sorts Courses (by name) - Class has
+// no name of its own to sort by at the DB level (see class.contract.ts's own note), so this runs
+// after toClassDto has resolved each one's parent courseName, ordering by that name first and its
+// variantLabel second (e.g. all "Ballet" classes grouped together, "Ages 7-10" before "Beginning,
+// Ages 11+" within that group).
+const compareByCourseNameThenVariant = (a: Awaited<ReturnType<typeof toClassDto>>, b: Awaited<ReturnType<typeof toClassDto>>): number =>
+  a.courseName.localeCompare(b.courseName) || (a.variantLabel ?? '').localeCompare(b.variantLabel ?? '');
+
 // Reading the catalog isn't sensitive - it's meant for every site visitor - so like
 // courses.route.ts there's a single public, unpaged read (the Course Detail page fetches a
 // course's variants and does no further pagination, matching the "small catalog" precedent every
@@ -51,7 +59,8 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     const courseId = typeof req.query['courseId'] === 'string' ? req.query['courseId'] : undefined;
     const classes = await listPublishedClasses(courseId ? { courseId } : undefined);
-    res.status(200).json(createSuccessResponse(await Promise.all(classes.map(toClassDto))));
+    const items = await Promise.all(classes.map(toClassDto));
+    res.status(200).json(createSuccessResponse(items.sort(compareByCourseNameThenVariant)));
   }),
 );
 
@@ -70,21 +79,27 @@ router.get(
     const searchField = isSearchField(rawSearchField) ? rawSearchField : 'variantLabel';
     const courseId = typeof req.query['courseId'] === 'string' ? req.query['courseId'] : undefined;
 
-    const result = await listClasses({
-      page,
-      pageSize,
+    // Fetches the whole matching set (unpaged) rather than paginating at the DB level - the sort
+    // key (courseName) only exists once toClassDto resolves it below, so pagination has to happen
+    // after that resolve+sort, not before it. Small catalog, same "fetch whole, process in
+    // application code" precedent this codebase already uses for every public listing.
+    const matching = await listClassesUnpaged({
       search: rawSearch || undefined,
       searchField: rawSearch ? searchField : undefined,
       courseId,
     });
-    const items = await Promise.all(result.items.map(toClassDto));
+    const sorted = (await Promise.all(matching.map(toClassDto))).sort(compareByCourseNameThenVariant);
+
+    const total = sorted.length;
+    const start = (page - 1) * pageSize;
+    const items = sorted.slice(start, start + pageSize);
 
     res.status(200).json(
       createSuccessResponse(items, {
-        page: result.page,
-        pageSize: result.pageSize,
-        total: result.total,
-        totalPages: Math.max(1, Math.ceil(result.total / result.pageSize)),
+        page,
+        pageSize,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / pageSize)),
       }),
     );
   }),
