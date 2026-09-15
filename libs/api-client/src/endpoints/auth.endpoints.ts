@@ -48,10 +48,24 @@ export const authApi = baseApi.injectEndpoints({
     login: builder.mutation<AuthResponse, LoginCredentials>({
       query: (credentials) => ({ url: '/auth/login', method: 'POST', body: credentials }),
       invalidatesTags: ['User'],
+      onQueryStarted: async (_credentials, { dispatch, queryFulfilled }) => {
+        // The login response already carries the full AuthUser - seed getMe's cache with it
+        // directly instead of waiting on a second /auth/me round trip. Without this, a caller
+        // that sets the access token and expects useGetMeQuery to resolve on the very next
+        // render (e.g. the CMS's login gate) sees one extra render cycle of "no user yet" while
+        // that second request is in flight, which reads as "the CMS doesn't recognize I'm logged
+        // in" until something else (a refresh) happens to re-trigger it.
+        const { data } = await queryFulfilled;
+        dispatch(authApi.util.upsertQueryData('getMe', undefined, data.user));
+      },
     }),
     register: builder.mutation<AuthResponse, RegisterInput>({
       query: (input) => ({ url: '/auth/register', method: 'POST', body: input }),
       invalidatesTags: ['User'],
+      onQueryStarted: async (_input, { dispatch, queryFulfilled }) => {
+        const { data } = await queryFulfilled;
+        dispatch(authApi.util.upsertQueryData('getMe', undefined, data.user));
+      },
     }),
   }),
 });

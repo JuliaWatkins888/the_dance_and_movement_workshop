@@ -16,6 +16,9 @@ import { StaffPage } from './StaffPage';
 // inithium:block:policy:imports:start
 import { PoliciesPage } from './PoliciesPage';
 // inithium:block:policy:imports:end
+// inithium:block:classes:imports:start
+import { ClassesPage } from './ClassesPage';
+// inithium:block:classes:imports:end
 // inithium:anchor:imports
 
 // Keyed by Page.slug, matching libs/db/src/page-seeds/registry.ts's own seeded records: home
@@ -42,5 +45,8 @@ export const pageComponents: PageComponentMap = {
 // inithium:block:policy:components:start
   policies: PoliciesPage,
 // inithium:block:policy:components:end
+// inithium:block:classes:components:start
+  classes: ClassesPage,
+// inithium:block:classes:components:end
   // inithium:anchor:components
 };

@@ -228,4 +228,22 @@ export type {
 } from './endpoints/policies.endpoints';
 
 // inithium:block:policy:exports:end
+// inithium:block:classes:exports:start
+export {
+  classesApi,
+  useListPublicClassesQuery,
+  useListClassesAdminQuery,
+  useCreateClassMutation,
+  useUpdateClassMutation,
+  useDeleteClassMutation,
+} from './endpoints/classes.endpoints';
+export type {
+  ClassDto,
+  ListClassesAdminParams,
+  ListClassesResult,
+  ClassWriteInput,
+  UpdateClassInput,
+} from './endpoints/classes.endpoints';
+
+// inithium:block:classes:exports:end
 // inithium:anchor:exports

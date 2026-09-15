@@ -1,6 +1,9 @@
 export { Text } from './Text/Text';
 export type { TextProps } from './Text/Text';
 
+export { AmpersandText } from './AmpersandText/AmpersandText';
+export type { AmpersandTextProps } from './AmpersandText/AmpersandText';
+
 export { Box } from './Box/Box';
 export type { BoxProps } from './Box/Box';
 

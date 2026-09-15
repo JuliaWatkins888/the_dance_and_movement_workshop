@@ -64,6 +64,9 @@ export const baseApi = createApi({
 // inithium:block:policy:tag-types:start
     'PolicyCategory',
 // inithium:block:policy:tag-types:end
+// inithium:block:classes:tag-types:start
+    'Class',
+// inithium:block:classes:tag-types:end
     // inithium:anchor:tag-types
   ],
   endpoints: () => ({}),

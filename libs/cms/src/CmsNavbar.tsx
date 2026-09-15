@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, Box, Button, NotificationCenter, Text, drawer, resolveAvatarConfigProps } from '@inithium/ui';
+import { AmpersandText, Avatar, Box, Button, NotificationCenter, Text, drawer, resolveAvatarConfigProps } from '@inithium/ui';
 import type { DrawerRenderContext } from '@inithium/ui';
 import { useAppName, useNotificationCenter, useShowPersistentNotificationCenter } from '@inithium/api-client';
 import type { AuthUser } from '@inithium/api-client';
@@ -68,7 +68,7 @@ export const CmsNavbar = ({ currentUser, onLogout }: CmsNavbarProps) => {
     >
       <Link to="/cms" className="flex shrink-0 items-center gap-2">
         <Text textColor={{ color: 'surface', intensity: 950 }} as="span" className="text-lg font-semibold font-primary">
-          {appName}
+          <AmpersandText text={appName} />
         </Text>
       </Link>
 

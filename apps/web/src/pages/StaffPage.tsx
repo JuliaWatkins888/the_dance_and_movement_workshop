@@ -55,15 +55,19 @@ const StaffCard = ({ member }: StaffCardProps) => {
         </Text>
       </div>
 
-      <div className="absolute inset-0 flex flex-col justify-center gap-2 bg-black/85 p-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        <Text as="p" className="text-lg font-bold text-white">
+      {/* flex-col (not justify-center) with the bio as the only flex-1/overflow-y-auto child -
+          name/title stay pinned at the top while a long bio scrolls internally instead of
+          spilling past the card's own bounds (inset-0 already caps this overlay at the card's
+          height, so overflowing content needs somewhere to go that isn't "past the edges"). */}
+      <div className="absolute inset-0 flex flex-col gap-2 bg-black/85 p-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <Text as="p" className="shrink-0 text-lg font-bold text-white">
           {name}
         </Text>
-        <Text as="p" className="text-xs font-semibold uppercase tracking-wide text-primary-400">
+        <Text as="p" className="shrink-0 text-xs font-semibold uppercase tracking-wide text-primary-400">
           {member.title}
         </Text>
         {member.bio ? (
-          <Text as="p" className="text-sm text-white/85">
+          <Text as="p" className="min-h-0 flex-1 overflow-y-auto text-sm text-white/85">
             {member.bio}
           </Text>
         ) : null}

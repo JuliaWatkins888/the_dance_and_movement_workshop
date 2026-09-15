@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { AvatarConfig, NotificationEntity, PageEntity } from '@inithium/db';
-import { Avatar, Box, Button, Divider, Icon, Text } from '../components';
+import { AmpersandText, Avatar, Box, Button, Divider, Icon, Text } from '../components';
 import { drawer } from '../drawer/drawer';
 import type { DrawerRenderContext } from '../drawer/drawerStore';
 import type { IconName } from '../tokens/icon';
@@ -65,7 +65,7 @@ export interface NavbarProps {
   readonly onChangePasswordClick?: () => void;
 }
 
-const DEFAULT_HEIGHT = 64;
+const DEFAULT_HEIGHT = 72;
 
 const NavLink = ({ page, onNavigate }: { page: PageEntity; onNavigate: () => void }) => (
   // variant stays color: 'accent' so the 'link' kind's own hover:border-b-accent-500 (already
@@ -274,10 +274,10 @@ export const Navbar = ({
         className={mergeClassNames('h-full w-full border-b', className)}
       >
         <Link to="/" className="flex shrink-0 items-center gap-2">
-          {logo ? <img src={logo.src} alt={logo.alt ?? ''} className="h-8 w-auto" /> : null}
+          {logo ? <img src={logo.src} alt={logo.alt ?? ''} className="h-14 w-auto" /> : null}
           {title ? (
             <Text textColor={{color: 'surface', intensity: 950}} as="span" className="text-lg font-semibold font-primary">
-              {title}
+              <AmpersandText text={title} />
             </Text>
           ) : null}
         </Link>

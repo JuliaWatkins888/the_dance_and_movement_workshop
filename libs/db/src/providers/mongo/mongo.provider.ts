@@ -46,6 +46,11 @@ import { PolicyRepository } from '../../contracts/policy.contract';
 import { createMongoPolicyRepository } from './policy.repository';
 import { PolicyCategoryModel } from '../../schemas/policy.schema';
 // inithium:block:policy:imports:end
+// inithium:block:classes:imports:start
+import { ClassRepository } from '../../contracts/class.contract';
+import { createMongoClassRepository } from './class.repository';
+import { ClassModel } from '../../schemas/class.schema';
+// inithium:block:classes:imports:end
 // inithium:anchor:imports
 
 const userRepository = createMongoUserRepository(UserModel);
@@ -70,6 +75,9 @@ const timeAuditLogRepository = createMongoTimeAuditLogRepository(TimeAuditLogMod
 // inithium:block:policy:repository-instances:start
 const policyRepository = createMongoPolicyRepository(PolicyCategoryModel);
 // inithium:block:policy:repository-instances:end
+// inithium:block:classes:repository-instances:start
+const classRepository = createMongoClassRepository(ClassModel);
+// inithium:block:classes:repository-instances:end
 // inithium:anchor:repository-instances
 
 export const mongoProvider: DbProvider = {
@@ -108,5 +116,8 @@ export const mongoProvider: DbProvider = {
 // inithium:block:policy:members:start
   getPolicyRepository: (): PolicyRepository => policyRepository,
 // inithium:block:policy:members:end
+// inithium:block:classes:members:start
+  getClassRepository: (): ClassRepository => classRepository,
+// inithium:block:classes:members:end
   // inithium:anchor:members
 };

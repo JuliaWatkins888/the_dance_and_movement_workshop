@@ -27,6 +27,9 @@ import timeExportRouter from './routes/time/time-export.route';
 // inithium:block:policy:imports:start
 import policyRouter from './routes/policy.route';
 // inithium:block:policy:imports:end
+// inithium:block:classes:imports:start
+import classesRouter from './routes/classes.route';
+// inithium:block:classes:imports:end
 // inithium:anchor:imports
 
 export const registerCoreRoutes = (app: Express): void => {
@@ -58,6 +61,9 @@ export const registerCoreRoutes = (app: Express): void => {
 // inithium:block:policy:routes:start
   app.use(policyRouter);
 // inithium:block:policy:routes:end
+// inithium:block:classes:routes:start
+  app.use(classesRouter);
+// inithium:block:classes:routes:end
   // inithium:anchor:routes
   console.log('✅ Core routes registered');
 };
