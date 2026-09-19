@@ -12,6 +12,7 @@ import { ContactPage } from './ContactPage';
 // inithium:block:contact:imports:end
 // inithium:block:staff:imports:start
 import { StaffPage } from './StaffPage';
+import { StaffDetailPage } from './StaffDetailPage';
 // inithium:block:staff:imports:end
 // inithium:block:policy:imports:start
 import { PoliciesPage } from './PoliciesPage';
@@ -20,6 +21,7 @@ import { PoliciesPage } from './PoliciesPage';
 import { CourseBrowsePage } from './CourseBrowsePage';
 import { CourseDetailPage } from './CourseDetailPage';
 import { WorkshopsPage } from './WorkshopsPage';
+import { RegisterPage } from './RegisterPage';
 // inithium:block:studio-offerings:imports:end
 // inithium:anchor:imports
 
@@ -43,6 +45,7 @@ export const pageComponents: PageComponentMap = {
 // inithium:block:contact:components:end
 // inithium:block:staff:components:start
   staff: StaffPage,
+  'staff-detail': StaffDetailPage,
 // inithium:block:staff:components:end
 // inithium:block:policy:components:start
   policies: PoliciesPage,
@@ -51,6 +54,7 @@ export const pageComponents: PageComponentMap = {
   courses: CourseBrowsePage,
   'course-detail': CourseDetailPage,
   workshops: WorkshopsPage,
+  register: RegisterPage,
 // inithium:block:studio-offerings:components:end
   // inithium:anchor:components
 };

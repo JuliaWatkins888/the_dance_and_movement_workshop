@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, Box, Loader, Pagination, Text } from '@inithium/ui';
+import { Avatar, Box, Loader, Pagination, Text, useNavigateWithTransition } from '@inithium/ui';
 import { useListPublicStaffQuery } from '@inithium/api-client';
 import type { StaffMemberDto } from '@inithium/api-client';
 
@@ -10,17 +10,32 @@ const fullNameOf = (member: StaffMemberDto): string =>
 
 interface StaffCardProps {
   readonly member: StaffMemberDto;
+  readonly onOpen: (member: StaffMemberDto) => void;
 }
 
 // Full-bleed portrait card: the photo (or an initials fallback) fills the whole card, with
 // name/title/email overlaid on a bottom gradient by default, and a full dark overlay with
 // name/bio fading in on hover. Modeled on the shape of the PRD screenshot (photo up top, quick
 // facts always visible, fuller bio on hover) without copying its specific visual treatment.
-const StaffCard = ({ member }: StaffCardProps) => {
+// Clicking/tapping anywhere on the card opens the full Staff Detail page (bio + what they teach) -
+// the hover overlay stays as a desktop-only quick peek, but the click-through is what actually
+// works on touch devices, which have no hover state to reveal that overlay at all.
+const StaffCard = ({ member, onOpen }: StaffCardProps) => {
   const name = fullNameOf(member);
 
   return (
-    <div className="group relative aspect-[3/4] w-full overflow-hidden rounded-lg border border-surface-300">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen(member)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onOpen(member);
+        }
+      }}
+      className="group relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-lg border border-surface-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+    >
       {member.photoUrl ? (
         <img src={member.photoUrl} alt={name} className="absolute inset-0 h-full w-full object-cover" />
       ) : (
@@ -79,6 +94,8 @@ const StaffCard = ({ member }: StaffCardProps) => {
 export const StaffPage = () => {
   const [page, setPage] = useState(1);
   const { data, isLoading } = useListPublicStaffQuery({ page, pageSize: PAGE_SIZE });
+  const navigate = useNavigateWithTransition();
+  const openMember = (member: StaffMemberDto) => navigate(`/instructors/${member.id}`);
 
   return (
     <Box flex={{ direction: 'col', gap: 24 }} padding={{ base: 32 }}>
@@ -98,7 +115,7 @@ export const StaffPage = () => {
       ) : (
         <Box className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {(data?.items ?? []).map((member) => (
-            <StaffCard key={member.id} member={member} />
+            <StaffCard key={member.id} member={member} onOpen={openMember} />
           ))}
         </Box>
       )}

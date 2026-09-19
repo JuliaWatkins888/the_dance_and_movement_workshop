@@ -136,6 +136,7 @@ export type {
 export {
   staffApi,
   useListPublicStaffQuery,
+  useGetPublicStaffMemberQuery,
   useListStaffAdminQuery,
   useListStaffUserCandidatesQuery,
   useListInstructorCandidatesQuery,
@@ -320,6 +321,7 @@ export type {
   WorkshopInstructorSummary,
   WorkshopOccurrenceDto,
   WorkshopOccurrenceWriteInput,
+  ListPublicWorkshopsParams,
   ListWorkshopsAdminParams,
   ListWorkshopsResult,
   WorkshopWriteInput,

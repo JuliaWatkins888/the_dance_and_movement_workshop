@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { alert, Box, Button, Icon, Input, Text, Textarea } from '@inithium/ui';
 import type { IconName } from '@inithium/ui';
 import { useIsContactCaptchaEnabled, useContactCaptchaSiteKey, useSubmitContactMutation } from '@inithium/api-client';
@@ -118,11 +119,16 @@ export const ContactPage = () => {
   const captchaSiteKey = useContactCaptchaSiteKey();
   const turnstileScriptLoaded = useTurnstileScript(captchaEnabled);
 
+  // A Register button elsewhere on the site (RegistrationButton.tsx) links here with ?subject=
+  // &message= prefilled - a parent asking about a full/not-yet-open class shouldn't have to
+  // retype which class they mean. Read once on mount; a visitor arriving with no query params
+  // just gets the usual blank form.
+  const [searchParams] = useSearchParams();
   const [firstName, setFirstName] = useState(currentUser?.firstName ?? '');
   const [lastName, setLastName] = useState(currentUser?.lastName ?? '');
   const [email, setEmail] = useState(currentUser?.email ?? '');
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
+  const [subject, setSubject] = useState(() => searchParams.get('subject') ?? '');
+  const [message, setMessage] = useState(() => searchParams.get('message') ?? '');
   // Honeypot - never rendered visibly, never touched by a real visitor. Its container is
   // off-screen and unreachable by keyboard, so only a bot that blindly fills every form field
   // (visible or not) will ever populate it.

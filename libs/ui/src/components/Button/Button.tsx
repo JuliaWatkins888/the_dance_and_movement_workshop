@@ -75,6 +75,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       resolveAnimationClasses(animation, trigger),
       resolveMargin(margin),
       resolvePadding(resolvedPadding),
+      // Every variant's bgColor/textColor/borderColor is a solid, deliberately-chosen color -
+      // without this, a disabled button (native `disabled` attribute) rendered exactly like an
+      // active one, since none of those classes read the disabled state on their own.
+      // pointer-events-none also blocks :hover from ever matching, so no per-variant hover
+      // class needs a disabled: counterpart.
+      'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
       className,
     );
 

@@ -38,6 +38,14 @@ export interface WorkshopDto {
   updatedAt: string;
   semesterName: string;
   instructors: WorkshopInstructorSummary[];
+  // registrationStartDate when the workshop has its own, otherwise the semester's own default -
+  // see ClassDto's identical field for the full rationale.
+  effectiveRegistrationOpensAt?: string;
+}
+
+export interface ListPublicWorkshopsParams {
+  // Narrows to one Staff member's own workshops - used by the Staff Detail page.
+  instructorId?: string;
 }
 
 export interface ListWorkshopsAdminParams {
@@ -91,9 +99,12 @@ export const workshopsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Unpaged - the public WorkshopsPage fetches the whole published catalog once (already sorted
     // by earliest occurrence date server-side) and filters it client-side, mirroring
-    // classesApi.listPublicClasses.
-    listPublicWorkshops: builder.query<WorkshopDto[], void>({
-      query: () => '/api/workshops',
+    // classesApi.listPublicClasses. The Staff Detail page instead narrows via ?instructorId=.
+    listPublicWorkshops: builder.query<WorkshopDto[], ListPublicWorkshopsParams | void>({
+      query: (params) => {
+        const query = params?.instructorId ? `?${new URLSearchParams({ instructorId: params.instructorId }).toString()}` : '';
+        return `/api/workshops${query}`;
+      },
       transformResponse: (response: ApiResponse<WorkshopDto[]>) => response.data,
       providesTags: ['Workshop'],
     }),

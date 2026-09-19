@@ -28,16 +28,21 @@ const toWorkshopDto = async (workshop: WorkshopEntity) => {
     semesterName: semester?.name ?? '',
     instructors,
     openings: Math.max(0, workshop.capacity - workshop.enrolled),
+    // Falls back to the semester's default registration-open date when the workshop has none of
+    // its own - see classes.route.ts's toClassDto for the identical rationale.
+    effectiveRegistrationOpensAt: workshop.registrationStartDate ?? semester?.registrationOpensAt,
   };
 };
 
 // Public, unpaged - like classes.route.ts and courses.route.ts, the full published workshop
 // catalog is small enough to fetch whole and let the public WorkshopsPage group/filter it
-// client-side (already sorted by earliest occurrence date - see workshop.repository.ts).
+// client-side (already sorted by earliest occurrence date - see workshop.repository.ts). Optional
+// ?instructorId= narrows to one Staff member's own workshops, used by the Staff Detail page.
 router.get(
   '/api/workshops',
-  asyncHandler(async (_req: Request, res: Response) => {
-    const workshops = await listPublishedWorkshops();
+  asyncHandler(async (req: Request, res: Response) => {
+    const instructorId = typeof req.query['instructorId'] === 'string' ? req.query['instructorId'] : undefined;
+    const workshops = await listPublishedWorkshops(instructorId ? { instructorId } : undefined);
     res.status(200).json(createSuccessResponse(await Promise.all(workshops.map(toWorkshopDto))));
   }),
 );

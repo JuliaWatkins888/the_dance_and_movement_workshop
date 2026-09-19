@@ -264,6 +264,22 @@ router.post(
 
 router.use('/api/staff/uploads', express.static(STAFF_UPLOAD_DIR));
 
+// Public single-record read for the Staff Detail page (bio + "what they teach") - unauthenticated
+// like /api/staff above, since a staff bio is public-facing content. Registered after every
+// literal /api/staff/* route above (admin, user-candidates, instructor-candidates, upload,
+// uploads) so none of those get shadowed by this param route.
+router.get(
+  '/api/staff/:id',
+  asyncHandler(async (req: Request, res: Response) => {
+    const id = normalizeParam(req.params.id);
+    const staff = await getStaffById(id);
+    if (!staff) {
+      throw NotFoundError('Staff member not found');
+    }
+    res.status(200).json(createSuccessResponse(await toStaffDto(staff)));
+  }),
+);
+
 router.post(
   '/api/staff',
   requireAuth,

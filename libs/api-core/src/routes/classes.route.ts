@@ -38,6 +38,13 @@ const toClassDto = async (classItem: ClassEntity) => {
     semesterName: semester?.name ?? '',
     instructors,
     openings: Math.max(0, classItem.capacity - classItem.enrolled),
+    // The class's own registrationStartDate wins when set; otherwise falls back to its semester's
+    // default (documented on the CMS form as "leave blank to use the semester's default" - this is
+    // what actually implements that). Resolving which date applies isn't itself time-dependent, so
+    // it's safe to compute once here rather than re-deriving the fallback on every client; whether
+    // that resolved date has actually passed *is* time-dependent and is left to the browser's own
+    // clock (apps/web's registrationStatus.ts), not baked into a cacheable API response.
+    effectiveRegistrationOpensAt: classItem.registrationStartDate ?? semester?.registrationOpensAt,
   };
 };
 
@@ -53,12 +60,14 @@ const compareByCourseNameThenVariant = (a: Awaited<ReturnType<typeof toClassDto>
 // courses.route.ts there's a single public, unpaged read (the Course Detail page fetches a
 // course's variants and does no further pagination, matching the "small catalog" precedent every
 // other public listing in this codebase already follows); only the admin listing below and the
-// mutations are gated. Optional ?courseId= narrows to one Course's variants.
+// mutations are gated. Optional ?courseId= narrows to one Course's variants; optional
+// ?instructorId= narrows to one Staff member's own sections, used by the Staff Detail page.
 router.get(
   '/api/classes',
   asyncHandler(async (req: Request, res: Response) => {
     const courseId = typeof req.query['courseId'] === 'string' ? req.query['courseId'] : undefined;
-    const classes = await listPublishedClasses(courseId ? { courseId } : undefined);
+    const instructorId = typeof req.query['instructorId'] === 'string' ? req.query['instructorId'] : undefined;
+    const classes = await listPublishedClasses(courseId || instructorId ? { courseId, instructorId } : undefined);
     const items = await Promise.all(classes.map(toClassDto));
     res.status(200).json(createSuccessResponse(items.sort(compareByCourseNameThenVariant)));
   }),
