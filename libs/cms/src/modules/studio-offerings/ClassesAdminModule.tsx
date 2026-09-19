@@ -20,11 +20,17 @@ const formatTime12h = (time: string): string => {
   return `${displayHours}:${minutes} ${period}`;
 };
 
+const termDateFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+// Two class records can share an identical variantLabel/day/time (e.g. one still carrying an old
+// term's dates, one carrying the next term's) and read as duplicates in this list with nothing to
+// tell them apart - the term range makes clear they're different offering windows.
 const formatSummary = (classItem: ClassDto): string => {
   const days = classItem.daysOfWeek.join('/');
   const schedule = `${days} ${formatTime12h(classItem.startTime)}–${formatTime12h(classItem.endTime)}`;
   const price = `$${classItem.priceAmount}${classItem.billingCycle.toLowerCase() === 'monthly' ? '/mo' : ` (${classItem.billingCycle})`}`;
-  return `${classItem.courseName}${classItem.variantLabel ? ` · ${classItem.variantLabel}` : ''} · ${schedule} · ${price} · ${classItem.openings} open`;
+  const term = `${termDateFormatter.format(new Date(classItem.startDate))} – ${termDateFormatter.format(new Date(classItem.endDate))}`;
+  return `${classItem.courseName}${classItem.variantLabel ? ` · ${classItem.variantLabel}` : ''} · ${schedule} · ${term} · ${price} · ${classItem.openings} open`;
 };
 
 export const ClassesAdminModule = () => {

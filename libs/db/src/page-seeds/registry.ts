@@ -12,6 +12,7 @@ import contactPageSeed from './contact.page-seed';
 // inithium:block:contact:imports:end
 // inithium:block:staff:imports:start
 import staffPageSeed from './staff.page-seed';
+import staffDetailPageSeed from './staff-detail.page-seed';
 // inithium:block:staff:imports:end
 // inithium:block:policy:imports:start
 import policiesPageSeed from './policies.page-seed';
@@ -20,6 +21,7 @@ import policiesPageSeed from './policies.page-seed';
 import coursesPageSeed from './courses.page-seed';
 import courseDetailPageSeed from './course-detail.page-seed';
 import workshopsPageSeed from './workshops.page-seed';
+import classRegisterPageSeed from './class-register.page-seed';
 // inithium:block:studio-offerings:imports:end
 // inithium:anchor:imports
 
@@ -47,6 +49,7 @@ export const pageSeeds: CreatePageInput[] = [
 // inithium:block:contact:seeds:end
 // inithium:block:staff:seeds:start
   staffPageSeed,
+  staffDetailPageSeed,
 // inithium:block:staff:seeds:end
 // inithium:block:policy:seeds:start
   policiesPageSeed,
@@ -55,6 +58,7 @@ export const pageSeeds: CreatePageInput[] = [
   coursesPageSeed,
   courseDetailPageSeed,
   workshopsPageSeed,
+  classRegisterPageSeed,
 // inithium:block:studio-offerings:seeds:end
   // inithium:anchor:seeds
 ];

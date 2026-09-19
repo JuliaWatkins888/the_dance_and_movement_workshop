@@ -41,10 +41,16 @@ export interface ClassDto {
   semesterId: string;
   semesterName: string;
   instructors: ClassInstructorSummary[];
+  // registrationStartDate when the class has its own, otherwise the semester's own default -
+  // resolving *which* date applies isn't time-dependent so it's safe to compute server-side;
+  // whether that date has actually passed is left to the browser's own clock (registrationStatus.ts).
+  effectiveRegistrationOpensAt?: string;
 }
 
 export interface ListPublicClassesParams {
   courseId?: string;
+  // Narrows to one Staff member's own sections - used by the Staff Detail page.
+  instructorId?: string;
 }
 
 export interface ListClassesAdminParams {
@@ -94,12 +100,16 @@ const buildListResult = (response: ApiResponse<ClassDto[]>): ListClassesResult =
 
 export const classesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Unpaged - the public Course Detail page fetches one Course's variants (via ?courseId=) and
-    // does no further pagination, mirroring policiesApi.listPolicies' "small catalog" precedent.
+    // Unpaged - the public Course Detail page fetches one Course's variants (via ?courseId=), and
+    // the Staff Detail page fetches one instructor's own sections (via ?instructorId=); neither
+    // does further pagination, mirroring policiesApi.listPolicies' "small catalog" precedent.
     listPublicClasses: builder.query<ClassDto[], ListPublicClassesParams | void>({
       query: (params) => {
-        const query = params?.courseId ? `?${new URLSearchParams({ courseId: params.courseId })}` : '';
-        return `/api/classes${query}`;
+        const searchParams = new URLSearchParams();
+        if (params?.courseId) searchParams.set('courseId', params.courseId);
+        if (params?.instructorId) searchParams.set('instructorId', params.instructorId);
+        const query = searchParams.toString();
+        return query ? `/api/classes?${query}` : '/api/classes';
       },
       transformResponse: (response: ApiResponse<ClassDto[]>) => response.data,
       providesTags: ['Class'],

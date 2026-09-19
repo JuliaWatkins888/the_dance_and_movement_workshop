@@ -70,6 +70,11 @@
 			"key": "workshopId",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "staffId",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -2295,6 +2300,43 @@
 								"api",
 								"children",
 								"{{childId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Staff",
+			"item": [
+				{
+					"name": "Get Public Staff Member",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Set {{staffId}} to a real Staff record's id before running - this collection has",
+									"// no Create Staff request to auto-populate it (Staff members are created via the",
+									"// CMS today, not this collection).",
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/{{staffId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"staff",
+								"{{staffId}}"
 							]
 						}
 					}

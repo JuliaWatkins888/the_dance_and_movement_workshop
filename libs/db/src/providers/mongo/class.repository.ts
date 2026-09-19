@@ -67,9 +67,16 @@ export const createMongoClassRepository = (model: Model<ClassDocument>): ClassRe
     return docs.map(mapToClassEntity);
   },
   findPublished: async (options?: FindPublishedClassesOptions): Promise<ClassEntity[]> => {
-    const filter: QueryFilter<ClassDocument> = { isPublished: true };
+    // A class whose endDate has passed is excluded from the public catalog entirely (not just
+    // shown as unregisterable) - a parent browsing current offerings shouldn't see something
+    // that's already over. The admin listings (findMany/findManyUnpaged) deliberately don't apply
+    // this filter, so a class stays visible in the CMS after it ends until an admin removes it.
+    const filter: QueryFilter<ClassDocument> = { isPublished: true, endDate: { $gte: new Date() } };
     if (options?.courseId) {
       filter.courseId = options.courseId;
+    }
+    if (options?.instructorId) {
+      filter.instructorIds = options.instructorId;
     }
     const docs = await model.find(filter).sort({ startDate: 1 }).exec();
     return docs.map(mapToClassEntity);

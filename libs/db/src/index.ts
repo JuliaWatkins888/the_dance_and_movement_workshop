@@ -48,7 +48,7 @@ import { CreateChildInput, FindManyChildrenOptions, UpdateChildInput } from './c
 // inithium:block:studio-offerings:imports:start
 import { CreateSemesterInput, FindManySemestersOptions, UpdateSemesterInput } from './contracts/semester.contract';
 import { CreateCourseInput, FindManyCoursesOptions, UpdateCourseInput } from './contracts/course.contract';
-import { CreateWorkshopInput, FindManyWorkshopsOptions, UpdateWorkshopInput } from './contracts/workshop.contract';
+import { CreateWorkshopInput, FindManyWorkshopsOptions, FindPublishedWorkshopsOptions, UpdateWorkshopInput } from './contracts/workshop.contract';
 // inithium:block:studio-offerings:imports:end
 // inithium:anchor:imports
 import { activeProvider as defaultProvider } from './providers/active-provider';
@@ -254,7 +254,7 @@ export const countCoursesBySemesterId = (semesterId: string) => getCourseReposit
 
 export const getWorkshopRepository = () => activeProvider.getWorkshopRepository();
 export const listWorkshops = (options: FindManyWorkshopsOptions) => getWorkshopRepository().findMany(options);
-export const listPublishedWorkshops = () => getWorkshopRepository().findPublished();
+export const listPublishedWorkshops = (options?: FindPublishedWorkshopsOptions) => getWorkshopRepository().findPublished(options);
 export const createWorkshop = (input: CreateWorkshopInput) => getWorkshopRepository().create(input);
 export const updateWorkshop = (id: string, input: UpdateWorkshopInput) => getWorkshopRepository().update(id, input);
 export const deleteWorkshop = (id: string) => getWorkshopRepository().delete(id);
@@ -434,6 +434,7 @@ export type {
   UpdateWorkshopInput,
   WorkshopSearchField,
   FindManyWorkshopsOptions,
+  FindPublishedWorkshopsOptions,
   WorkshopRepository,
 } from './contracts/workshop.contract';
 // inithium:block:studio-offerings:type-exports:end

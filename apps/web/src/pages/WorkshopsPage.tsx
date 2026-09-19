@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Box, Button, Loader, Select, SelectItem, Text } from '@inithium/ui';
+import { Box, Loader, Select, SelectItem, Text } from '@inithium/ui';
 import { useListPublicWorkshopsQuery } from '@inithium/api-client';
 import type { WorkshopDto } from '@inithium/api-client';
+import { RegistrationButton } from './RegistrationButton';
+import { buildWorkshopClosedContactMessage, buildWorkshopFullContactMessage, getWorkshopRegistrationStatus } from './registrationStatus';
 
 const ALL_FILTER_VALUE = 'all';
 
@@ -53,15 +55,6 @@ const formatAgeRange = (min?: number, max?: number): string => {
 
 const formatOpenings = (openings: number): string => (openings <= 0 ? 'Workshop full' : `${openings} spot${openings === 1 ? '' : 's'} open`);
 
-// A workshop hasn't already happened as long as at least one of its dated occurrences is still
-// upcoming - unlike a Class's ongoing recurring schedule, a Workshop's relevance genuinely expires
-// once its last date passes.
-const isUpcoming = (workshop: WorkshopDto): boolean => {
-  if (workshop.occurrences.length === 0) return true;
-  const lastOccurrence = workshop.occurrences[workshop.occurrences.length - 1];
-  return new Date(lastOccurrence.date).getTime() >= Date.now() - 24 * 60 * 60 * 1000;
-};
-
 interface WorkshopCardProps {
   readonly workshop: WorkshopDto;
 }
@@ -111,9 +104,14 @@ const WorkshopCard = ({ workshop }: WorkshopCardProps) => (
       {formatOpenings(workshop.openings)}
     </Text>
 
-    <Button variant={{ kind: 'filled', color: 'primary' }} className="mt-2 w-full" disabled>
-      Registration Opening Soon
-    </Button>
+    <RegistrationButton
+      status={getWorkshopRegistrationStatus(workshop)}
+      opensAt={workshop.effectiveRegistrationOpensAt}
+      registerPath={`/register/workshop/${workshop.id}`}
+      fullContactMessage={buildWorkshopFullContactMessage(workshop.name, workshop.semesterName)}
+      closedContactMessage={buildWorkshopClosedContactMessage(workshop.name, workshop.semesterName)}
+      className="mt-2 w-full"
+    />
   </Box>
 );
 
@@ -121,18 +119,16 @@ export const WorkshopsPage = () => {
   const { data: workshops, isLoading } = useListPublicWorkshopsQuery();
   const [ageGroupFilter, setAgeGroupFilter] = useState(ALL_FILTER_VALUE);
 
-  const upcomingWorkshops = useMemo(() => (workshops ?? []).filter(isUpcoming), [workshops]);
-
   const ageGroupOptions = useMemo(
-    () => AGE_GROUPS.filter((group) => upcomingWorkshops.some((workshop) => workshopMatchesAgeGroup(workshop, group))),
-    [upcomingWorkshops],
+    () => AGE_GROUPS.filter((group) => (workshops ?? []).some((workshop) => workshopMatchesAgeGroup(workshop, group))),
+    [workshops],
   );
 
   const filteredWorkshops = useMemo(() => {
     const activeAgeGroup = AGE_GROUPS.find((group) => group.label === ageGroupFilter);
-    if (!activeAgeGroup) return upcomingWorkshops;
-    return upcomingWorkshops.filter((workshop) => workshopMatchesAgeGroup(workshop, activeAgeGroup));
-  }, [upcomingWorkshops, ageGroupFilter]);
+    if (!activeAgeGroup) return workshops ?? [];
+    return (workshops ?? []).filter((workshop) => workshopMatchesAgeGroup(workshop, activeAgeGroup));
+  }, [workshops, ageGroupFilter]);
 
   return (
     <Box flex={{ direction: 'col', gap: 24 }} padding={{ base: 32 }}>

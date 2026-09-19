@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Banner, Box, Button, Loader, Pill, Select, SelectItem, Text, useElementSize } from '@inithium/ui';
+import { Banner, Box, Loader, Pill, Select, SelectItem, Text, useElementSize } from '@inithium/ui';
 import { useListPublicClassesQuery, useListPublicCoursesQuery, usePageParams } from '@inithium/api-client';
 import type { ClassDto } from '@inithium/api-client';
 import type { DayOfWeek } from '@inithium/db';
 import { NotFoundPage } from './NotFoundPage';
 import { generateCourseBannerConfig } from './courseBannerConfig';
+import { RegistrationButton } from './RegistrationButton';
+import { buildClassClosedContactMessage, buildClassFullContactMessage, getClassRegistrationStatus } from './registrationStatus';
 
 const ALL_FILTER_VALUE = 'all';
 const DETAIL_BANNER_HEIGHT = 500;
@@ -70,6 +72,13 @@ const formatPrice = (amount: number, billingCycle: string): string => {
 
 const formatOpenings = (openings: number): string => (openings <= 0 ? 'Class full' : `${openings} spot${openings === 1 ? '' : 's'} open`);
 
+const termDateFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+// Two class records can share an identical variantLabel/day/time (e.g. one still carrying an old
+// term's dates, one carrying the next term's) and read as duplicates with nothing to tell them
+// apart - showing each one's own term span makes clear they're different offering windows.
+const formatTermRange = (startIso: string, endIso: string): string =>
+  `${termDateFormatter.format(new Date(startIso))} – ${termDateFormatter.format(new Date(endIso))}`;
+
 interface ClassVariantCardProps {
   readonly classItem: ClassDto;
 }
@@ -77,37 +86,55 @@ interface ClassVariantCardProps {
 // A "pick your time" card - everything a parent needs to choose between this Course's sections,
 // without a further detail dialog (unlike the old flat ClassesPage, there's no name/description
 // left to elaborate on here - that's already shown once, above, for the whole Course).
-const ClassVariantCard = ({ classItem }: ClassVariantCardProps) => (
-  <Box borderColor={{ color: 'surface', intensity: 300 }} padding={{ base: 16 }} flex={{ direction: 'col', gap: 8 }} className="rounded-lg border">
-    <Box flex={{ direction: 'row', justify: 'between', align: 'start', gap: 8 }}>
-      <Text as="h3" textColor={{ color: 'surface', intensity: 950 }} className="text-base font-bold leading-tight">
-        {classItem.variantLabel ?? formatSchedule(classItem.daysOfWeek, classItem.startTime, classItem.endTime)}
-      </Text>
-      <Text as="p" textColor={{ color: 'primary', intensity: 600 }} className="shrink-0 text-sm font-semibold">
-        {formatPrice(classItem.priceAmount, classItem.billingCycle)}
-      </Text>
-    </Box>
+const ClassVariantCard = ({ classItem }: ClassVariantCardProps) => {
+  const displayName = `${classItem.courseName} - ${classItem.variantLabel ?? formatSchedule(classItem.daysOfWeek, classItem.startTime, classItem.endTime)}`;
 
-    <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
-      {formatSchedule(classItem.daysOfWeek, classItem.startTime, classItem.endTime)}
-    </Text>
-    <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
-      {formatAgeRange(classItem.minAgeYears, classItem.maxAgeYears)}
-      {classItem.instructors.length > 0 ? ` · ${classItem.instructors.map((instructor) => instructor.name).join(', ')}` : ''}
-    </Text>
-    <Text
-      as="p"
-      textColor={classItem.openings <= 0 ? { color: 'red', intensity: 600 } : { color: 'surface', intensity: 700 }}
-      className="text-xs font-medium"
+  return (
+    <Box
+      borderColor={{ color: 'surface', intensity: 300 }}
+      bgColor={{ color: 'surface', intensity: 100 }}
+      padding={{ base: 16 }}
+      flex={{ direction: 'col', gap: 8 }}
+      className="rounded-lg border"
     >
-      {formatOpenings(classItem.openings)}
-    </Text>
+      <Box flex={{ direction: 'row', justify: 'between', align: 'start', gap: 8 }}>
+        <Text as="h3" textColor={{ color: 'surface', intensity: 950 }} className="text-base font-bold leading-tight">
+          {displayName}
+        </Text>
+        <Text as="p" textColor={{ color: 'primary', intensity: 600 }} className="shrink-0 text-sm font-semibold">
+          {formatPrice(classItem.priceAmount, classItem.billingCycle)}
+        </Text>
+      </Box>
 
-    <Button variant={{ kind: 'filled', color: 'primary' }} className="mt-2 w-full" disabled>
-      Registration Opening Soon
-    </Button>
-  </Box>
-);
+      <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+        {formatSchedule(classItem.daysOfWeek, classItem.startTime, classItem.endTime)}
+      </Text>
+      <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
+        {formatTermRange(classItem.startDate, classItem.endDate)}
+      </Text>
+      <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
+        {formatAgeRange(classItem.minAgeYears, classItem.maxAgeYears)}
+        {classItem.instructors.length > 0 ? ` · ${classItem.instructors.map((instructor) => instructor.name).join(', ')}` : ''}
+      </Text>
+      <Text
+        as="p"
+        textColor={classItem.openings <= 0 ? { color: 'red', intensity: 600 } : { color: 'surface', intensity: 700 }}
+        className="text-xs font-medium"
+      >
+        {formatOpenings(classItem.openings)}
+      </Text>
+
+      <RegistrationButton
+        status={getClassRegistrationStatus(classItem)}
+        opensAt={classItem.effectiveRegistrationOpensAt}
+        registerPath={`/register/class/${classItem.id}`}
+        fullContactMessage={buildClassFullContactMessage(displayName, classItem.courseName, classItem.semesterName)}
+        closedContactMessage={buildClassClosedContactMessage(displayName, classItem.courseName, classItem.semesterName)}
+        className="mt-2 w-full"
+      />
+    </Box>
+  );
+};
 
 export const CourseDetailPage = () => {
   const { courseId } = usePageParams();

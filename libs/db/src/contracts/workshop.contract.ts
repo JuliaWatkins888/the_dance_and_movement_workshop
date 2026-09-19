@@ -49,6 +49,12 @@ export interface FindManyWorkshopsOptions {
   semesterId?: string;
 }
 
+export interface FindPublishedWorkshopsOptions {
+  // Narrows to one Staff member's own workshops - used by the Staff Detail page's "what they
+  // teach" listing, mirroring FindPublishedClassesOptions.instructorId exactly.
+  instructorId?: string;
+}
+
 export interface WorkshopRepository {
   findMany: (options: FindManyWorkshopsOptions) => Promise<PaginatedResult<WorkshopEntity>>;
   // Public catalog - unpaged, sorted by each workshop's earliest occurrence date. Sorted in
@@ -56,7 +62,7 @@ export interface WorkshopRepository {
   // documents by the minimum of an array field without an aggregation pipeline this small a
   // catalog doesn't warrant - same reasoning policy.repository.ts already applies to sorting
   // items *within* one document).
-  findPublished: () => Promise<WorkshopEntity[]>;
+  findPublished: (options?: FindPublishedWorkshopsOptions) => Promise<WorkshopEntity[]>;
   create: (input: CreateWorkshopInput) => Promise<WorkshopEntity>;
   update: (id: string, input: UpdateWorkshopInput) => Promise<WorkshopEntity | null>;
   delete: (id: string) => Promise<boolean>;

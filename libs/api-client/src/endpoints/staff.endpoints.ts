@@ -94,6 +94,13 @@ export const staffApi = baseApi.injectEndpoints({
       transformResponse: buildListResult,
       providesTags: ['Staff'],
     }),
+    // Powers the Staff Detail page - single-record read, unauthenticated like listPublicStaff
+    // above (a staff bio is public-facing content).
+    getPublicStaffMember: builder.query<StaffMemberDto, string>({
+      query: (id) => `/api/staff/${id}`,
+      transformResponse: (response: ApiResponse<StaffMemberDto>) => response.data,
+      providesTags: ['Staff'],
+    }),
     listStaffAdmin: builder.query<ListStaffResult, ListStaffAdminParams>({
       query: ({ page, pageSize, search, searchField }) => {
         const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
@@ -149,6 +156,7 @@ export const staffApi = baseApi.injectEndpoints({
 
 export const {
   useListPublicStaffQuery,
+  useGetPublicStaffMemberQuery,
   useListStaffAdminQuery,
   useListStaffUserCandidatesQuery,
   useListInstructorCandidatesQuery,

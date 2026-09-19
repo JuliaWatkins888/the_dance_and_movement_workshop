@@ -2,6 +2,7 @@ import type { Model, QueryFilter } from 'mongoose';
 import {
   CreateWorkshopInput,
   FindManyWorkshopsOptions,
+  FindPublishedWorkshopsOptions,
   UpdateWorkshopInput,
   WorkshopEntity,
   WorkshopRepository,
@@ -59,8 +60,16 @@ export const createMongoWorkshopRepository = (model: Model<WorkshopDocument>): W
 
     return { items: docs.map(mapToWorkshopEntity), total, page, pageSize };
   },
-  findPublished: async (): Promise<WorkshopEntity[]> => {
-    const docs = await model.find({ isPublished: true }).exec();
+  findPublished: async (options?: FindPublishedWorkshopsOptions): Promise<WorkshopEntity[]> => {
+    // A workshop whose every occurrence has already passed is excluded from the public catalog
+    // entirely, mirroring Class's own findPublished filter - $elemMatch here means "at least one
+    // occurrence is still upcoming", i.e. it isn't fully over yet. Admin listings (findMany)
+    // deliberately don't apply this, so it stays visible in the CMS until an admin removes it.
+    const filter: QueryFilter<WorkshopDocument> = { isPublished: true, occurrences: { $elemMatch: { date: { $gte: new Date() } } } };
+    if (options?.instructorId) {
+      filter.instructorIds = options.instructorId;
+    }
+    const docs = await model.find(filter).exec();
     return [...docs].sort((a, b) => earliestOccurrenceTime(a) - earliestOccurrenceTime(b)).map(mapToWorkshopEntity);
   },
   create: async (input: CreateWorkshopInput): Promise<WorkshopEntity> => {

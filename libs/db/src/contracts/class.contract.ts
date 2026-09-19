@@ -53,6 +53,10 @@ export interface FindPublishedClassesOptions {
   // entirely, the full published catalog is returned (small enough to fetch whole, same rationale
   // as every other public listing in this codebase).
   courseId?: string;
+  // Narrows to one Staff member's own sections - used by the Staff Detail page's "what they
+  // teach" listing. instructorIds is a plain string array, so this matches the same "scalar value
+  // against an array field" semantics Mongo already applies for courseId-style filters.
+  instructorId?: string;
 }
 
 export interface FindManyClassesUnpagedOptions {
