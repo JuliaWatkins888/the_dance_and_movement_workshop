@@ -108,6 +108,7 @@ export const PageEditDialog = ({ page, onDone }: PageEditDialogProps) => {
   const [navLabel, setNavLabel] = useState(page.navigation.label);
   const [navOrder, setNavOrder] = useState(page.navigation.order);
   const [navIcon, setNavIcon] = useState(page.navigation.icon ?? '');
+  const [navParentGroup, setNavParentGroup] = useState(page.navigation.parentGroup ?? '');
 
   // SEO
   const [metaTitle, setMetaTitle] = useState(page.seo?.metaTitle ?? '');
@@ -140,6 +141,7 @@ export const PageEditDialog = ({ page, onDone }: PageEditDialogProps) => {
         label: navLabel,
         order: navOrder,
         icon: navIcon || undefined,
+        parentGroup: navParentGroup.trim() || undefined,
       },
       seo: {
         metaTitle: metaTitle || undefined,
@@ -299,6 +301,13 @@ export const PageEditDialog = ({ page, onDone }: PageEditDialogProps) => {
               onChange={(event) => setNavOrder(Number(event.target.value))}
             />
             <IconPicker label="Nav Icon" value={navIcon} onValueChange={setNavIcon} />
+            <Input
+              label="Nested Under"
+              placeholder="e.g. Offerings"
+              helperText="Optional. Any other page sharing this exact value collapses into one dropdown with this label, in place of a flat link. Leave blank for a normal top-level link."
+              value={navParentGroup}
+              onChange={(event) => setNavParentGroup(event.target.value)}
+            />
           </Box>
         </TabsContent>
 

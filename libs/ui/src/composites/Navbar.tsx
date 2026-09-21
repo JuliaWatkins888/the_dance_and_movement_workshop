@@ -1,6 +1,20 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
 import type { AvatarConfig, NotificationEntity, PageEntity } from '@inithium/db';
-import { AmpersandText, Avatar, Box, Button, Divider, Icon, Text } from '../components';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  AmpersandText,
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  Icon,
+  Text,
+} from '../components';
 import { drawer } from '../drawer/drawer';
 import type { DrawerRenderContext } from '../drawer/drawerStore';
 import type { IconName } from '../tokens/icon';
@@ -67,6 +81,46 @@ export interface NavbarProps {
 
 const DEFAULT_HEIGHT = 72;
 
+interface NavPageItem {
+  readonly kind: 'page';
+  readonly page: PageEntity;
+}
+interface NavGroupItem {
+  readonly kind: 'group';
+  readonly label: string;
+  readonly pages: PageEntity[];
+}
+type NavItem = NavPageItem | NavGroupItem;
+
+// Pages already arrive sorted by navigation.order (see page.repository.ts's findByNavLocation).
+// A page opts into a dropdown by setting navigation.parentGroup (edited via the CMS's Pages
+// module - see PageEditDialog.tsx's "Nested Under" field): any other page sharing that same
+// trimmed string joins the same dropdown, labeled with that string, and the group lands wherever
+// its first member would otherwise have sorted. Pages with no parentGroup render as flat
+// top-level links exactly as before - this is purely additive, no other page is affected.
+const buildNavItems = (pages: PageEntity[]): NavItem[] => {
+  const items: NavItem[] = [];
+  const groupPagesByLabel = new Map<string, PageEntity[]>();
+
+  for (const page of pages) {
+    const groupLabel = page.navigation.parentGroup?.trim();
+    if (!groupLabel) {
+      items.push({ kind: 'page', page });
+      continue;
+    }
+
+    let groupPages = groupPagesByLabel.get(groupLabel);
+    if (!groupPages) {
+      groupPages = [];
+      groupPagesByLabel.set(groupLabel, groupPages);
+      items.push({ kind: 'group', label: groupLabel, pages: groupPages });
+    }
+    groupPages.push(page);
+  }
+
+  return items;
+};
+
 const NavLink = ({ page, onNavigate }: { page: PageEntity; onNavigate: () => void }) => (
   // variant stays color: 'accent' so the 'link' kind's own hover:border-b-accent-500 (already
   // safelisted in theme.css) resolves correctly - textColor is a separate override that always
@@ -85,11 +139,120 @@ const NavLink = ({ page, onNavigate }: { page: PageEntity; onNavigate: () => voi
   </Button>
 );
 
+// Popover menu item: real click-target padding + a primary-tinted hover highlight (mirrors
+// SelectItem's own data-[highlighted] treatment), unlike NavLink's minimal underline-on-hover
+// styling, which reads as cramped once a couple of instances are stacked inside a compact panel.
+const NavDropdownLink = ({ page, onNavigate }: { page: PageEntity; onNavigate: () => void }) => (
+  <Button
+    asChild
+    variant={{ kind: 'ghost', color: 'primary' }}
+    textColor={{ color: 'surface', intensity: 950 }}
+    className="flex w-full items-center justify-start gap-2 rounded-sm"
+    onClick={onNavigate}
+  >
+    <Link to={page.routePattern}>
+      {page.navigation.icon ? <Icon name={page.navigation.icon as IconName} size={16} /> : null}
+      {page.navigation.label}
+    </Link>
+  </Button>
+);
+
+// Desktop top-bar rendering of a NavGroupItem: a link-styled trigger (mirrors NavLink's own
+// Button variant/textColor so "Offerings" reads as just another nav item) that opens a Popover
+// listing the group's pages. `open` is controlled locally (rather than left to Radix's
+// uncontrolled default) purely so a link click inside the panel can close it immediately instead
+// of waiting on Popover's own outside-click dismissal, and so the caret can rotate with it.
+const NavDropdown = ({
+  label,
+  pages,
+  onNavigate,
+}: {
+  label: string;
+  pages: PageEntity[];
+  onNavigate: () => void;
+}) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+      <PopoverPrimitive.Trigger asChild>
+        <Button
+          variant={{ kind: 'link', color: 'accent' }}
+          textColor={{ color: 'surface', intensity: 950 }}
+          aria-expanded={open}
+          // exitAdornment (not a plain child) - AdornedContent only wraps its children in a flex
+          // row when an adornment is supplied (see components/AdornedContent/AdornedContent.tsx);
+          // without it the label and icon are two bare DOM children of a non-flex <button> and the
+          // block-level icon wraps onto its own line instead of sitting beside the label.
+          exitAdornment={
+            <Icon
+              name="CaretDown"
+              size={14}
+              className={mergeClassNames('transition-transform duration-200', open && 'rotate-180')}
+            />
+          }
+        >
+          {label}
+        </Button>
+      </PopoverPrimitive.Trigger>
+      <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Content
+          align="start"
+          sideOffset={8}
+          className="z-50 min-w-44 overflow-hidden rounded-md border border-surface-300 bg-surface-100 p-2 shadow-md"
+        >
+          <Box flex={{ direction: 'col', align: 'stretch', gap: 4 }}>
+            {pages.map((page) => (
+              <NavDropdownLink
+                key={page.id}
+                page={page}
+                onNavigate={() => {
+                  setOpen(false);
+                  onNavigate();
+                }}
+              />
+            ))}
+          </Box>
+        </PopoverPrimitive.Content>
+      </PopoverPrimitive.Portal>
+    </PopoverPrimitive.Root>
+  );
+};
+
+const NavItemRenderer = ({ item, onNavigate }: { item: NavItem; onNavigate: () => void }) =>
+  item.kind === 'group' ? (
+    <NavDropdown label={item.label} pages={item.pages} onNavigate={onNavigate} />
+  ) : (
+    <NavLink page={item.page} onNavigate={onNavigate} />
+  );
+
+// Mobile drawer rendering of a NavGroupItem: an Accordion (collapsed by default) rather than a
+// Popover - the drawer is already a scrollable vertical stack, so an inline expand/collapse reads
+// more naturally there than a floating panel would.
+const NavGroupAccordion = ({ label, pages, onNavigate }: { label: string; pages: PageEntity[]; onNavigate: () => void }) => (
+  <Accordion type="single" className="w-full">
+    <AccordionItem value={label}>
+      <AccordionTrigger className="text-surface-950">{label}</AccordionTrigger>
+      <AccordionContent>
+        <Box flex={{ direction: 'col', align: 'start', gap: 4 }} className="pl-4">
+          {pages.map((page) => (
+            <NavLink key={page.id} page={page} onNavigate={onNavigate} />
+          ))}
+        </Box>
+      </AccordionContent>
+    </AccordionItem>
+  </Accordion>
+);
+
 const NavLinkStack = ({ pages, onNavigate }: { pages: PageEntity[]; onNavigate: () => void }) => (
-  <Box flex={{ direction: 'col', align: 'start', gap: 4 }}>
-    {pages.map((page) => (
-      <NavLink key={page.id} page={page} onNavigate={onNavigate} />
-    ))}
+  <Box flex={{ direction: 'col', align: 'start', gap: 4 }} className="w-full">
+    {buildNavItems(pages).map((item) =>
+      item.kind === 'group' ? (
+        <NavGroupAccordion key={item.label} label={item.label} pages={item.pages} onNavigate={onNavigate} />
+      ) : (
+        <NavLink key={item.page.id} page={item.page} onNavigate={onNavigate} />
+      ),
+    )}
   </Box>
 );
 
@@ -284,8 +447,12 @@ export const Navbar = ({
 
         <Box flex={{ direction: 'row', align: 'center', gap: 24 }}>
           <Box className="hidden lg:flex" flex={{ direction: 'row', align: 'center', gap: 16 }}>
-            {primaryNavPages.map((page) => (
-              <NavLink key={page.id} page={page} onNavigate={() => undefined} />
+            {buildNavItems(primaryNavPages).map((item) => (
+              <NavItemRenderer
+                key={item.kind === 'group' ? item.label : item.page.id}
+                item={item}
+                onNavigate={() => undefined}
+              />
             ))}
           </Box>
 

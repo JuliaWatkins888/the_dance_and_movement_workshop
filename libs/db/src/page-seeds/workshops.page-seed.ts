@@ -9,7 +9,7 @@ const workshopsPageSeed: CreatePageInput = {
   backgroundColor: { color: 'surface', intensity: 100 },
   foregroundColor: { color: 'surface', intensity: 950 },
   access: { isPublic: true, isAnonymousOnly: false, requiredRoles: [] },
-  navigation: { locations: ['primary-nav', 'primary-footer'], label: 'Workshops', order: 3 },
+  navigation: { locations: ['primary-nav', 'primary-footer'], label: 'Workshops', order: 3, parentGroup: 'Offerings' },
   layoutTemplate: 'default',
   isPublished: true,
 };

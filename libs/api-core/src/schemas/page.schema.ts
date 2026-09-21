@@ -19,6 +19,7 @@ const pageNavigationSchema = z.object({
   label: z.string().min(1),
   order: z.number().int(),
   icon: z.string().optional(),
+  parentGroup: z.string().optional(),
 });
 
 const pageSeoSchema = z
