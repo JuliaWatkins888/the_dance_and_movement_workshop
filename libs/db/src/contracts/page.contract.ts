@@ -36,6 +36,14 @@ export interface PageNavigationConfig {
   label: string;
   order: number;
   icon?: string;
+  // Groups this page under a shared dropdown in the nav instead of rendering it as a flat
+  // top-level link - any other page with the same (trimmed, case-sensitive) parentGroup string
+  // collapses into the same dropdown, labeled with that string, positioned at the lowest `order`
+  // among its members. Deliberately just a plain string rather than a reference to a separate
+  // "nav group" entity - renaming a dropdown means editing this field on each of its member
+  // pages, and creating a new dropdown is just giving 2+ pages a new shared value here. See
+  // Navbar.tsx's buildNavItems for the grouping logic this drives.
+  parentGroup?: string;
 }
 
 export interface PageSeoConfig {

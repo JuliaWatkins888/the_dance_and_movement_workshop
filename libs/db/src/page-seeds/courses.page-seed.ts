@@ -12,7 +12,7 @@ const coursesPageSeed: CreatePageInput = {
   backgroundColor: { color: 'surface', intensity: 100 },
   foregroundColor: { color: 'surface', intensity: 950 },
   access: { isPublic: true, isAnonymousOnly: false, requiredRoles: [] },
-  navigation: { locations: ['primary-nav', 'primary-footer'], label: 'Classes', order: 2 },
+  navigation: { locations: ['primary-nav', 'primary-footer'], label: 'Classes', order: 2, parentGroup: 'Offerings' },
   layoutTemplate: 'default',
   isPublished: true,
 };
