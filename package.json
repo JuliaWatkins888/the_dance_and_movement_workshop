@@ -4,6 +4,16 @@
   "license": "MIT",
   "scripts": {},
   "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "core-js-pure",
+      "esbuild",
+      "less",
+      "nx",
+      "unrs-resolver"
+    ]
+  },
   "devDependencies": {
     "@nx/express": "^23.1.1",
     "@nx/js": "23.1.1",
