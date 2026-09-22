@@ -1,3 +1,11 @@
 packages:
   - 'apps/*'
   - 'libs/*'
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - 'core-js-pure'
+  - 'esbuild'
+  - 'less'
+  - 'nx'
+  - 'unrs-resolver'
