@@ -12,12 +12,22 @@ export interface CmsSidebarProps {
 const EXPANDED_WIDTH = 'w-60';
 const COLLAPSED_WIDTH = 'w-16';
 
-// Module links + the collapse toggle, formatted identically (icon left, label right, label
-// hidden while collapsed) so the toggle reads as one more row in the same list rather than a
-// separate control. A module with `children` renders its label and disclosure caret inside one
-// single Link - clicking either always navigates to the module's own landing page AND ensures
-// the group is expanded, rather than the label and caret being two separate controls with two
-// different effects (which read as two buttons doing "the same thing" when they weren't).
+const DASHBOARD_MODULE_ID = 'dashboard';
+const SETTINGS_MODULE_ID = 'settings';
+
+const compareModulesWithSettingsLastDashboardFirst = (a: { id: string; navLabel: string }, b: { id: string; navLabel: string }): number => {
+  if (a.id === SETTINGS_MODULE_ID) return 1;
+  if (b.id === SETTINGS_MODULE_ID) return -1;
+  if (a.id === DASHBOARD_MODULE_ID) return 1;
+  if (b.id === DASHBOARD_MODULE_ID) return 1;
+  return a.navLabel.localeCompare(b.navLabel);
+};
+
+const getVisibleSortedModules = (modules: typeof cmsModules, user: ReturnType<typeof useCmsCurrentUser>) =>
+  modules
+    .filter((cmsModule) => canAccessCmsResource(user, cmsModule.requiredCapability))
+    .sort(compareModulesWithSettingsLastDashboardFirst);
+
 export const CmsSidebar = ({ isCollapsed, onToggleCollapsed }: CmsSidebarProps) => {
   const currentUser = useCmsCurrentUser();
   const location = useLocation();
@@ -25,18 +35,14 @@ export const CmsSidebar = ({ isCollapsed, onToggleCollapsed }: CmsSidebarProps) 
 
   const activeModuleId = location.pathname.split('/')[2];
 
-  const expand = (moduleId: string) => setExpandedIds((prev) => (prev.has(moduleId) ? prev : new Set(prev).add(moduleId)));
+  const expand = (moduleId: string) =>
+    setExpandedIds((prev) => (prev.has(moduleId) ? prev : new Set(prev).add(moduleId)));
 
-  // Auto-expand whichever module's own URL is currently active, so a directly-loaded child route
-  // (e.g. a bookmarked /cms/studio-offerings/classes) shows its parent group already open instead
-  // of collapsed with no visual explanation for where the current page lives.
   useEffect(() => {
     if (activeModuleId) expand(activeModuleId);
   }, [activeModuleId]);
 
-  const visibleModules = cmsModules.filter((cmsModule) =>
-    canAccessCmsResource(currentUser, cmsModule.requiredCapability)
-  );
+  const visibleModules = getVisibleSortedModules(cmsModules, currentUser);
 
   return (
     <Box
