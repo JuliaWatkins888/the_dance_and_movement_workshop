@@ -74,7 +74,7 @@ const communicationsNeedingReplyWidget: DashboardWidget = {
   id: 'communications-needing-reply',
   title: 'Contact Messages Awaiting Reply',
   order: 10,
-  span: 2,
+  span: 1,
   requiredCapability: 'contact:manageThreads',
   Component: CommunicationsNeedingReplyWidget,
 };

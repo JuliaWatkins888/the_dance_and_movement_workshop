@@ -49,7 +49,7 @@ const childrenOverTimeWidget: DashboardWidget = {
   id: 'children-over-time',
   title: 'Child Accounts Over Time',
   order: 5,
-  span: 2,
+  span: 1,
   requiredCapability: 'children:manage',
   Component: ChildrenOverTimeWidget,
 };

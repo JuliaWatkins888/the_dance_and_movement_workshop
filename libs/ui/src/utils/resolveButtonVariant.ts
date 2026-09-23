@@ -11,7 +11,7 @@ export interface ButtonVariantDefaults {
 }
 
 const DEFAULT_INTENSITY = 500;
-const NEUTRAL_TEXT_COLOR: ColorSpec = { color: 'slate', intensity: 500 };
+const NEUTRAL_TEXT_COLOR: ColorSpec = { color: 'slate', intensity: 100 };
 // red-500 specifically reads better with a near-white label than the general slate-500 fallback
 // below (e.g. destructive confirm buttons) - carved out ahead of that fallback rather than
 // replacing it, so every other raw color/intensity combination keeps today's slate-500 text.
