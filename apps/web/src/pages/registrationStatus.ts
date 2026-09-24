@@ -58,14 +58,16 @@ const buildExceptionSubject = (displayName: string): string => `Enrollment Excep
 const buildExceptionBody = (displayName: string, context: string, reason: string): string =>
   `Hello,\n\nI understand that ${reason}, so I realize I may not be able to register right now. I wanted to reach out anyway to ask if it might be possible to make an exception and still enroll my student in ${displayName}${context}.\n\nThank you!`;
 
-export const buildClassFullContactMessage = (displayName: string, courseName: string, semesterName: string): ContactMessage => ({
+// semesterLabel is every semester the class runs in ("Summer/Fall 2026 & Winter/Spring 2027"), since
+// a class can run in one term or both.
+export const buildClassFullContactMessage = (displayName: string, courseName: string, semesterLabel: string): ContactMessage => ({
   subject: buildExceptionSubject(displayName),
-  body: buildExceptionBody(displayName, `, part of ${courseName} (${semesterName})`, 'this class is currently full'),
+  body: buildExceptionBody(displayName, `, part of ${courseName} (${semesterLabel})`, 'this class is currently full'),
 });
 
-export const buildClassClosedContactMessage = (displayName: string, courseName: string, semesterName: string): ContactMessage => ({
+export const buildClassClosedContactMessage = (displayName: string, courseName: string, semesterLabel: string): ContactMessage => ({
   subject: buildExceptionSubject(displayName),
-  body: buildExceptionBody(displayName, `, part of ${courseName} (${semesterName})`, 'the registration window for this class has closed'),
+  body: buildExceptionBody(displayName, `, part of ${courseName} (${semesterLabel})`, 'the registration window for this class has closed'),
 });
 
 export const buildWorkshopFullContactMessage = (name: string, semesterName: string): ContactMessage => ({

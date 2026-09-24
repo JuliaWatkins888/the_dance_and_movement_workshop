@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { Box, Button, Input, Switch, Text } from '@inithium/ui';
-import { useCreateClassMutation, useUpdateClassMutation } from '@inithium/api-client';
-import type { ClassDto, ClassWriteInput, InstructorCandidate } from '@inithium/api-client';
+import { computeClassPricing, useCreateClassMutation, useGetClassPricingConfigQuery, useUpdateClassMutation } from '@inithium/api-client';
+import type { ClassDto, ClassPricingConfigDto, ClassWriteInput, InstructorCandidate } from '@inithium/api-client';
 import type { DayOfWeek } from '@inithium/db';
-import { SemesterPicker } from './SemesterPicker';
-import { CoursePicker } from './CoursePicker';
+import { AcademicYearPicker } from './AcademicYearPicker';
+import { CoursePicker, useAcademicYearCourses } from './CoursePicker';
 import { InstructorPicker } from './InstructorPicker';
+import { SemesterScopeField } from './SemesterScopeField';
+import { formatCurrency } from './formatOffering';
+import { extractConflictMessage } from './extractErrorMessage';
+import { parseOptionalNumber, toNumberInputValue } from './numberInput';
 
 export interface ClassEditDialogProps {
   readonly mode: 'create' | 'edit';
@@ -53,17 +57,62 @@ const DaysOfWeekField = ({ values, onChange }: DaysOfWeekFieldProps) => {
   );
 };
 
-// Cascading Semester -> Course choice: the dialog holds both, but only courseId is ever part of
-// the submit payload - semesterId exists purely to scope which Courses CoursePicker offers (a
-// Class's semester is always whatever its chosen Course's own semester is, resolved server-side).
+interface PricingPreviewProps {
+  readonly monthlyPrice: number;
+  readonly spansFullYear: boolean;
+  readonly config: ClassPricingConfigDto | undefined;
+}
+
+// What a purchaser would pay under each billing option for the monthly price typed above - a live
+// read-only preview of the derived totals (nothing here is stored or editable per class; the
+// discounts live in Settings -> Pricing). Mirrors what the server puts in ClassDto.pricing.
+const PricingPreview = ({ monthlyPrice, spansFullYear, config }: PricingPreviewProps) => {
+  const pricing = config ? computeClassPricing(monthlyPrice, spansFullYear, config) : undefined;
+
+  return (
+    <Box bgColor={{ color: 'surface', intensity: 100 }} borderColor={{ color: 'surface', intensity: 200 }} padding={{ base: 12 }} flex={{ direction: 'col', gap: 4 }} className="rounded border">
+      <Text as="span" textColor={{ color: 'surface', intensity: 900 }} className="text-sm font-medium">
+        Pricing options
+      </Text>
+      {pricing && config ? (
+        <>
+          <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+            Month to month: {formatCurrency(pricing.monthly)}/mo
+          </Text>
+          <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+            Semester in full: {formatCurrency(pricing.semester)} ({config.semesterDiscountPercent}% off, {config.monthsPerSemester} months)
+          </Text>
+          <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+            {pricing.year !== undefined
+              ? `Full year in full: ${formatCurrency(pricing.year)} (${config.yearDiscountPercent}% off, ${config.monthsPerYear} months)`
+              : 'Full year in full: not available - the class must run in both semesters.'}
+          </Text>
+        </>
+      ) : (
+        <Text as="p" textColor={{ color: 'surface', intensity: 500 }} className="text-sm">
+          Loading pricing rules…
+        </Text>
+      )}
+      <Text as="p" textColor={{ color: 'surface', intensity: 500 }} className="text-xs">
+        Totals are calculated from the monthly price. The discount percentages are set under Settings.
+      </Text>
+    </Box>
+  );
+};
+
+// Cascading Academic Year -> Course -> Semester(s) choice. The dialog holds the year and course, but
+// only courseId and semesterIds are part of the submit payload - academicYearId exists purely to
+// scope which Courses CoursePicker offers. The semester choices are limited to the chosen Course's
+// own, since a class can only run in terms its course does.
 export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogProps) => {
   const [createClass, { isLoading: isCreating }] = useCreateClassMutation();
   const [updateClass, { isLoading: isUpdating }] = useUpdateClassMutation();
   const isLoading = isCreating || isUpdating;
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
 
-  const [semesterId, setSemesterId] = useState(initialClass?.semesterId ?? '');
+  const [academicYearId, setAcademicYearId] = useState(initialClass?.academicYearId ?? '');
   const [courseId, setCourseId] = useState(initialClass?.courseId ?? '');
+  const [semesterIds, setSemesterIds] = useState<string[]>(initialClass?.semesterIds ?? []);
   const [variantLabel, setVariantLabel] = useState(initialClass?.variantLabel ?? '');
   const [instructors, setInstructors] = useState<InstructorCandidate[]>(initialClass?.instructors ?? []);
   const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>(initialClass?.daysOfWeek ?? []);
@@ -72,24 +121,45 @@ export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogP
   const [registrationStartDate, setRegistrationStartDate] = useState(toDateInputValue(initialClass?.registrationStartDate));
   const [startDate, setStartDate] = useState(toDateInputValue(initialClass?.startDate));
   const [endDate, setEndDate] = useState(toDateInputValue(initialClass?.endDate));
-  const [minAgeYears, setMinAgeYears] = useState(initialClass?.minAgeYears !== undefined ? String(initialClass.minAgeYears) : '');
-  const [maxAgeYears, setMaxAgeYears] = useState(initialClass?.maxAgeYears !== undefined ? String(initialClass.maxAgeYears) : '');
+  const [minAgeYears, setMinAgeYears] = useState(toNumberInputValue(initialClass?.minAgeYears));
+  const [maxAgeYears, setMaxAgeYears] = useState(toNumberInputValue(initialClass?.maxAgeYears));
   const [priceAmount, setPriceAmount] = useState(String(initialClass?.priceAmount ?? 0));
-  const [billingCycle, setBillingCycle] = useState(initialClass?.billingCycle ?? 'Monthly');
   const [capacity, setCapacity] = useState(String(initialClass?.capacity ?? 0));
   const [enrolled, setEnrolled] = useState(String(initialClass?.enrolled ?? 0));
   const [isPublished, setIsPublished] = useState(initialClass?.isPublished ?? true);
 
-  const handleSemesterChange = (nextSemesterId: string) => {
-    setSemesterId(nextSemesterId);
+  // The course list is the same cached query CoursePicker reads; it's looked up here too because the
+  // selected course's own semesters drive both the scope choices and whether year pricing applies.
+  const { data: courses } = useAcademicYearCourses(academicYearId);
+  const selectedCourse = courses?.items.find((course) => course.id === courseId);
+  const { data: pricingConfig } = useGetClassPricingConfigQuery();
+
+  const handleAcademicYearChange = (nextAcademicYearId: string) => {
+    setAcademicYearId(nextAcademicYearId);
     setCourseId('');
+    setSemesterIds([]);
   };
+
+  // A new course starts the class off running in all of that course's semesters; the admin narrows
+  // it to one only when the class really is a single-semester section.
+  const handleCourseChange = (nextCourseId: string) => {
+    setCourseId(nextCourseId);
+    const nextCourse = courses?.items.find((course) => course.id === nextCourseId);
+    setSemesterIds(nextCourse ? nextCourse.semesters.map((semester) => semester.id) : []);
+  };
+
+  // Year pricing applies only when the class covers every semester of a full-year course.
+  const spansFullYear = Boolean(selectedCourse?.spansFullYear) && semesterIds.length === selectedCourse?.semesters.length;
 
   const handleSubmit = async () => {
     setSubmitError(undefined);
 
     if (!courseId) {
-      setSubmitError('Choose a semester and course.');
+      setSubmitError('Choose an academic year and course.');
+      return;
+    }
+    if (semesterIds.length === 0) {
+      setSubmitError('Choose which semester(s) this class runs in.');
       return;
     }
     if (daysOfWeek.length === 0) {
@@ -101,11 +171,12 @@ export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogP
       return;
     }
 
-    const parsedMinAge = minAgeYears.trim() ? Number(minAgeYears) : undefined;
-    const parsedMaxAge = maxAgeYears.trim() ? Number(maxAgeYears) : undefined;
+    const parsedMinAge = parseOptionalNumber(minAgeYears);
+    const parsedMaxAge = parseOptionalNumber(maxAgeYears);
 
     const commonFields: ClassWriteInput = {
       courseId,
+      semesterIds,
       variantLabel: variantLabel.trim() || undefined,
       instructorIds: instructors.map((instructor) => instructor.id),
       daysOfWeek,
@@ -117,7 +188,6 @@ export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogP
       minAgeYears: parsedMinAge,
       maxAgeYears: parsedMaxAge,
       priceAmount: Number(priceAmount) || 0,
-      billingCycle: billingCycle.trim() || 'Monthly',
       capacity: Number(capacity) || 0,
       enrolled: Number(enrolled) || 0,
       isPublished,
@@ -130,8 +200,8 @@ export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogP
         await updateClass({ id: initialClass.id, ...commonFields }).unwrap();
       }
       onDone();
-    } catch {
-      setSubmitError('Could not save this class. Check the fields and try again.');
+    } catch (error) {
+      setSubmitError(extractConflictMessage(error, 'Could not save this class. Check the fields and try again.'));
     }
   };
 
@@ -139,12 +209,26 @@ export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogP
     <Box flex={{ direction: 'col', gap: 16 }}>
       <Box flex={{ direction: 'row', gap: 16 }}>
         <Box className="flex-1">
-          <SemesterPicker value={semesterId} onValueChange={handleSemesterChange} />
+          <AcademicYearPicker value={academicYearId} onValueChange={handleAcademicYearChange} />
         </Box>
         <Box className="flex-1">
-          <CoursePicker semesterId={semesterId} value={courseId} onValueChange={setCourseId} />
+          <CoursePicker academicYearId={academicYearId} value={courseId} onValueChange={handleCourseChange} />
         </Box>
       </Box>
+
+      {selectedCourse ? (
+        <SemesterScopeField
+          label="Runs In"
+          available={selectedCourse.semesters}
+          value={semesterIds}
+          onChange={setSemesterIds}
+          helperText={
+            selectedCourse.spansFullYear
+              ? 'Only classes that run in both semesters can be bought for the full year.'
+              : 'This course only runs in one semester, so its classes do too.'
+          }
+        />
+      ) : null}
 
       <Input
         label="Variant Label"
@@ -181,10 +265,18 @@ export const ClassEditDialog = ({ mode, initialClass, onDone }: ClassEditDialogP
         <Input label="Max Age (years)" type="number" min={0} value={maxAgeYears} onChange={(event) => setMaxAgeYears(event.target.value)} className="flex-1" />
       </Box>
 
-      <Box flex={{ direction: 'row', gap: 12 }}>
-        <Input label="Price" type="number" min={0} step="0.01" required value={priceAmount} onChange={(event) => setPriceAmount(event.target.value)} className="flex-1" />
-        <Input label="Billing Cycle" placeholder="e.g. Monthly" value={billingCycle} onChange={(event) => setBillingCycle(event.target.value)} className="flex-1" />
-      </Box>
+      <Input
+        label="Monthly Price"
+        type="number"
+        min={0}
+        step="0.01"
+        required
+        helperText="The month-to-month rate. Semester and full-year prices are calculated from it."
+        value={priceAmount}
+        onChange={(event) => setPriceAmount(event.target.value)}
+      />
+
+      <PricingPreview monthlyPrice={Number(priceAmount) || 0} spansFullYear={spansFullYear} config={pricingConfig} />
 
       <Box flex={{ direction: 'row', gap: 12 }}>
         <Input label="Capacity" type="number" min={0} required value={capacity} onChange={(event) => setCapacity(event.target.value)} className="flex-1" />

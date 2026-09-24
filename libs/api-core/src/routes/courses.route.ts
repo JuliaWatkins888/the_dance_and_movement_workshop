@@ -11,14 +11,17 @@ import {
   countClassesByCourseId,
   createCourse,
   deleteCourse,
-  getCourseRepository,
-  getSemesterById,
+  getCourseById,
+  listClassesUnpaged,
   listCourses,
   listPublishedCourses,
   updateCourse,
 } from '@inithium/db';
-import type { CourseEntity, CourseSearchField } from '@inithium/db';
+import type { CourseEntity, CourseSearchField, SemesterEntity } from '@inithium/db';
 import { createCourseSchema, updateCourseSchema } from '../schemas/courses.schema';
+import { coversWholeYear, createAcademicYearContextLoader, pickSemesters, toSemesterSummary } from '../shared/academicContext';
+import type { AcademicYearContextLoader } from '../shared/academicContext';
+import { COURSE_UPLOAD_DIR, resolvePublicOrigin } from '../shared/courseUploads';
 
 const router: RouterType = Router();
 
@@ -29,12 +32,6 @@ const normalizeParam = (raw: string | string[]): string => (Array.isArray(raw) ?
 const SEARCH_FIELDS = ['name'] as const;
 const isSearchField = (value: unknown): value is CourseSearchField =>
   typeof value === 'string' && (SEARCH_FIELDS as readonly string[]).includes(value);
-
-// Lives in the source tree, never under dist/ - see staff.route.ts's own STAFF_UPLOAD_DIR comment
-// for why (webpack's output.clean wipes dist/apps/api on every build, and apps/api/src/assets is
-// only copied into dist at build time). Mirrors that same precedent exactly for Course images.
-const COURSE_UPLOAD_DIR = path.resolve(process.cwd(), 'apps/api/uploads/courses');
-fs.mkdirSync(COURSE_UPLOAD_DIR, { recursive: true });
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 // No image/svg+xml - an uploaded SVG can carry <script> and is a stored-XSS vector once rendered
@@ -80,21 +77,36 @@ const handleUpload = (req: Request, res: Response, next: NextFunction): void => 
   });
 };
 
-const resolvePublicOrigin = (): string => process.env['API_PUBLIC_URL'] || `http://localhost:${process.env['PORT'] || 3000}`;
+// A Course never stores its own copy of its academic year's title or its semesters' names/dates -
+// resolved at response time the same way staff.route.ts's toStaffDto resolves userId. Falls back to
+// empty/undefined if the linked year has since been deleted rather than throwing and breaking the
+// whole list over one orphaned record.
+//
+// `semesters` is only the ones this course runs in; `spansFullYear` is whether that's every semester
+// its year has. isPubliclyVisible is kept out of the DTO itself - it only gates the public list.
+const resolveCourse = async (course: CourseEntity, loadContext: AcademicYearContextLoader) => {
+  const { academicYear, semesters: yearSemesters } = await loadContext(course.academicYearId);
+  const offered = pickSemesters(yearSemesters, course.semesterIds);
+  const now = Date.now();
 
-// A Course never stores its own copy of the Semester's name/dates - resolved at response time the
-// same way staff.route.ts's toStaffDto resolves userId. Falls back to empty/undefined if the
-// linked semester has since been deleted rather than throwing and breaking the whole list over
-// one orphaned record.
-const toCourseDto = async (course: CourseEntity) => {
-  const semester = await getSemesterById(course.semesterId);
   return {
-    ...course,
-    semesterName: semester?.name ?? '',
-    semesterStartDate: semester?.startDate,
-    semesterEndDate: semester?.endDate,
-    semesterRegistrationOpensAt: semester?.registrationOpensAt,
+    dto: {
+      ...course,
+      academicYearTitle: academicYear?.title ?? '',
+      semesters: offered.map(toSemesterSummary),
+      spansFullYear: coversWholeYear(yearSemesters, course.semesterIds),
+    },
+    // Hidden once its year is unpublished or every semester it runs in is unpublished or over -
+    // mirrors class.repository.ts's rule that finished offerings drop out of the public catalog.
+    isPubliclyVisible:
+      academicYear?.isPublished === true && offered.some((semester) => semester.isPublished && semester.endDate.getTime() >= now),
   };
+};
+
+const assertSemestersBelongToYear = (semesterIds: string[], yearSemesters: SemesterEntity[]): void => {
+  if (!semesterIds.every((semesterId) => yearSemesters.some((semester) => semester.id === semesterId))) {
+    throw ValidationError('Every selected semester must belong to the selected academic year');
+  }
 };
 
 // Reading the catalog isn't sensitive - it's meant for every site visitor - so like
@@ -105,7 +117,9 @@ router.get(
   '/api/courses',
   asyncHandler(async (_req: Request, res: Response) => {
     const courses = await listPublishedCourses();
-    res.status(200).json(createSuccessResponse(await Promise.all(courses.map(toCourseDto))));
+    const loadContext = createAcademicYearContextLoader();
+    const resolved = await Promise.all(courses.map((course) => resolveCourse(course, loadContext)));
+    res.status(200).json(createSuccessResponse(resolved.filter((entry) => entry.isPubliclyVisible).map((entry) => entry.dto)));
   }),
 );
 
@@ -121,6 +135,7 @@ router.get(
     const rawSearch = typeof req.query['search'] === 'string' ? req.query['search'].trim() : undefined;
     const rawSearchField = req.query['searchField'];
     const searchField = isSearchField(rawSearchField) ? rawSearchField : 'name';
+    const academicYearId = typeof req.query['academicYearId'] === 'string' ? req.query['academicYearId'] : undefined;
     const semesterId = typeof req.query['semesterId'] === 'string' ? req.query['semesterId'] : undefined;
 
     const result = await listCourses({
@@ -128,9 +143,11 @@ router.get(
       pageSize,
       search: rawSearch || undefined,
       searchField: rawSearch ? searchField : undefined,
+      academicYearId,
       semesterId,
     });
-    const items = await Promise.all(result.items.map(toCourseDto));
+    const loadContext = createAcademicYearContextLoader();
+    const items = (await Promise.all(result.items.map((course) => resolveCourse(course, loadContext)))).map((entry) => entry.dto);
 
     res.status(200).json(
       createSuccessResponse(items, {
@@ -173,14 +190,16 @@ router.post(
       throw ValidationError('Invalid request body', parsed.error.flatten());
     }
 
-    const semester = await getSemesterById(parsed.data.semesterId);
-    if (!semester) {
-      throw NotFoundError('Linked semester not found');
+    const loadContext = createAcademicYearContextLoader();
+    const { academicYear, semesters } = await loadContext(parsed.data.academicYearId);
+    if (!academicYear) {
+      throw NotFoundError('Linked academic year not found');
     }
+    assertSemestersBelongToYear(parsed.data.semesterIds, semesters);
 
     const { isPublished, ...rest } = parsed.data;
     const course = await createCourse({ ...rest, isPublished: isPublished ?? true });
-    res.status(201).json(createSuccessResponse(await toCourseDto(course)));
+    res.status(201).json(createSuccessResponse((await resolveCourse(course, loadContext)).dto));
   }),
 );
 
@@ -195,10 +214,31 @@ router.put(
       throw ValidationError('Invalid request body', parsed.error.flatten());
     }
 
-    if (parsed.data.semesterId) {
-      const semester = await getSemesterById(parsed.data.semesterId);
-      if (!semester) {
-        throw NotFoundError('Linked semester not found');
+    const existing = await getCourseById(id);
+    if (!existing) {
+      throw NotFoundError('Course not found');
+    }
+
+    const loadContext = createAcademicYearContextLoader();
+    if (parsed.data.academicYearId !== undefined || parsed.data.semesterIds !== undefined) {
+      const nextAcademicYearId = parsed.data.academicYearId ?? existing.academicYearId;
+      const nextSemesterIds = parsed.data.semesterIds ?? existing.semesterIds;
+
+      const { academicYear, semesters } = await loadContext(nextAcademicYearId);
+      if (!academicYear) {
+        throw NotFoundError('Linked academic year not found');
+      }
+      assertSemestersBelongToYear(nextSemesterIds, semesters);
+
+      // A class can only run in semesters its course runs in - so narrowing a course (or moving it
+      // to another year) is refused while any of its classes still run in a semester being dropped,
+      // rather than silently leaving them pointing outside their course.
+      const classes = await listClassesUnpaged({ courseId: id });
+      const stranded = classes.filter((classItem) => classItem.semesterIds.some((semesterId) => !nextSemesterIds.includes(semesterId)));
+      if (stranded.length > 0) {
+        throw ConflictError(
+          `${stranded.length} class${stranded.length === 1 ? '' : 'es'} in this course run in a semester you're removing - update or delete them first`,
+        );
       }
     }
 
@@ -206,7 +246,7 @@ router.put(
     if (!course) {
       throw NotFoundError('Course not found');
     }
-    res.status(200).json(createSuccessResponse(await toCourseDto(course)));
+    res.status(200).json(createSuccessResponse((await resolveCourse(course, loadContext)).dto));
   }),
 );
 
@@ -222,7 +262,7 @@ router.delete(
       throw ConflictError(`This course still has ${classCount} class${classCount === 1 ? '' : 'es'} - remove or move them first`);
     }
 
-    const course = await getCourseRepository().findById(id);
+    const course = await getCourseById(id);
     if (!course) {
       throw NotFoundError('Course not found');
     }

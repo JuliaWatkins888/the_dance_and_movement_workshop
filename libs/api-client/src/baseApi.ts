@@ -71,6 +71,7 @@ export const baseApi = createApi({
     'Child',
 // inithium:block:children:tag-types:end
 // inithium:block:studio-offerings:tag-types:start
+    'AcademicYear',
     'Semester',
     'Course',
     'Workshop',

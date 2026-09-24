@@ -57,12 +57,32 @@
 			"type": "string"
 		},
 		{
+			"key": "academicYearId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sourceAcademicYearId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "destinationAcademicYearId",
+			"value": "",
+			"type": "string"
+		},
+		{
 			"key": "semesterId",
 			"value": "",
 			"type": "string"
 		},
 		{
 			"key": "courseId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "destinationCourseId",
 			"value": "",
 			"type": "string"
 		},
@@ -1178,6 +1198,214 @@
 			]
 		},
 		{
+			"name": "Academic Years",
+			"item": [
+				{
+					"name": "List Public Academic Years",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/academic-years",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"academic-years"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Academic Years (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"Default user lacks studio-offerings:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/academic-years/admin?page=1&pageSize=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"academic-years",
+								"admin"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "20"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Academic Year",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"Default user lacks studio-offerings:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"2026–2027\",\n  \"description\": \"Summer/Fall 2026 and Winter/Spring 2027.\",\n  \"semesters\": {\n    \"summer-fall\": {\n      \"startDate\": \"2026-08-24\",\n      \"endDate\": \"2026-12-18\",\n      \"registrationOpensAt\": \"2026-07-01\"\n    },\n    \"winter-spring\": {\n      \"startDate\": \"2027-01-11\",\n      \"endDate\": \"2027-05-28\",\n      \"registrationOpensAt\": \"2026-11-01\"\n    }\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/academic-years",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"academic-years"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Academic Year",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"Default user lacks studio-offerings:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/academic-years/{{academicYearId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"academic-years",
+								"{{academicYearId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Academic Year",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"Default user lacks studio-offerings:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/academic-years/{{academicYearId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"academic-years",
+								"{{academicYearId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
 			"name": "Semesters",
 			"item": [
 				{
@@ -1219,54 +1447,12 @@
 								{
 									"key": "pageSize",
 									"value": "20"
+								},
+								{
+									"key": "academicYearId",
+									"value": "{{academicYearId}}",
+									"disabled": true
 								}
-							]
-						}
-					}
-				},
-				{
-					"name": "Create Semester",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"// Default user lacks studio-offerings:manage capability.",
-									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{accessToken}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Fall 2026\",\n  \"startDate\": \"2026-09-01\",\n  \"endDate\": \"2026-12-15\",\n  \"registrationOpensAt\": \"2026-07-01\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/semesters",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"semesters"
 							]
 						}
 					}
@@ -1299,48 +1485,13 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"isPublished\": true\n}",
+							"raw": "{\n  \"name\": \"Summer/Fall 2026\",\n  \"startDate\": \"2026-08-24\",\n  \"endDate\": \"2026-12-18\",\n  \"registrationOpensAt\": \"2026-07-01\",\n  \"isPublished\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/semesters/{{semesterId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"semesters",
-								"{{semesterId}}"
-							]
-						}
-					}
-				},
-				{
-					"name": "Delete Semester",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"// Default user lacks studio-offerings:manage capability.",
-									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{accessToken}}"
-							}
-						],
 						"url": {
 							"raw": "{{baseUrl}}/api/semesters/{{semesterId}}",
 							"host": [
@@ -1427,6 +1578,11 @@
 								{
 									"key": "pageSize",
 									"value": "20"
+								},
+								{
+									"key": "academicYearId",
+									"value": "{{academicYearId}}",
+									"disabled": true
 								}
 							]
 						}
@@ -1460,7 +1616,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"semesterId\": \"{{semesterId}}\",\n  \"name\": \"Ballet\",\n  \"description\": \"Foundational ballet technique across age levels.\",\n  \"categories\": [\n    \"Ballet\"\n  ]\n}",
+							"raw": "{\n  \"academicYearId\": \"{{academicYearId}}\",\n  \"semesterIds\": [\n    \"{{semesterId}}\"\n  ],\n  \"name\": \"Ballet\",\n  \"description\": \"Foundational ballet technique across age levels.\",\n  \"categories\": [\n    \"Ballet\"\n  ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1596,6 +1752,40 @@
 					}
 				},
 				{
+					"name": "Get Class Pricing Config",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Returns the discount rules', () => {",
+									"  const { data } = pm.response.json();",
+									"  pm.expect(data).to.have.property('semesterDiscountPercent');",
+									"  pm.expect(data).to.have.property('yearDiscountPercent');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/pricing-config",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"pricing-config"
+							]
+						}
+					}
+				},
+				{
 					"name": "List Classes (Admin)",
 					"event": [
 						{
@@ -1668,7 +1858,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"courseId\": \"{{courseId}}\",\n  \"variantLabel\": \"Tuesdays, Ages 7-10\",\n  \"instructorIds\": [],\n  \"daysOfWeek\": [\n    \"Tuesday\"\n  ],\n  \"startTime\": \"19:30\",\n  \"endTime\": \"20:30\",\n  \"registrationStartDate\": \"2026-07-13\",\n  \"startDate\": \"2026-09-15\",\n  \"endDate\": \"2026-12-15\",\n  \"minAgeYears\": 7,\n  \"maxAgeYears\": 10,\n  \"priceAmount\": 60,\n  \"billingCycle\": \"Monthly\",\n  \"capacity\": 10\n}",
+							"raw": "{\n  \"courseId\": \"{{courseId}}\",\n  \"semesterIds\": [\n    \"{{semesterId}}\"\n  ],\n  \"variantLabel\": \"Tuesdays, Ages 7-10\",\n  \"instructorIds\": [],\n  \"daysOfWeek\": [\n    \"Tuesday\"\n  ],\n  \"startTime\": \"19:30\",\n  \"endTime\": \"20:30\",\n  \"registrationStartDate\": \"2026-07-13\",\n  \"startDate\": \"2026-09-15\",\n  \"endDate\": \"2026-12-15\",\n  \"minAgeYears\": 7,\n  \"maxAgeYears\": 10,\n  \"priceAmount\": 60,\n  \"capacity\": 10\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1974,6 +2164,104 @@
 								"api",
 								"workshops",
 								"{{workshopId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Studio Offerings",
+			"item": [
+				{
+					"name": "Get Copy Preview (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"Default user lacks studio-offerings:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/studio-offerings/copy-preview?sourceAcademicYearId={{sourceAcademicYearId}}&destinationAcademicYearId={{destinationAcademicYearId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"studio-offerings",
+								"copy-preview"
+							],
+							"query": [
+								{
+									"key": "sourceAcademicYearId",
+									"value": "{{sourceAcademicYearId}}"
+								},
+								{
+									"key": "destinationAcademicYearId",
+									"value": "{{destinationAcademicYearId}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Copy Offerings (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"Default user lacks studio-offerings:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"sourceAcademicYearId\": \"{{sourceAcademicYearId}}\",\n  \"destinationAcademicYearId\": \"{{destinationAcademicYearId}}\",\n  \"courses\": [\n    {\n      \"sourceCourseId\": \"{{courseId}}\",\n      \"target\": {\n        \"mode\": \"create\"\n      },\n      \"classIds\": [\n        \"{{classId}}\"\n      ]\n    },\n    {\n      \"sourceCourseId\": \"{{courseId}}\",\n      \"target\": {\n        \"mode\": \"existing\",\n        \"courseId\": \"{{destinationCourseId}}\"\n      },\n      \"classIds\": []\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/studio-offerings/copy",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"studio-offerings",
+								"copy"
 							]
 						}
 					}

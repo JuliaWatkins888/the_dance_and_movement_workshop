@@ -12,10 +12,12 @@ import { SemesterDocument } from '../../schemas/semester.schema';
 
 const mapToSemesterEntity = (doc: SemesterDocument): SemesterEntity => ({
   id: doc._id.toString(),
+  academicYearId: doc.academicYearId,
+  term: doc.term,
   name: doc.name,
   startDate: doc.startDate,
   endDate: doc.endDate,
-  registrationOpensAt: doc.registrationOpensAt,
+  registrationOpensAt: doc.registrationOpensAt ?? undefined,
   isPublished: doc.isPublished,
   createdAt: doc.createdAt,
   updatedAt: doc.updatedAt,
@@ -23,8 +25,11 @@ const mapToSemesterEntity = (doc: SemesterDocument): SemesterEntity => ({
 
 export const createMongoSemesterRepository = (model: Model<SemesterDocument>): SemesterRepository => ({
   findMany: async (options: FindManySemestersOptions): Promise<PaginatedResult<SemesterEntity>> => {
-    const { page, pageSize, search, searchField } = options;
+    const { page, pageSize, search, searchField, academicYearId } = options;
     const filter: QueryFilter<SemesterDocument> = {};
+    if (academicYearId) {
+      filter.academicYearId = academicYearId;
+    }
     if (search && searchField) {
       filter[searchField] = { $regex: escapeRegExp(search), $options: 'i' };
     }
@@ -41,6 +46,14 @@ export const createMongoSemesterRepository = (model: Model<SemesterDocument>): S
     const doc = await model.findById(id).exec();
     return doc ? mapToSemesterEntity(doc) : null;
   },
+  findByIds: async (ids: string[]): Promise<SemesterEntity[]> => {
+    const docs = await model.find({ _id: { $in: ids } }).sort({ startDate: 1 }).exec();
+    return docs.map(mapToSemesterEntity);
+  },
+  findByAcademicYearId: async (academicYearId: string): Promise<SemesterEntity[]> => {
+    const docs = await model.find({ academicYearId }).sort({ startDate: 1 }).exec();
+    return docs.map(mapToSemesterEntity);
+  },
   create: async (input: CreateSemesterInput): Promise<SemesterEntity> => {
     const doc = await model.create(input);
     return mapToSemesterEntity(doc);
@@ -49,8 +62,8 @@ export const createMongoSemesterRepository = (model: Model<SemesterDocument>): S
     const doc = await model.findByIdAndUpdate(id, { $set: input }, { new: true, runValidators: true }).exec();
     return doc ? mapToSemesterEntity(doc) : null;
   },
-  delete: async (id: string): Promise<boolean> => {
-    const result = await model.findByIdAndDelete(id).exec();
-    return result !== null;
+  deleteByAcademicYearId: async (academicYearId: string): Promise<number> => {
+    const result = await model.deleteMany({ academicYearId }).exec();
+    return result.deletedCount;
   },
 });

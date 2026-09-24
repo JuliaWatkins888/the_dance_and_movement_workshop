@@ -5,6 +5,7 @@ import type { InstructorCandidate, WorkshopDto, WorkshopWriteInput } from '@init
 import { SemesterPicker } from './SemesterPicker';
 import { InstructorPicker } from './InstructorPicker';
 import { OccurrencesField } from './OccurrencesField';
+import { parseOptionalNumber, toNumberInputValue } from './numberInput';
 import type { OccurrenceInput } from './OccurrencesField';
 
 export interface WorkshopEditDialogProps {
@@ -33,8 +34,8 @@ export const WorkshopEditDialog = ({ mode, initialWorkshop, onDone }: WorkshopEd
   const [description, setDescription] = useState(initialWorkshop?.description ?? '');
   const [instructors, setInstructors] = useState<InstructorCandidate[]>(initialWorkshop?.instructors ?? []);
   const [occurrences, setOccurrences] = useState<OccurrenceInput[]>(toOccurrenceInputs(initialWorkshop));
-  const [minAgeYears, setMinAgeYears] = useState(initialWorkshop?.minAgeYears !== undefined ? String(initialWorkshop.minAgeYears) : '');
-  const [maxAgeYears, setMaxAgeYears] = useState(initialWorkshop?.maxAgeYears !== undefined ? String(initialWorkshop.maxAgeYears) : '');
+  const [minAgeYears, setMinAgeYears] = useState(toNumberInputValue(initialWorkshop?.minAgeYears));
+  const [maxAgeYears, setMaxAgeYears] = useState(toNumberInputValue(initialWorkshop?.maxAgeYears));
   const [priceAmount, setPriceAmount] = useState(String(initialWorkshop?.priceAmount ?? 0));
   const [registrationStartDate, setRegistrationStartDate] = useState(toDateInputValue(initialWorkshop?.registrationStartDate));
   const [capacity, setCapacity] = useState(String(initialWorkshop?.capacity ?? 0));
@@ -57,8 +58,8 @@ export const WorkshopEditDialog = ({ mode, initialWorkshop, onDone }: WorkshopEd
       return;
     }
 
-    const parsedMinAge = minAgeYears.trim() ? Number(minAgeYears) : undefined;
-    const parsedMaxAge = maxAgeYears.trim() ? Number(maxAgeYears) : undefined;
+    const parsedMinAge = parseOptionalNumber(minAgeYears);
+    const parsedMaxAge = parseOptionalNumber(maxAgeYears);
 
     const commonFields: WorkshopWriteInput = {
       semesterId,

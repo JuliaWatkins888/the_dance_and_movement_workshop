@@ -7,9 +7,9 @@ export interface SemesterPickerProps {
   readonly label?: string;
 }
 
-// Semester CRUD is rare (~twice a year), so a plain Select backed by the existing admin-list query
-// at a large page size is enough - no dedicated candidates endpoint needed the way Staff/Parent
-// picking needs (those exclude already-linked accounts; nothing about picking a Semester does).
+// A year only ever has two semesters, so even a few years' worth fits a plain Select backed by the
+// existing admin-list query at a large page size - no dedicated candidates endpoint needed. Used for
+// Workshops, which belong to a single semester rather than a year-or-term scope like Courses/Classes.
 const PAGE_SIZE = 100;
 
 export const SemesterPicker = ({ value, onValueChange, label = 'Semester' }: SemesterPickerProps) => {
@@ -23,7 +23,7 @@ export const SemesterPicker = ({ value, onValueChange, label = 'Semester' }: Sem
       <Select value={value} onValueChange={onValueChange} placeholder="Select a semester">
         {(data?.items ?? []).map((semester) => (
           <SelectItem key={semester.id} value={semester.id}>
-            {semester.name}
+            {semester.academicYearTitle ? `${semester.name} (${semester.academicYearTitle})` : semester.name}
           </SelectItem>
         ))}
       </Select>

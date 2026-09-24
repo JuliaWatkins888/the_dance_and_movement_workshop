@@ -232,9 +232,11 @@ export type {
 
 // inithium:block:policy:exports:end
 // inithium:block:classes:exports:start
+export { computeClassPricing } from './utils/computeClassPricing';
 export {
   classesApi,
   useListPublicClassesQuery,
+  useGetClassPricingConfigQuery,
   useListClassesAdminQuery,
   useCreateClassMutation,
   useUpdateClassMutation,
@@ -242,6 +244,8 @@ export {
 } from './endpoints/classes.endpoints';
 export type {
   ClassDto,
+  ClassPricingDto,
+  ClassPricingConfigDto,
   ClassInstructorSummary,
   ListPublicClassesParams,
   ListClassesAdminParams,
@@ -276,12 +280,25 @@ export type {
 // inithium:block:children:exports:end
 // inithium:block:studio-offerings:exports:start
 export {
-  semestersApi,
-  useListSemestersAdminQuery,
-  useCreateSemesterMutation,
-  useUpdateSemesterMutation,
-  useDeleteSemesterMutation,
-} from './endpoints/semesters.endpoints';
+  academicYearsApi,
+  useListPublicAcademicYearsQuery,
+  useListAcademicYearsAdminQuery,
+  useCreateAcademicYearMutation,
+  useUpdateAcademicYearMutation,
+  useDeleteAcademicYearMutation,
+} from './endpoints/academic-years.endpoints';
+export type {
+  AcademicYearDto,
+  SemesterSummaryDto,
+  SemesterDatesInput,
+  ListAcademicYearsAdminParams,
+  ListAcademicYearsResult,
+  AcademicYearCreateInput,
+  AcademicYearUpdateFields,
+  UpdateAcademicYearInput,
+} from './endpoints/academic-years.endpoints';
+
+export { semestersApi, useListSemestersAdminQuery, useUpdateSemesterMutation } from './endpoints/semesters.endpoints';
 export type {
   SemesterDto,
   ListSemestersAdminParams,
@@ -328,8 +345,23 @@ export type {
   UpdateWorkshopInput,
 } from './endpoints/workshops.endpoints';
 
-export { pickCurrentSemester } from './utils/pickCurrentSemester';
-export type { SemesterLike } from './utils/pickCurrentSemester';
+export { pickCurrentAcademicYear } from './utils/pickCurrentAcademicYear';
+export type { AcademicYearLike } from './utils/pickCurrentAcademicYear';
+
+export { offeringCopyApi, useGetOfferingCopyPreviewQuery, useCopyOfferingsMutation } from './endpoints/offering-copy.endpoints';
+export type {
+  CopyClassPreviewDto,
+  CopyDestinationMatchDto,
+  CopyCoursePreviewDto,
+  OfferingCopyPreviewDto,
+  OfferingCopyPreviewParams,
+  CopyTargetInput,
+  CopyCourseEntryInput,
+  OfferingCopyRequest,
+  CopyClassSkipDto,
+  CopyCourseResultDto,
+  OfferingCopyResultDto,
+} from './endpoints/offering-copy.endpoints';
 
 export { studioOfferingsStatsApi, useGetStudioOfferingsStatsQuery } from './endpoints/studio-offerings-stats.endpoints';
 export type { StudioOfferingsStatsDto } from './endpoints/studio-offerings-stats.endpoints';

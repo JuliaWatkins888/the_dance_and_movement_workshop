@@ -21,7 +21,14 @@ const requireImageSourceFields = (
 };
 
 const courseShape = {
-  semesterId: z.string().min(1, 'Semester is required'),
+  academicYearId: z.string().min(1, 'Academic year is required'),
+  // One semester for a single-term course, both of the year's for a full-year course. That each id
+  // actually belongs to academicYearId is checked in the route, which has the year's semesters.
+  semesterIds: z
+    .array(z.string().min(1))
+    .min(1, 'Choose at least one semester')
+    .max(2, 'A course can run in at most two semesters')
+    .refine((ids) => new Set(ids).size === ids.length, 'Semesters must be distinct'),
   name: z.string().min(1, 'Name is required'),
   description: z.string().max(4000).optional(),
   categories: z.array(z.string().min(1)).min(1, 'At least one category is required'),

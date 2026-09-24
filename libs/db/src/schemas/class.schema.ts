@@ -4,6 +4,7 @@ import type { DayOfWeek } from '../contracts/class.contract';
 
 export interface ClassDocument extends Document {
   courseId: string;
+  semesterIds: string[];
   variantLabel?: string;
   instructorIds: string[];
   daysOfWeek: DayOfWeek[];
@@ -15,9 +16,9 @@ export interface ClassDocument extends Document {
   minAgeYears?: number;
   maxAgeYears?: number;
   priceAmount: number;
-  billingCycle: string;
   capacity: number;
   enrolled: number;
+  copiedFromId?: string;
   isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -26,6 +27,7 @@ export interface ClassDocument extends Document {
 const classSchema = new Schema<ClassDocument>(
   {
     courseId: { type: String, required: true, index: true },
+    semesterIds: { type: [String], required: true, default: [], index: true },
     variantLabel: { type: String, required: false, index: true },
     instructorIds: { type: [String], required: true, default: [] },
     daysOfWeek: { type: [String], required: true, enum: DAYS_OF_WEEK, default: [], index: true },
@@ -37,9 +39,9 @@ const classSchema = new Schema<ClassDocument>(
     minAgeYears: { type: Number, required: false },
     maxAgeYears: { type: Number, required: false },
     priceAmount: { type: Number, required: true },
-    billingCycle: { type: String, required: true, default: 'Monthly' },
     capacity: { type: Number, required: true },
     enrolled: { type: Number, required: true, default: 0 },
+    copiedFromId: { type: String, required: false, index: true },
     isPublished: { type: Boolean, required: true, default: true, index: true },
   },
   { timestamps: true },

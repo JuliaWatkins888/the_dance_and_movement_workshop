@@ -12,23 +12,28 @@ import type { PaginatedResult } from '../../contracts/pagination.contract';
 import { escapeRegExp } from '../../utils/escapeRegExp';
 import { ClassDocument } from '../../schemas/class.schema';
 
+// Optional fields are `?? undefined` here (and in the sibling repositories) because Mongo can hold an
+// explicit null for a field that was never set - the raw driver serializes undefined as null - while
+// the entity contract says "absent". A null that leaked into the API would arrive in the CMS as
+// String(null) === "null" in a number input, and round-trip back as a rejected null on save.
 const mapToClassEntity = (doc: ClassDocument): ClassEntity => ({
   id: doc._id.toString(),
   courseId: doc.courseId,
-  variantLabel: doc.variantLabel,
+  semesterIds: doc.semesterIds,
+  variantLabel: doc.variantLabel ?? undefined,
   instructorIds: doc.instructorIds,
   daysOfWeek: doc.daysOfWeek,
   startTime: doc.startTime,
   endTime: doc.endTime,
-  registrationStartDate: doc.registrationStartDate,
+  registrationStartDate: doc.registrationStartDate ?? undefined,
   startDate: doc.startDate,
   endDate: doc.endDate,
-  minAgeYears: doc.minAgeYears,
-  maxAgeYears: doc.maxAgeYears,
+  minAgeYears: doc.minAgeYears ?? undefined,
+  maxAgeYears: doc.maxAgeYears ?? undefined,
   priceAmount: doc.priceAmount,
-  billingCycle: doc.billingCycle,
   capacity: doc.capacity,
   enrolled: doc.enrolled,
+  copiedFromId: doc.copiedFromId ?? undefined,
   isPublished: doc.isPublished,
   createdAt: doc.createdAt,
   updatedAt: doc.updatedAt,
@@ -79,6 +84,14 @@ export const createMongoClassRepository = (model: Model<ClassDocument>): ClassRe
       filter.instructorIds = options.instructorId;
     }
     const docs = await model.find(filter).sort({ startDate: 1 }).exec();
+    return docs.map(mapToClassEntity);
+  },
+  findById: async (id: string): Promise<ClassEntity | null> => {
+    const doc = await model.findById(id).exec();
+    return doc ? mapToClassEntity(doc) : null;
+  },
+  findByCourseIds: async (courseIds: string[]): Promise<ClassEntity[]> => {
+    const docs = await model.find({ courseId: { $in: courseIds } }).sort({ startDate: 1 }).exec();
     return docs.map(mapToClassEntity);
   },
   create: async (input: CreateClassInput): Promise<ClassEntity> => {

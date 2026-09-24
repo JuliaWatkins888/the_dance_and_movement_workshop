@@ -37,6 +37,9 @@ export interface WorkshopDto {
   createdAt: string;
   updatedAt: string;
   semesterName: string;
+  // A workshop belongs to one semester; its academic year is that semester's parent.
+  academicYearId: string;
+  academicYearTitle: string;
   instructors: WorkshopInstructorSummary[];
   // registrationStartDate when the workshop has its own, otherwise the semester's own default -
   // see ClassDto's identical field for the full rationale.

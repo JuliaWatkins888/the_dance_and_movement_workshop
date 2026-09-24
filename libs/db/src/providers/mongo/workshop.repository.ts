@@ -20,7 +20,7 @@ const mapToWorkshopEntity = (doc: WorkshopDocument): WorkshopEntity => ({
   id: doc._id.toString(),
   semesterId: doc.semesterId,
   name: doc.name,
-  description: doc.description,
+  description: doc.description ?? undefined,
   instructorIds: doc.instructorIds,
   occurrences: [...doc.occurrences]
     .sort((a, b) => a.date.getTime() - b.date.getTime())
@@ -30,10 +30,10 @@ const mapToWorkshopEntity = (doc: WorkshopDocument): WorkshopEntity => ({
       startTime: occurrence.startTime,
       endTime: occurrence.endTime,
     })),
-  minAgeYears: doc.minAgeYears,
-  maxAgeYears: doc.maxAgeYears,
+  minAgeYears: doc.minAgeYears ?? undefined,
+  maxAgeYears: doc.maxAgeYears ?? undefined,
   priceAmount: doc.priceAmount,
-  registrationStartDate: doc.registrationStartDate,
+  registrationStartDate: doc.registrationStartDate ?? undefined,
   capacity: doc.capacity,
   enrolled: doc.enrolled,
   isPublished: doc.isPublished,
@@ -84,5 +84,5 @@ export const createMongoWorkshopRepository = (model: Model<WorkshopDocument>): W
     const result = await model.findByIdAndDelete(id).exec();
     return result !== null;
   },
-  countBySemesterId: async (semesterId: string): Promise<number> => model.countDocuments({ semesterId }).exec(),
+  countBySemesterIds: async (semesterIds: string[]): Promise<number> => model.countDocuments({ semesterId: { $in: semesterIds } }).exec(),
 });
