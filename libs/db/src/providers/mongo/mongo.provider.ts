@@ -57,12 +57,15 @@ import { createMongoChildRepository } from './child.repository';
 import { ChildModel } from '../../schemas/child.schema';
 // inithium:block:children:imports:end
 // inithium:block:studio-offerings:imports:start
+import { AcademicYearRepository } from '../../contracts/academic-year.contract';
 import { SemesterRepository } from '../../contracts/semester.contract';
 import { CourseRepository } from '../../contracts/course.contract';
 import { WorkshopRepository } from '../../contracts/workshop.contract';
+import { createMongoAcademicYearRepository } from './academic-year.repository';
 import { createMongoSemesterRepository } from './semester.repository';
 import { createMongoCourseRepository } from './course.repository';
 import { createMongoWorkshopRepository } from './workshop.repository';
+import { AcademicYearModel } from '../../schemas/academic-year.schema';
 import { SemesterModel } from '../../schemas/semester.schema';
 import { CourseModel } from '../../schemas/course.schema';
 import { WorkshopModel } from '../../schemas/workshop.schema';
@@ -98,6 +101,7 @@ const classRepository = createMongoClassRepository(ClassModel);
 const childRepository = createMongoChildRepository(ChildModel);
 // inithium:block:children:repository-instances:end
 // inithium:block:studio-offerings:repository-instances:start
+const academicYearRepository = createMongoAcademicYearRepository(AcademicYearModel);
 const semesterRepository = createMongoSemesterRepository(SemesterModel);
 const courseRepository = createMongoCourseRepository(CourseModel);
 const workshopRepository = createMongoWorkshopRepository(WorkshopModel);
@@ -147,6 +151,7 @@ export const mongoProvider: DbProvider = {
   getChildRepository: (): ChildRepository => childRepository,
 // inithium:block:children:members:end
 // inithium:block:studio-offerings:members:start
+  getAcademicYearRepository: (): AcademicYearRepository => academicYearRepository,
   getSemesterRepository: (): SemesterRepository => semesterRepository,
   getCourseRepository: (): CourseRepository => courseRepository,
   getWorkshopRepository: (): WorkshopRepository => workshopRepository,

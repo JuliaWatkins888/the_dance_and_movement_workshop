@@ -1,10 +1,17 @@
 import { useRef, useState } from 'react';
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import { Box, Button, Input, Pill, Switch, Tabs, TabsContent, TabsList, TabsTrigger, Text, Textarea } from '@inithium/ui';
-import { useCreateCourseMutation, useUpdateCourseMutation, useUploadCourseImageLocalMutation } from '@inithium/api-client';
+import {
+  useCreateCourseMutation,
+  useListAcademicYearsAdminQuery,
+  useUpdateCourseMutation,
+  useUploadCourseImageLocalMutation,
+} from '@inithium/api-client';
 import type { CourseDto, CourseWriteInput } from '@inithium/api-client';
 import type { CourseImageSourceType } from '@inithium/db';
-import { SemesterPicker } from './SemesterPicker';
+import { AcademicYearPicker } from './AcademicYearPicker';
+import { SemesterScopeField } from './SemesterScopeField';
+import { extractConflictMessage } from './extractErrorMessage';
 
 export interface CourseEditDialogProps {
   readonly mode: 'create' | 'edit';
@@ -153,7 +160,8 @@ export const CourseEditDialog = ({ mode, initialCourse, onDone }: CourseEditDial
   const isLoading = isCreating || isUpdating;
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
 
-  const [semesterId, setSemesterId] = useState(initialCourse?.semesterId ?? '');
+  const [academicYearId, setAcademicYearId] = useState(initialCourse?.academicYearId ?? '');
+  const [semesterIds, setSemesterIds] = useState<string[]>(initialCourse?.semesterIds ?? []);
   const [name, setName] = useState(initialCourse?.name ?? '');
   const [description, setDescription] = useState(initialCourse?.description ?? '');
   const [categories, setCategories] = useState<string[]>(initialCourse?.categories ?? []);
@@ -161,6 +169,18 @@ export const CourseEditDialog = ({ mode, initialCourse, onDone }: CourseEditDial
   const [imageSourceType, setImageSourceType] = useState<CourseImageSourceType | undefined>(initialCourse?.imageSourceType);
   const [imageStorageKey, setImageStorageKey] = useState(initialCourse?.imageStorageKey);
   const [isPublished, setIsPublished] = useState(initialCourse?.isPublished ?? true);
+
+  // The scope choices come from the selected year's own semesters (the same cached list the picker
+  // reads). Picking a different year starts the course as full-year, the common case - the admin
+  // narrows it to one semester only when it genuinely runs in just one.
+  const { data: academicYears } = useListAcademicYearsAdminQuery({ page: 1, pageSize: 100 });
+  const selectedAcademicYear = academicYears?.items.find((academicYear) => academicYear.id === academicYearId);
+
+  const handleAcademicYearChange = (nextAcademicYearId: string) => {
+    setAcademicYearId(nextAcademicYearId);
+    const nextAcademicYear = academicYears?.items.find((academicYear) => academicYear.id === nextAcademicYearId);
+    setSemesterIds(nextAcademicYear ? nextAcademicYear.semesters.map((semester) => semester.id) : []);
+  };
 
   const handleImageUrlCommit = (url: string) => {
     setImageUrl(url);
@@ -177,8 +197,12 @@ export const CourseEditDialog = ({ mode, initialCourse, onDone }: CourseEditDial
   const handleSubmit = async () => {
     setSubmitError(undefined);
 
-    if (!semesterId) {
-      setSubmitError('Choose a semester.');
+    if (!academicYearId) {
+      setSubmitError('Choose an academic year.');
+      return;
+    }
+    if (semesterIds.length === 0) {
+      setSubmitError('Choose which semester(s) this course runs in.');
       return;
     }
     if (!name.trim()) {
@@ -191,7 +215,8 @@ export const CourseEditDialog = ({ mode, initialCourse, onDone }: CourseEditDial
     }
 
     const commonFields: CourseWriteInput = {
-      semesterId,
+      academicYearId,
+      semesterIds,
       name: name.trim(),
       description: description.trim() || undefined,
       categories,
@@ -208,14 +233,24 @@ export const CourseEditDialog = ({ mode, initialCourse, onDone }: CourseEditDial
         await updateCourse({ id: initialCourse.id, ...commonFields }).unwrap();
       }
       onDone();
-    } catch {
-      setSubmitError('Could not save this course. Check the fields and try again.');
+    } catch (error) {
+      setSubmitError(extractConflictMessage(error, 'Could not save this course. Check the fields and try again.'));
     }
   };
 
   return (
     <Box flex={{ direction: 'col', gap: 16 }}>
-      <SemesterPicker value={semesterId} onValueChange={setSemesterId} />
+      <AcademicYearPicker value={academicYearId} onValueChange={handleAcademicYearChange} />
+
+      {selectedAcademicYear ? (
+        <SemesterScopeField
+          label="Runs In"
+          available={selectedAcademicYear.semesters}
+          value={semesterIds}
+          onChange={setSemesterIds}
+          helperText="A course doesn't have to span the whole year - choose one semester if it only runs then."
+        />
+      ) : null}
 
       <Input label="Course Name" required placeholder="e.g. Ballet" value={name} onChange={(event) => setName(event.target.value)} />
 

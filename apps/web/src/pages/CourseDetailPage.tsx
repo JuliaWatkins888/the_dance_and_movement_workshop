@@ -65,10 +65,12 @@ const formatAgeRange = (min?: number, max?: number): string => {
   return `Ages ${min}–${max}`;
 };
 
-const formatPrice = (amount: number, billingCycle: string): string => {
-  const formatted = `$${amount % 1 === 0 ? amount : amount.toFixed(2)}`;
-  return billingCycle.toLowerCase() === 'monthly' ? `${formatted}/mo` : `${formatted} (${billingCycle})`;
-};
+// The card shows the month-to-month rate; the semester/year-in-full totals (classItem.pricing) are
+// what the registration flow will offer as billing options.
+const formatMonthlyPrice = (amount: number): string => `$${amount % 1 === 0 ? amount : amount.toFixed(2)}/mo`;
+
+// "Summer/Fall 2026 & Winter/Spring 2027" - which term(s) something runs in, for prefilled contact copy.
+const formatSemesterNames = (semesters: readonly { readonly name: string }[]): string => semesters.map((semester) => semester.name).join(' & ');
 
 const formatOpenings = (openings: number): string => (openings <= 0 ? 'Class full' : `${openings} spot${openings === 1 ? '' : 's'} open`);
 
@@ -102,7 +104,7 @@ const ClassVariantCard = ({ classItem }: ClassVariantCardProps) => {
           {displayName}
         </Text>
         <Text as="p" textColor={{ color: 'primary', intensity: 600 }} className="shrink-0 text-sm font-semibold">
-          {formatPrice(classItem.priceAmount, classItem.billingCycle)}
+          {formatMonthlyPrice(classItem.priceAmount)}
         </Text>
       </Box>
 
@@ -128,8 +130,8 @@ const ClassVariantCard = ({ classItem }: ClassVariantCardProps) => {
         status={getClassRegistrationStatus(classItem)}
         opensAt={classItem.effectiveRegistrationOpensAt}
         registerPath={`/register/class/${classItem.id}`}
-        fullContactMessage={buildClassFullContactMessage(displayName, classItem.courseName, classItem.semesterName)}
-        closedContactMessage={buildClassClosedContactMessage(displayName, classItem.courseName, classItem.semesterName)}
+        fullContactMessage={buildClassFullContactMessage(displayName, classItem.courseName, formatSemesterNames(classItem.semesters))}
+        closedContactMessage={buildClassClosedContactMessage(displayName, classItem.courseName, formatSemesterNames(classItem.semesters))}
         className="mt-2 w-full"
       />
     </Box>
@@ -214,7 +216,7 @@ export const CourseDetailPage = () => {
             ))}
           </Box>
           <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-sm font-medium">
-            {course.semesterName}
+            {course.spansFullYear ? course.academicYearTitle : `${course.academicYearTitle} · ${formatSemesterNames(course.semesters)}`}
           </Text>
           {course.description ? (
             <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="whitespace-pre-line text-sm">

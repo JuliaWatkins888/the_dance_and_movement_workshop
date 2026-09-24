@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import { alert, Box, Button, IconButton, ListRow, Pagination, Pill, SearchFilterBar, Select, SelectItem, Text, dialog, useSelection } from '@inithium/ui';
-import { useDeleteCourseMutation, useListCoursesAdminQuery, useListSemestersAdminQuery } from '@inithium/api-client';
+import { useDeleteCourseMutation, useListAcademicYearsAdminQuery, useListCoursesAdminQuery } from '@inithium/api-client';
 import type { CourseDto } from '@inithium/api-client';
 import type { CourseSearchField } from '@inithium/db';
 import { CourseEditDialog } from './CourseEditDialog';
 import { extractErrorMessage } from './extractErrorMessage';
+import { formatSemesterScope } from './formatOffering';
 
 const PAGE_SIZE = 10;
 const SEARCH_DEBOUNCE_MS = 300;
 const DIALOG_WIDTH = 640;
-const ALL_SEMESTERS_VALUE = 'all';
+const ALL_YEARS_VALUE = 'all';
 
 const FIELD_OPTIONS: { value: CourseSearchField; label: string }[] = [{ value: 'name', label: 'Name' }];
 
@@ -20,7 +21,7 @@ export const CoursesAdminModule = () => {
   const [searchField, setSearchField] = useState<CourseSearchField>('name');
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [semesterFilter, setSemesterFilter] = useState(ALL_SEMESTERS_VALUE);
+  const [academicYearFilter, setAcademicYearFilter] = useState(ALL_YEARS_VALUE);
 
   useEffect(() => {
     const timeout = setTimeout(() => setDebouncedSearch(searchInput), SEARCH_DEBOUNCE_MS);
@@ -29,15 +30,15 @@ export const CoursesAdminModule = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, searchField, semesterFilter]);
+  }, [debouncedSearch, searchField, academicYearFilter]);
 
-  const { data: semesterOptions } = useListSemestersAdminQuery({ page: 1, pageSize: 100 });
+  const { data: academicYearOptions } = useListAcademicYearsAdminQuery({ page: 1, pageSize: 100 });
   const { data, isLoading, refetch } = useListCoursesAdminQuery({
     page,
     pageSize: PAGE_SIZE,
     search: debouncedSearch || undefined,
     searchField,
-    semesterId: semesterFilter === ALL_SEMESTERS_VALUE ? undefined : semesterFilter,
+    academicYearId: academicYearFilter === ALL_YEARS_VALUE ? undefined : academicYearFilter,
   });
   const [deleteCourse] = useDeleteCourseMutation();
   const selection = useSelection();
@@ -76,7 +77,7 @@ export const CoursesAdminModule = () => {
   const handleDelete = async (course: CourseDto) => {
     const confirmed = await dialog.confirm({
       title: 'Delete this course?',
-      description: `This removes "${course.name}" (${course.semesterName}) entirely. This cannot be undone.`,
+      description: `This removes "${course.name}" (${course.academicYearTitle}) entirely. This cannot be undone.`,
       confirmLabel: 'Delete',
       cancelLabel: 'Cancel',
       confirmVariant: { kind: 'filled', color: 'red' },
@@ -129,11 +130,11 @@ export const CoursesAdminModule = () => {
       </Box>
 
       <Box flex={{ direction: 'col', gap: 12 }}>
-        <Select value={semesterFilter} onValueChange={setSemesterFilter} placeholder="Semester">
-          <SelectItem value={ALL_SEMESTERS_VALUE}>All Semesters</SelectItem>
-          {(semesterOptions?.items ?? []).map((semester) => (
-            <SelectItem key={semester.id} value={semester.id}>
-              {semester.name}
+        <Select value={academicYearFilter} onValueChange={setAcademicYearFilter} placeholder="Academic Year">
+          <SelectItem value={ALL_YEARS_VALUE}>All Academic Years</SelectItem>
+          {(academicYearOptions?.items ?? []).map((academicYear) => (
+            <SelectItem key={academicYear.id} value={academicYear.id}>
+              {academicYear.title}
             </SelectItem>
           ))}
         </Select>
@@ -178,7 +179,7 @@ export const CoursesAdminModule = () => {
                 {course.name}
               </Text>
               <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
-                {course.semesterName} · {course.categories.join(', ')}
+                {course.academicYearTitle} · {formatSemesterScope(course)} · {course.categories.join(', ')}
               </Text>
             </ListRow>
           ))

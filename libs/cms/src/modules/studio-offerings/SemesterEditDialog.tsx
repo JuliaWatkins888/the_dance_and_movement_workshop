@@ -1,27 +1,26 @@
 import { useState } from 'react';
 import { Box, Button, Input, Switch, Text } from '@inithium/ui';
-import { useCreateSemesterMutation, useUpdateSemesterMutation } from '@inithium/api-client';
+import { useUpdateSemesterMutation } from '@inithium/api-client';
 import type { SemesterDto, SemesterWriteInput } from '@inithium/api-client';
 
 export interface SemesterEditDialogProps {
-  readonly mode: 'create' | 'edit';
-  readonly initialSemester?: SemesterDto;
+  readonly semester: SemesterDto;
   readonly onDone: () => void;
 }
 
 const toDateInputValue = (iso?: string): string => (iso ? iso.slice(0, 10) : '');
 
-export const SemesterEditDialog = ({ mode, initialSemester, onDone }: SemesterEditDialogProps) => {
-  const [createSemester, { isLoading: isCreating }] = useCreateSemesterMutation();
-  const [updateSemester, { isLoading: isUpdating }] = useUpdateSemesterMutation();
-  const isLoading = isCreating || isUpdating;
+// Edit-only: a semester is created together with its academic year and its parent year/term slot
+// never change, so the year is shown here read-only for context rather than as a field.
+export const SemesterEditDialog = ({ semester, onDone }: SemesterEditDialogProps) => {
+  const [updateSemester, { isLoading }] = useUpdateSemesterMutation();
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
 
-  const [name, setName] = useState(initialSemester?.name ?? '');
-  const [startDate, setStartDate] = useState(toDateInputValue(initialSemester?.startDate));
-  const [endDate, setEndDate] = useState(toDateInputValue(initialSemester?.endDate));
-  const [registrationOpensAt, setRegistrationOpensAt] = useState(toDateInputValue(initialSemester?.registrationOpensAt));
-  const [isPublished, setIsPublished] = useState(initialSemester?.isPublished ?? true);
+  const [name, setName] = useState(semester.name);
+  const [startDate, setStartDate] = useState(toDateInputValue(semester.startDate));
+  const [endDate, setEndDate] = useState(toDateInputValue(semester.endDate));
+  const [registrationOpensAt, setRegistrationOpensAt] = useState(toDateInputValue(semester.registrationOpensAt));
+  const [isPublished, setIsPublished] = useState(semester.isPublished);
 
   const handleSubmit = async () => {
     setSubmitError(undefined);
@@ -34,8 +33,12 @@ export const SemesterEditDialog = ({ mode, initialSemester, onDone }: SemesterEd
       setSubmitError('Start and end dates are required.');
       return;
     }
+    if (endDate < startDate) {
+      setSubmitError('The end date must be on or after the start date.');
+      return;
+    }
 
-    const commonFields: SemesterWriteInput = {
+    const fields: SemesterWriteInput = {
       name: name.trim(),
       startDate,
       endDate,
@@ -44,11 +47,7 @@ export const SemesterEditDialog = ({ mode, initialSemester, onDone }: SemesterEd
     };
 
     try {
-      if (mode === 'create') {
-        await createSemester(commonFields).unwrap();
-      } else if (initialSemester) {
-        await updateSemester({ id: initialSemester.id, ...commonFields }).unwrap();
-      }
+      await updateSemester({ id: semester.id, ...fields }).unwrap();
       onDone();
     } catch {
       setSubmitError('Could not save this semester. Check the fields and try again.');
@@ -57,7 +56,13 @@ export const SemesterEditDialog = ({ mode, initialSemester, onDone }: SemesterEd
 
   return (
     <Box flex={{ direction: 'col', gap: 16 }}>
-      <Input label="Semester Name" required placeholder="e.g. Fall 2026" value={name} onChange={(event) => setName(event.target.value)} />
+      {semester.academicYearTitle ? (
+        <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
+          Part of academic year <strong>{semester.academicYearTitle}</strong>.
+        </Text>
+      ) : null}
+
+      <Input label="Semester Name" required placeholder="e.g. Summer/Fall 2026" value={name} onChange={(event) => setName(event.target.value)} />
 
       <Box flex={{ direction: 'row', gap: 12 }}>
         <Input label="Start Date" type="date" required value={startDate} onChange={(event) => setStartDate(event.target.value)} className="flex-1" />
@@ -67,7 +72,7 @@ export const SemesterEditDialog = ({ mode, initialSemester, onDone }: SemesterEd
       <Input
         label="Registration Opens"
         type="date"
-        helperText="Default registration-open date for Courses/Classes/Workshops under this semester - each can still override it individually."
+        helperText="Default registration-open date for Classes/Workshops in this semester - each can still override it individually."
         value={registrationOpensAt}
         onChange={(event) => setRegistrationOpensAt(event.target.value)}
       />

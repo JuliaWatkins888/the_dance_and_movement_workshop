@@ -12,14 +12,16 @@ import { CourseDocument } from '../../schemas/course.schema';
 
 const mapToCourseEntity = (doc: CourseDocument): CourseEntity => ({
   id: doc._id.toString(),
-  semesterId: doc.semesterId,
+  academicYearId: doc.academicYearId,
+  semesterIds: doc.semesterIds,
   name: doc.name,
-  description: doc.description,
+  description: doc.description ?? undefined,
   categories: doc.categories,
-  imageUrl: doc.imageUrl,
-  imageSourceType: doc.imageSourceType,
-  imageAssetId: doc.imageAssetId,
-  imageStorageKey: doc.imageStorageKey,
+  imageUrl: doc.imageUrl ?? undefined,
+  imageSourceType: doc.imageSourceType ?? undefined,
+  imageAssetId: doc.imageAssetId ?? undefined,
+  imageStorageKey: doc.imageStorageKey ?? undefined,
+  copiedFromId: doc.copiedFromId ?? undefined,
   isPublished: doc.isPublished,
   createdAt: doc.createdAt,
   updatedAt: doc.updatedAt,
@@ -27,10 +29,13 @@ const mapToCourseEntity = (doc: CourseDocument): CourseEntity => ({
 
 export const createMongoCourseRepository = (model: Model<CourseDocument>): CourseRepository => ({
   findMany: async (options: FindManyCoursesOptions): Promise<PaginatedResult<CourseEntity>> => {
-    const { page, pageSize, search, searchField, semesterId } = options;
+    const { page, pageSize, search, searchField, academicYearId, semesterId } = options;
     const filter: QueryFilter<CourseDocument> = {};
+    if (academicYearId) {
+      filter.academicYearId = academicYearId;
+    }
     if (semesterId) {
-      filter.semesterId = semesterId;
+      filter.semesterIds = semesterId;
     }
     if (search && searchField) {
       filter[searchField] = { $regex: escapeRegExp(search), $options: 'i' };
@@ -46,6 +51,10 @@ export const createMongoCourseRepository = (model: Model<CourseDocument>): Cours
   },
   findPublished: async (): Promise<CourseEntity[]> => {
     const docs = await model.find({ isPublished: true }).sort({ name: 1 }).exec();
+    return docs.map(mapToCourseEntity);
+  },
+  findByAcademicYearId: async (academicYearId: string): Promise<CourseEntity[]> => {
+    const docs = await model.find({ academicYearId }).sort({ name: 1 }).exec();
     return docs.map(mapToCourseEntity);
   },
   findById: async (id: string): Promise<CourseEntity | null> => {
@@ -64,5 +73,5 @@ export const createMongoCourseRepository = (model: Model<CourseDocument>): Cours
     const result = await model.findByIdAndDelete(id).exec();
     return result !== null;
   },
-  countBySemesterId: async (semesterId: string): Promise<number> => model.countDocuments({ semesterId }).exec(),
+  countByAcademicYearId: async (academicYearId: string): Promise<number> => model.countDocuments({ academicYearId }).exec(),
 });

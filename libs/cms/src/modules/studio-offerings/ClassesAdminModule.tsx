@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Box, Button, IconButton, ListRow, Pagination, Pill, SearchFilterBar, Select, SelectItem, Text, dialog, useSelection } from '@inithium/ui';
-import { useDeleteClassMutation, useListClassesAdminQuery, useListCoursesAdminQuery, useListSemestersAdminQuery } from '@inithium/api-client';
+import { useDeleteClassMutation, useListAcademicYearsAdminQuery, useListClassesAdminQuery, useListCoursesAdminQuery } from '@inithium/api-client';
 import type { ClassDto } from '@inithium/api-client';
 import type { ClassSearchField } from '@inithium/db';
 import { ClassEditDialog } from './ClassEditDialog';
+import { formatCurrency, formatSemesterScope } from './formatOffering';
 
 const PAGE_SIZE = 10;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -28,9 +29,9 @@ const termDateFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', day
 const formatSummary = (classItem: ClassDto): string => {
   const days = classItem.daysOfWeek.join('/');
   const schedule = `${days} ${formatTime12h(classItem.startTime)}–${formatTime12h(classItem.endTime)}`;
-  const price = `$${classItem.priceAmount}${classItem.billingCycle.toLowerCase() === 'monthly' ? '/mo' : ` (${classItem.billingCycle})`}`;
+  const price = `${formatCurrency(classItem.priceAmount)}/mo`;
   const term = `${termDateFormatter.format(new Date(classItem.startDate))} – ${termDateFormatter.format(new Date(classItem.endDate))}`;
-  return `${classItem.courseName}${classItem.variantLabel ? ` · ${classItem.variantLabel}` : ''} · ${schedule} · ${term} · ${price} · ${classItem.openings} open`;
+  return `${classItem.courseName}${classItem.variantLabel ? ` · ${classItem.variantLabel}` : ''} · ${formatSemesterScope(classItem)} · ${schedule} · ${term} · ${price} · ${classItem.openings} open`;
 };
 
 export const ClassesAdminModule = () => {
@@ -38,7 +39,7 @@ export const ClassesAdminModule = () => {
   const [searchField, setSearchField] = useState<ClassSearchField>('variantLabel');
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [semesterFilter, setSemesterFilter] = useState(ALL_VALUE);
+  const [academicYearFilter, setAcademicYearFilter] = useState(ALL_VALUE);
   const [courseFilter, setCourseFilter] = useState(ALL_VALUE);
 
   useEffect(() => {
@@ -52,13 +53,13 @@ export const ClassesAdminModule = () => {
 
   useEffect(() => {
     setCourseFilter(ALL_VALUE);
-  }, [semesterFilter]);
+  }, [academicYearFilter]);
 
-  const { data: semesterOptions } = useListSemestersAdminQuery({ page: 1, pageSize: 100 });
+  const { data: academicYearOptions } = useListAcademicYearsAdminQuery({ page: 1, pageSize: 100 });
   const { data: courseOptions } = useListCoursesAdminQuery({
     page: 1,
     pageSize: 100,
-    semesterId: semesterFilter === ALL_VALUE ? undefined : semesterFilter,
+    academicYearId: academicYearFilter === ALL_VALUE ? undefined : academicYearFilter,
   });
   const { data, isLoading, refetch } = useListClassesAdminQuery({
     page,
@@ -148,11 +149,11 @@ export const ClassesAdminModule = () => {
 
       <Box flex={{ direction: 'col', gap: 12 }}>
         <Box className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Select value={semesterFilter} onValueChange={setSemesterFilter} placeholder="Semester">
-            <SelectItem value={ALL_VALUE}>All Semesters</SelectItem>
-            {(semesterOptions?.items ?? []).map((semester) => (
-              <SelectItem key={semester.id} value={semester.id}>
-                {semester.name}
+          <Select value={academicYearFilter} onValueChange={setAcademicYearFilter} placeholder="Academic Year">
+            <SelectItem value={ALL_VALUE}>All Academic Years</SelectItem>
+            {(academicYearOptions?.items ?? []).map((academicYear) => (
+              <SelectItem key={academicYear.id} value={academicYear.id}>
+                {academicYear.title}
               </SelectItem>
             ))}
           </Select>

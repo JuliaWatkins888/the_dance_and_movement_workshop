@@ -15,7 +15,8 @@ export interface WorkshopOccurrence {
 export type CreateWorkshopOccurrenceInput = Omit<WorkshopOccurrence, 'id'>;
 
 // A standalone, revenue/roster-bearing special offering that doesn't belong to a Course (a guest
-// choreographer's one-off weekend intensive, a PT-led session) - belongs directly to a Semester.
+// choreographer's one-off weekend intensive, a PT-led session) - belongs directly to a Semester (and
+// so to that semester's AcademicYear), never to a Course.
 // Unlike the separate Event concept (a non-revenue calendar record with no registration flow,
 // intentionally out of scope here), a Workshop carries pricing/capacity exactly like a Class does.
 export interface WorkshopEntity {
@@ -27,7 +28,7 @@ export interface WorkshopEntity {
   occurrences: WorkshopOccurrence[];
   minAgeYears?: number;
   maxAgeYears?: number;
-  priceAmount: number; // one-time flat price - no billingCycle, unlike Class
+  priceAmount: number; // one-time flat price - no monthly/semester/year tiers, unlike Class
   registrationStartDate?: Date;
   capacity: number;
   enrolled: number;
@@ -66,7 +67,7 @@ export interface WorkshopRepository {
   create: (input: CreateWorkshopInput) => Promise<WorkshopEntity>;
   update: (id: string, input: UpdateWorkshopInput) => Promise<WorkshopEntity | null>;
   delete: (id: string) => Promise<boolean>;
-  // Powers DELETE /api/semesters/:id's cascade-delete guard and the Studio Offerings dashboard's
-  // per-semester workshop count.
-  countBySemesterId: (semesterId: string) => Promise<number>;
+  // Powers DELETE /api/academic-years/:id's cascade-delete guard and the Studio Offerings
+  // dashboard's per-year workshop count (summed across that year's semester ids).
+  countBySemesterIds: (semesterIds: string[]) => Promise<number>;
 }

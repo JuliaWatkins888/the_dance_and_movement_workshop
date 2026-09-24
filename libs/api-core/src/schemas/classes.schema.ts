@@ -4,6 +4,12 @@ import { calendarDateString, timeString, withAgeRangeCheck } from './shared/sche
 
 const classShape = {
   courseId: z.string().min(1, 'Course is required'),
+  // Must be a subset of the course's own semesterIds - checked in the route, which has the course.
+  semesterIds: z
+    .array(z.string().min(1))
+    .min(1, 'Choose at least one semester')
+    .max(2, 'A class can run in at most two semesters')
+    .refine((ids) => new Set(ids).size === ids.length, 'Semesters must be distinct'),
   variantLabel: z.string().max(200).optional(),
   instructorIds: z.array(z.string().min(1)).default([]),
   daysOfWeek: z.array(z.enum(DAYS_OF_WEEK)).min(1, 'At least one day is required'),
@@ -14,8 +20,8 @@ const classShape = {
   endDate: calendarDateString,
   minAgeYears: z.number().min(0).max(120).optional(),
   maxAgeYears: z.number().min(0).max(120).optional(),
+  // The month-to-month rate; semester/year totals are derived (see classPricing.ts).
   priceAmount: z.number().min(0, 'Price must be zero or greater'),
-  billingCycle: z.string().min(1).default('Monthly'),
   capacity: z.number().int().min(0, 'Capacity must be zero or greater'),
   enrolled: z.number().int().min(0).optional(),
   isPublished: z.boolean().optional(),

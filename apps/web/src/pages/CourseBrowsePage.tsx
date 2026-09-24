@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Banner, Box, Icon, Loader, Pill, Text, useNavigateWithTransition } from '@inithium/ui';
-import { useListPublicCoursesQuery } from '@inithium/api-client';
-import type { CourseDto } from '@inithium/api-client';
+import { Banner, Box, Icon, Loader, Pill, Select, SelectItem, Text, useNavigateWithTransition } from '@inithium/ui';
+import { pickCurrentAcademicYear, useListPublicAcademicYearsQuery, useListPublicCoursesQuery } from '@inithium/api-client';
+import type { AcademicYearDto, CourseDto, SemesterSummaryDto } from '@inithium/api-client';
 import { generateCourseBannerConfig } from './courseBannerConfig';
 
 const TILE_BANNER_HEIGHT = 144;
@@ -34,53 +34,38 @@ const formatDateRange = (startIso: string, endIso: string): string => `${dateFor
 const buildStatusLabel = (status: SemesterStatus, registrationOpensAt?: string): string =>
   status === 'upcoming' && registrationOpensAt ? `Enrollment opens ${dateFormatter.format(new Date(registrationOpensAt))}` : STATUS_LABEL[status];
 
-const describeSemesterStatus = (course: CourseDto): SemesterStatus => {
-  if (!course.semesterStartDate || !course.semesterEndDate) return 'upcoming';
+const describeSemesterStatus = (semester: SemesterSummaryDto): SemesterStatus => {
   const now = Date.now();
-  const start = new Date(course.semesterStartDate).getTime();
-  const end = new Date(course.semesterEndDate).getTime();
+  const start = new Date(semester.startDate).getTime();
+  const end = new Date(semester.endDate).getTime();
   if (now > end) return 'past';
   if (now >= start) return 'in-session';
-  const registrationOpensAt = course.semesterRegistrationOpensAt ? new Date(course.semesterRegistrationOpensAt).getTime() : undefined;
+  const registrationOpensAt = semester.registrationOpensAt ? new Date(semester.registrationOpensAt).getTime() : undefined;
   return registrationOpensAt !== undefined && now >= registrationOpensAt ? 'enrolling' : 'upcoming';
 };
 
 interface SemesterSection {
-  readonly semesterId: string;
-  readonly semesterName: string;
+  readonly semester: SemesterSummaryDto;
   readonly status: SemesterStatus;
-  readonly startDate?: string;
-  readonly endDate?: string;
-  readonly registrationOpensAt?: string;
   readonly courses: CourseDto[];
 }
 
-const groupBySemester = (courses: CourseDto[]): SemesterSection[] => {
-  const bySemesterId = new Map<string, SemesterSection>();
-
-  for (const course of courses) {
-    const existing = bySemesterId.get(course.semesterId);
-    if (existing) {
-      existing.courses.push(course);
-      continue;
-    }
-    bySemesterId.set(course.semesterId, {
-      semesterId: course.semesterId,
-      semesterName: course.semesterName,
-      status: describeSemesterStatus(course),
-      startDate: course.semesterStartDate,
-      endDate: course.semesterEndDate,
-      registrationOpensAt: course.semesterRegistrationOpensAt,
-      courses: [course],
+// One accordion per semester of the chosen year, each listing the courses that run in it - a
+// full-year course therefore appears under both semesters, a single-semester course under only its
+// own. A semester with nothing running in it is left out rather than shown as an empty accordion.
+const buildSections = (academicYear: AcademicYearDto, courses: CourseDto[]): SemesterSection[] =>
+  academicYear.semesters
+    .map((semester) => ({
+      semester,
+      status: describeSemesterStatus(semester),
+      courses: courses.filter((course) => course.academicYearId === academicYear.id && course.semesterIds.includes(semester.id)),
+    }))
+    .filter((section) => section.courses.length > 0)
+    .sort((a, b) => {
+      const priorityDiff = STATUS_PRIORITY[a.status] - STATUS_PRIORITY[b.status];
+      if (priorityDiff !== 0) return priorityDiff;
+      return new Date(a.semester.startDate).getTime() - new Date(b.semester.startDate).getTime();
     });
-  }
-
-  return [...bySemesterId.values()].sort((a, b) => {
-    const priorityDiff = STATUS_PRIORITY[a.status] - STATUS_PRIORITY[b.status];
-    if (priorityDiff !== 0) return priorityDiff;
-    return (a.startDate ? new Date(a.startDate).getTime() : 0) - (b.startDate ? new Date(b.startDate).getTime() : 0);
-  });
-};
 
 interface CourseTileProps {
   readonly course: CourseDto;
@@ -128,10 +113,26 @@ const CourseTile = ({ course, onOpen }: CourseTileProps) => (
 );
 
 export const CourseBrowsePage = () => {
-  const { data: courses, isLoading } = useListPublicCoursesQuery();
+  const { data: courses, isLoading: isLoadingCourses } = useListPublicCoursesQuery();
+  const { data: academicYears, isLoading: isLoadingAcademicYears } = useListPublicAcademicYearsQuery();
+  const isLoading = isLoadingCourses || isLoadingAcademicYears;
   const navigate = useNavigateWithTransition();
 
-  const sections = useMemo(() => groupBySemester(courses ?? []), [courses]);
+  // The API only returns years that are in session or still to come. Starts on the one in session
+  // now (else the soonest upcoming) until the visitor picks another.
+  const [selectedAcademicYearId, setSelectedAcademicYearId] = useState('');
+  const selectedAcademicYear = useMemo(
+    () =>
+      (academicYears ?? []).find((academicYear) => academicYear.id === selectedAcademicYearId) ??
+      pickCurrentAcademicYear(academicYears ?? []) ??
+      academicYears?.[0],
+    [academicYears, selectedAcademicYearId],
+  );
+
+  const sections = useMemo(
+    () => (selectedAcademicYear ? buildSections(selectedAcademicYear, courses ?? []) : []),
+    [selectedAcademicYear, courses],
+  );
   const openCourse = (course: CourseDto) => navigate(`/courses/${course.id}`);
 
   // Every section starts collapsed - a visitor opens whichever term(s) they actually want to
@@ -152,9 +153,22 @@ export const CourseBrowsePage = () => {
 
   return (
     <Box flex={{ direction: 'col', gap: 32 }} padding={{ base: 32 }}>
-      <Text textColor={{ color: 'surface', intensity: 950 }} as="h1" className="text-3xl font-bold">
-        Find a class that's right for you
-      </Text>
+      <Box flex={{ direction: 'row', justify: 'between', align: 'center', gap: 16 }} className="flex-wrap">
+        <Text textColor={{ color: 'surface', intensity: 950 }} as="h1" className="text-3xl font-bold">
+          Find a class that's right for you
+        </Text>
+        {academicYears && academicYears.length > 0 && selectedAcademicYear ? (
+          <Box className="w-full sm:w-64">
+            <Select value={selectedAcademicYear.id} onValueChange={setSelectedAcademicYearId} placeholder="Choose a year">
+              {academicYears.map((academicYear) => (
+                <SelectItem key={academicYear.id} value={academicYear.id}>
+                  {academicYear.title}
+                </SelectItem>
+              ))}
+            </Select>
+          </Box>
+        ) : null}
+      </Box>
 
       {isLoading ? (
         <Box flex={{ justify: 'center' }} padding={{ base: 32 }}>
@@ -166,18 +180,19 @@ export const CourseBrowsePage = () => {
         </Text>
       ) : (
         sections.map((section) => {
-          const isExpanded = expandedSemesterIds.has(section.semesterId);
+          const semesterId = section.semester.id;
+          const isExpanded = expandedSemesterIds.has(semesterId);
           const isEnrolling = section.status === 'enrolling';
           return (
             <Box
-              key={section.semesterId}
+              key={semesterId}
               borderColor={{ color: isEnrolling ? 'primary' : 'surface', intensity: isEnrolling ? 400 : 300 }}
               bgColor={{ color: 'surface', intensity: 200 }}
               className="overflow-hidden rounded-xl border shadow-sm transition-shadow duration-200 hover:shadow-md"
             >
               <button
                 type="button"
-                onClick={() => toggleSemester(section.semesterId)}
+                onClick={() => toggleSemester(semesterId)}
                 aria-expanded={isExpanded}
                 className="flex w-full flex-col items-start gap-1 px-5 py-4 text-left transition-colors duration-150 hover:bg-surface-300/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
               >
@@ -189,20 +204,18 @@ export const CourseBrowsePage = () => {
                     className={`shrink-0 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
                   />
                   <Text as="h2" textColor={{ color: 'surface', intensity: 950 }} className="text-xl font-bold">
-                    {section.semesterName}
+                    {section.semester.name}
                   </Text>
                   <Pill color={{ color: isEnrolling ? 'primary' : 'surface', intensity: isEnrolling ? 500 : 300 }}>
-                    {buildStatusLabel(section.status, section.registrationOpensAt)}
+                    {buildStatusLabel(section.status, section.semester.registrationOpensAt)}
                   </Pill>
                   <Text as="span" textColor={{ color: 'surface', intensity: 500 }} className="ml-auto text-sm">
                     {section.courses.length} class{section.courses.length === 1 ? '' : 'es'}
                   </Text>
                 </Box>
-                {section.startDate && section.endDate ? (
-                  <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="pl-7 text-sm">
-                    {formatDateRange(section.startDate, section.endDate)}
-                  </Text>
-                ) : null}
+                <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="pl-7 text-sm">
+                  {formatDateRange(section.semester.startDate, section.semester.endDate)}
+                </Text>
               </button>
 
               {/* CSS-only accordion: animating grid-template-rows between 0fr/1fr (with the inner

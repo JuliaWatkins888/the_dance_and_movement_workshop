@@ -5,14 +5,18 @@ export type CourseSearchField = 'name';
 export const COURSE_IMAGE_SOURCE_TYPES = ['local', 'cloud', 'external'] as const;
 export type CourseImageSourceType = (typeof COURSE_IMAGE_SOURCE_TYPES)[number];
 
-// A curriculum offered within one Semester (e.g. "Ballet") - recreated fresh each semester rather
-// than reused evergreen across terms, matching how the studio actually plans: sit down each term,
-// decide that term's course lineup, then build Class variants (schedule/age/instructor) under it.
-// One document per scheduled variant lives on ClassEntity, which references this by courseId -
-// see class.contract.ts's own note on why that split exists.
+// A curriculum offered within one AcademicYear (e.g. "Ballet"), running for the whole year or for
+// just one of its two Semesters - not every course spans both, and a course covering only one term
+// must not silently appear in the other. The studio plans each year fresh rather than reusing a
+// course evergreen across terms: decide that year's course lineup, then build Class variants
+// (schedule/age/instructor) under it. One document per scheduled variant lives on ClassEntity,
+// which references this by courseId - see class.contract.ts's own note on why that split exists.
 export interface CourseEntity {
   id: string;
-  semesterId: string; // FK -> SemesterEntity.id, resolved at the API layer (never a Mongoose ref)
+  academicYearId: string; // FK -> AcademicYearEntity.id, resolved at the API layer (never a Mongoose ref)
+  // FK -> SemesterEntity.id: the one or two semesters (all belonging to academicYearId) this course
+  // runs in. Both of the year's semesters means a full-year course.
+  semesterIds: string[];
   name: string;
   description?: string;
   categories: string[];
@@ -27,6 +31,10 @@ export interface CourseEntity {
   imageAssetId?: string;
   // local only - the filename under apps/api/uploads/courses, mirrors StaffEntity.photoStorageKey.
   imageStorageKey?: string;
+  // FK -> CourseEntity.id of the course this one was copied from (see the year-to-year copy flow in
+  // offering-copy.route.ts). Informational only: it lets the copy wizard mark what's already been
+  // copied into a year, and deleting the original never touches the copy.
+  copiedFromId?: string;
   isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -40,6 +48,8 @@ export interface FindManyCoursesOptions {
   pageSize: number;
   search?: string;
   searchField?: CourseSearchField;
+  academicYearId?: string;
+  // Matches courses that run in this semester (a full-year course matches either of its two).
   semesterId?: string;
 }
 
@@ -48,13 +58,16 @@ export interface CourseRepository {
   // Public catalog - unpaged like ClassRepository.findPublished(), since the full offering catalog
   // is small enough for the public CourseBrowsePage to fetch whole and filter/group client-side.
   findPublished: () => Promise<CourseEntity[]>;
-  // FK resolution target for Class's own toDto (courseId -> Course -> semesterId -> Semester) and
-  // for the cascade-delete check on DELETE /api/courses/:id.
+  // Every course in one academic year, unpaged and sorted by name - the copy wizard needs the whole
+  // set for both the source and the destination year.
+  findByAcademicYearId: (academicYearId: string) => Promise<CourseEntity[]>;
+  // FK resolution target for Class's own toDto (courseId -> Course -> academicYearId/semesterIds)
+  // and for the cascade-delete check on DELETE /api/courses/:id.
   findById: (id: string) => Promise<CourseEntity | null>;
   create: (input: CreateCourseInput) => Promise<CourseEntity>;
   update: (id: string, input: UpdateCourseInput) => Promise<CourseEntity | null>;
   delete: (id: string) => Promise<boolean>;
-  // Powers DELETE /api/semesters/:id's cascade-delete guard and the Studio Offerings dashboard's
-  // per-semester course count.
-  countBySemesterId: (semesterId: string) => Promise<number>;
+  // Powers DELETE /api/academic-years/:id's cascade-delete guard and the Studio Offerings
+  // dashboard's per-year course count.
+  countByAcademicYearId: (academicYearId: string) => Promise<number>;
 }

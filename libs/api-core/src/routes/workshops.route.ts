@@ -6,6 +6,8 @@ import { requirePermission } from '@inithium/permissions';
 import { createWorkshop, deleteWorkshop, getSemesterById, listPublishedWorkshops, listWorkshops, updateWorkshop } from '@inithium/db';
 import type { WorkshopEntity, WorkshopSearchField } from '@inithium/db';
 import { createWorkshopSchema, updateWorkshopSchema } from '../schemas/workshops.schema';
+import { createAcademicYearContextLoader } from '../shared/academicContext';
+import type { AcademicYearContextLoader } from '../shared/academicContext';
 import { resolveInstructorSummaries } from '../shared/resolveInstructorSummaries';
 
 const router: RouterType = Router();
@@ -18,19 +20,28 @@ const SEARCH_FIELDS = ['name'] as const;
 const isSearchField = (value: unknown): value is WorkshopSearchField =>
   typeof value === 'string' && (SEARCH_FIELDS as readonly string[]).includes(value);
 
-// A Workshop never stores its own copy of the Semester's name/dates or the instructors' names -
-// both resolved at response time, mirroring courses.route.ts's toCourseDto and staff.route.ts's
-// toStaffDto respectively.
-const toWorkshopDto = async (workshop: WorkshopEntity) => {
+// A Workshop never stores its own copy of the Semester's name/dates, its academic year's title, or
+// the instructors' names - all resolved at response time, mirroring courses.route.ts's resolveCourse
+// and staff.route.ts's toStaffDto respectively. A workshop belongs to exactly one semester, so unlike
+// a Class it has no year-in-full pricing and its year is simply that semester's parent.
+// isPubliclyVisible is kept out of the DTO - it only gates the public list.
+const resolveWorkshop = async (workshop: WorkshopEntity, loadContext: AcademicYearContextLoader) => {
   const [semester, instructors] = await Promise.all([getSemesterById(workshop.semesterId), resolveInstructorSummaries(workshop.instructorIds)]);
+  const context = semester ? await loadContext(semester.academicYearId) : null;
+
   return {
-    ...workshop,
-    semesterName: semester?.name ?? '',
-    instructors,
-    openings: Math.max(0, workshop.capacity - workshop.enrolled),
-    // Falls back to the semester's default registration-open date when the workshop has none of
-    // its own - see classes.route.ts's toClassDto for the identical rationale.
-    effectiveRegistrationOpensAt: workshop.registrationStartDate ?? semester?.registrationOpensAt,
+    dto: {
+      ...workshop,
+      semesterName: semester?.name ?? '',
+      academicYearId: semester?.academicYearId ?? '',
+      academicYearTitle: context?.academicYear?.title ?? '',
+      instructors,
+      openings: Math.max(0, workshop.capacity - workshop.enrolled),
+      // Falls back to the semester's default registration-open date when the workshop has none of
+      // its own - see classes.route.ts's resolveClass for the identical rationale.
+      effectiveRegistrationOpensAt: workshop.registrationStartDate ?? semester?.registrationOpensAt,
+    },
+    isPubliclyVisible: context?.academicYear?.isPublished === true && semester?.isPublished === true,
   };
 };
 
@@ -43,7 +54,9 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     const instructorId = typeof req.query['instructorId'] === 'string' ? req.query['instructorId'] : undefined;
     const workshops = await listPublishedWorkshops(instructorId ? { instructorId } : undefined);
-    res.status(200).json(createSuccessResponse(await Promise.all(workshops.map(toWorkshopDto))));
+    const loadContext = createAcademicYearContextLoader();
+    const resolved = await Promise.all(workshops.map((workshop) => resolveWorkshop(workshop, loadContext)));
+    res.status(200).json(createSuccessResponse(resolved.filter((entry) => entry.isPubliclyVisible).map((entry) => entry.dto)));
   }),
 );
 
@@ -68,7 +81,8 @@ router.get(
       searchField: rawSearch ? searchField : undefined,
       semesterId,
     });
-    const items = await Promise.all(result.items.map(toWorkshopDto));
+    const loadContext = createAcademicYearContextLoader();
+    const items = (await Promise.all(result.items.map((workshop) => resolveWorkshop(workshop, loadContext)))).map((entry) => entry.dto);
 
     res.status(200).json(
       createSuccessResponse(items, {
@@ -104,7 +118,7 @@ router.post(
       enrolled: enrolled ?? 0,
       isPublished: isPublished ?? true,
     });
-    res.status(201).json(createSuccessResponse(await toWorkshopDto(workshop)));
+    res.status(201).json(createSuccessResponse((await resolveWorkshop(workshop, createAcademicYearContextLoader())).dto));
   }),
 );
 
@@ -135,7 +149,7 @@ router.put(
     if (!workshop) {
       throw NotFoundError('Workshop not found');
     }
-    res.status(200).json(createSuccessResponse(await toWorkshopDto(workshop)));
+    res.status(200).json(createSuccessResponse((await resolveWorkshop(workshop, createAcademicYearContextLoader())).dto));
   }),
 );
 

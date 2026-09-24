@@ -1,14 +1,17 @@
 import type { ApiResponse } from '@inithium/api-utils';
 import type { CourseImageSourceType, CourseSearchField } from '@inithium/db';
 import { baseApi } from '../baseApi';
+import type { SemesterSummaryDto } from './academic-years.endpoints';
 
-// Frontend-facing shape - dates cross the HTTP boundary as ISO strings. semesterName/
-// semesterStartDate/semesterEndDate/semesterRegistrationOpensAt are resolved server-side
-// (courses.route.ts's toCourseDto) from the linked Semester, the same "arrives display-ready"
-// precedent StaffMemberDto's firstName/lastName/email already follows for its own userId FK.
+// Frontend-facing shape - dates cross the HTTP boundary as ISO strings. academicYearTitle/semesters/
+// spansFullYear are resolved server-side (courses.route.ts's resolveCourse) from the linked year and
+// semesters, the same "arrives display-ready" precedent StaffMemberDto's firstName/lastName/email
+// already follows for its own userId FK.
 export interface CourseDto {
   id: string;
-  semesterId: string;
+  academicYearId: string;
+  // The one or two semesters (of academicYearId) this course runs in.
+  semesterIds: string[];
   name: string;
   description?: string;
   categories: string[];
@@ -19,13 +22,16 @@ export interface CourseDto {
   imageSourceType?: CourseImageSourceType;
   imageAssetId?: string;
   imageStorageKey?: string;
+  // Set when this course was copied from another year's course (see offering-copy.route.ts).
+  copiedFromId?: string;
   isPublished: boolean;
   createdAt: string;
   updatedAt: string;
-  semesterName: string;
-  semesterStartDate?: string;
-  semesterEndDate?: string;
-  semesterRegistrationOpensAt?: string;
+  academicYearTitle: string;
+  // Only the semesters this course runs in (a subset of its year's), ordered by start date.
+  semesters: SemesterSummaryDto[];
+  // True when it runs in every semester its year has.
+  spansFullYear: boolean;
 }
 
 export interface ListCoursesAdminParams {
@@ -33,6 +39,7 @@ export interface ListCoursesAdminParams {
   pageSize: number;
   search?: string;
   searchField?: CourseSearchField;
+  academicYearId?: string;
   semesterId?: string;
 }
 
@@ -45,7 +52,8 @@ export interface ListCoursesResult {
 }
 
 export interface CourseWriteInput {
-  semesterId: string;
+  academicYearId: string;
+  semesterIds: string[];
   name: string;
   description?: string;
   categories: string[];
@@ -81,10 +89,11 @@ export const coursesApi = baseApi.injectEndpoints({
       providesTags: ['Course'],
     }),
     listCoursesAdmin: builder.query<ListCoursesResult, ListCoursesAdminParams>({
-      query: ({ page, pageSize, search, searchField, semesterId }) => {
+      query: ({ page, pageSize, search, searchField, academicYearId, semesterId }) => {
         const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
         if (search) params.set('search', search);
         if (searchField) params.set('searchField', searchField);
+        if (academicYearId) params.set('academicYearId', academicYearId);
         if (semesterId) params.set('semesterId', semesterId);
         return `/api/courses/admin?${params.toString()}`;
       },
@@ -106,10 +115,11 @@ export const coursesApi = baseApi.injectEndpoints({
       transformResponse: (response: ApiResponse<CourseDto>) => response.data,
       invalidatesTags: ['Course'],
     }),
+    // A class embeds its course's name/year, so a course edit refreshes the class caches too.
     updateCourse: builder.mutation<CourseDto, UpdateCourseInput>({
       query: ({ id, ...input }) => ({ url: `/api/courses/${id}`, method: 'PUT', body: input }),
       transformResponse: (response: ApiResponse<CourseDto>) => response.data,
-      invalidatesTags: ['Course'],
+      invalidatesTags: ['Course', 'Class'],
     }),
     deleteCourse: builder.mutation<void, string>({
       query: (id) => ({ url: `/api/courses/${id}`, method: 'DELETE' }),

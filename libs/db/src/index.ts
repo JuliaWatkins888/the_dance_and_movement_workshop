@@ -46,6 +46,7 @@ import { CreateClassInput, FindManyClassesOptions, FindManyClassesUnpagedOptions
 import { CreateChildInput, FindManyChildrenOptions, UpdateChildInput } from './contracts/child.contract';
 // inithium:block:children:imports:end
 // inithium:block:studio-offerings:imports:start
+import { CreateAcademicYearInput, FindManyAcademicYearsUnpagedOptions, UpdateAcademicYearInput } from './contracts/academic-year.contract';
 import { CreateSemesterInput, FindManySemestersOptions, UpdateSemesterInput } from './contracts/semester.contract';
 import { CreateCourseInput, FindManyCoursesOptions, UpdateCourseInput } from './contracts/course.contract';
 import { CreateWorkshopInput, FindManyWorkshopsOptions, FindPublishedWorkshopsOptions, UpdateWorkshopInput } from './contracts/workshop.contract';
@@ -217,6 +218,8 @@ export const getClassRepository = () => activeProvider.getClassRepository();
 export const listClasses = (options: FindManyClassesOptions) => getClassRepository().findMany(options);
 export const listClassesUnpaged = (options: FindManyClassesUnpagedOptions) => getClassRepository().findManyUnpaged(options);
 export const listPublishedClasses = (options?: FindPublishedClassesOptions) => getClassRepository().findPublished(options);
+export const getClassById = (id: string) => getClassRepository().findById(id);
+export const listClassesByCourseIds = (courseIds: string[]) => getClassRepository().findByCourseIds(courseIds);
 export const createClass = (input: CreateClassInput) => getClassRepository().create(input);
 export const updateClass = (id: string, input: UpdateClassInput) => getClassRepository().update(id, input);
 export const deleteClass = (id: string) => getClassRepository().delete(id);
@@ -236,21 +239,32 @@ export const getChildrenCreatedByDay = () => getChildRepository().countCreatedBy
 
 // inithium:block:children:repositories:end
 // inithium:block:studio-offerings:repositories:start
+export const getAcademicYearRepository = () => activeProvider.getAcademicYearRepository();
+export const listAcademicYearsUnpaged = (options?: FindManyAcademicYearsUnpagedOptions) => getAcademicYearRepository().findManyUnpaged(options);
+export const listPublishedAcademicYears = () => getAcademicYearRepository().findPublished();
+export const getAcademicYearById = (id: string) => getAcademicYearRepository().findById(id);
+export const createAcademicYear = (input: CreateAcademicYearInput) => getAcademicYearRepository().create(input);
+export const updateAcademicYear = (id: string, input: UpdateAcademicYearInput) => getAcademicYearRepository().update(id, input);
+export const deleteAcademicYear = (id: string) => getAcademicYearRepository().delete(id);
+
 export const getSemesterRepository = () => activeProvider.getSemesterRepository();
 export const listSemesters = (options: FindManySemestersOptions) => getSemesterRepository().findMany(options);
 export const getSemesterById = (id: string) => getSemesterRepository().findById(id);
+export const listSemestersByIds = (ids: string[]) => getSemesterRepository().findByIds(ids);
+export const listSemestersByAcademicYearId = (academicYearId: string) => getSemesterRepository().findByAcademicYearId(academicYearId);
 export const createSemester = (input: CreateSemesterInput) => getSemesterRepository().create(input);
 export const updateSemester = (id: string, input: UpdateSemesterInput) => getSemesterRepository().update(id, input);
-export const deleteSemester = (id: string) => getSemesterRepository().delete(id);
+export const deleteSemestersByAcademicYearId = (academicYearId: string) => getSemesterRepository().deleteByAcademicYearId(academicYearId);
 
 export const getCourseRepository = () => activeProvider.getCourseRepository();
 export const listCourses = (options: FindManyCoursesOptions) => getCourseRepository().findMany(options);
 export const listPublishedCourses = () => getCourseRepository().findPublished();
+export const listCoursesByAcademicYearId = (academicYearId: string) => getCourseRepository().findByAcademicYearId(academicYearId);
 export const getCourseById = (id: string) => getCourseRepository().findById(id);
 export const createCourse = (input: CreateCourseInput) => getCourseRepository().create(input);
 export const updateCourse = (id: string, input: UpdateCourseInput) => getCourseRepository().update(id, input);
 export const deleteCourse = (id: string) => getCourseRepository().delete(id);
-export const countCoursesBySemesterId = (semesterId: string) => getCourseRepository().countBySemesterId(semesterId);
+export const countCoursesByAcademicYearId = (academicYearId: string) => getCourseRepository().countByAcademicYearId(academicYearId);
 
 export const getWorkshopRepository = () => activeProvider.getWorkshopRepository();
 export const listWorkshops = (options: FindManyWorkshopsOptions) => getWorkshopRepository().findMany(options);
@@ -258,7 +272,7 @@ export const listPublishedWorkshops = (options?: FindPublishedWorkshopsOptions) 
 export const createWorkshop = (input: CreateWorkshopInput) => getWorkshopRepository().create(input);
 export const updateWorkshop = (id: string, input: UpdateWorkshopInput) => getWorkshopRepository().update(id, input);
 export const deleteWorkshop = (id: string) => getWorkshopRepository().delete(id);
-export const countWorkshopsBySemesterId = (semesterId: string) => getWorkshopRepository().countBySemesterId(semesterId);
+export const countWorkshopsBySemesterIds = (semesterIds: string[]) => getWorkshopRepository().countBySemesterIds(semesterIds);
 
 // inithium:block:studio-offerings:repositories:end
 // inithium:anchor:repositories
@@ -409,7 +423,17 @@ export type {
 // inithium:block:children:type-exports:end
 // inithium:block:studio-offerings:type-exports:start
 export type {
+  AcademicYearEntity,
+  CreateAcademicYearInput,
+  UpdateAcademicYearInput,
+  AcademicYearSearchField,
+  FindManyAcademicYearsUnpagedOptions,
+  AcademicYearRepository,
+} from './contracts/academic-year.contract';
+export { SEMESTER_TERMS, SEMESTER_TERM_LABELS } from './contracts/semester.contract';
+export type {
   SemesterEntity,
+  SemesterTerm,
   CreateSemesterInput,
   UpdateSemesterInput,
   SemesterSearchField,

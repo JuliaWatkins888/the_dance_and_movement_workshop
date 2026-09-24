@@ -6,7 +6,7 @@ export type DayOfWeek = (typeof DAYS_OF_WEEK)[number];
 export type ClassSearchField = 'variantLabel';
 
 // One scheduled variant of a Course (a specific age/instructor/day-time combination) - "Ballet"
-// the Course exists once per semester; "Tuesdays/Thursdays, Ages 7-10 with Julia Watkins" and
+// the Course exists once per academic year; "Tuesdays/Thursdays, Ages 7-10 with Julia Watkins" and
 // "Wednesdays/Fridays, Ages 11-14 with Amy Guilmette" are two ClassEntity records under it. This
 // replaces the old flat, one-row-per-offering shape (name/description/categories duplicated
 // across every age/day variant) inherited from the studio's prior system - those fields now live
@@ -14,6 +14,11 @@ export type ClassSearchField = 'variantLabel';
 export interface ClassEntity {
   id: string;
   courseId: string; // FK -> CourseEntity.id, resolved at the API layer (never a Mongoose ref)
+  // FK -> SemesterEntity.id: which of its Course's semesters this class runs in. Always a subset of
+  // the Course's own semesterIds, so a full-year Course can still hold a Fall-only class (e.g. a
+  // different instructor each semester) without duplicating the Course. Covering both of the
+  // year's semesters is what unlocks the pay-for-the-year price tier.
+  semesterIds: string[];
   // Optional admin/display disambiguator now that Class has no name of its own (e.g. "Tuesdays &
   // Thursdays, Ages 7-10") - shown alongside the parent Course's name.
   variantLabel?: string;
@@ -28,10 +33,16 @@ export interface ClassEntity {
   endDate: Date;
   minAgeYears?: number;
   maxAgeYears?: number;
+  // The month-to-month rate. Semester-in-full and year-in-full prices are never stored - they're
+  // derived from this plus the studio-wide discount settings (see api-core's classPricing.ts), so
+  // changing a discount never leaves stale per-class totals behind.
   priceAmount: number;
-  billingCycle: string;
   capacity: number;
   enrolled: number;
+  // FK -> ClassEntity.id of the class this one was copied from (see course.contract.ts's copiedFromId).
+  // Classes have no name to match on, so this link is the only way the copy wizard can tell a class
+  // was already copied.
+  copiedFromId?: string;
   isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -77,12 +88,16 @@ export interface ClassRepository {
   // for every public listing.
   findManyUnpaged: (options: FindManyClassesUnpagedOptions) => Promise<ClassEntity[]>;
   findPublished: (options?: FindPublishedClassesOptions) => Promise<ClassEntity[]>;
+  // Lets a partial PUT resolve its effective courseId/semesterIds before re-validating that pair.
+  findById: (id: string) => Promise<ClassEntity | null>;
+  // Every class of the given courses, unpaged - the copy wizard's source/destination class lists.
+  findByCourseIds: (courseIds: string[]) => Promise<ClassEntity[]>;
   create: (input: CreateClassInput) => Promise<ClassEntity>;
   update: (id: string, input: UpdateClassInput) => Promise<ClassEntity | null>;
   delete: (id: string) => Promise<boolean>;
   // Powers DELETE /api/courses/:id's cascade-delete guard.
   countByCourseId: (courseId: string) => Promise<number>;
-  // Powers the Studio Offerings dashboard's per-semester class count (summed across every Course
-  // in that semester).
+  // Powers the Studio Offerings dashboard's per-year class count (summed across every Course in
+  // that year).
   countByCourseIds: (courseIds: string[]) => Promise<number>;
 }
