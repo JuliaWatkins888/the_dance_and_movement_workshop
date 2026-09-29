@@ -26,6 +26,16 @@ import { ClassRepository } from './class.contract';
 // inithium:block:children:imports:start
 import { ChildRepository } from './child.contract';
 // inithium:block:children:imports:end
+// inithium:block:ecommerce:imports:start
+import { ProductRepository } from './product.contract';
+import { CartRepository } from './cart.contract';
+import { OrderRepository } from './order.contract';
+import { DiscountRepository } from './discount.contract';
+import { BillingSubscriptionRepository } from './billing-subscription.contract';
+import { ShippingMethodRepository } from './shipping-method.contract';
+import { PaymentCustomerRepository } from './payment-customer.contract';
+import { PaymentEventRepository } from './payment-event.contract';
+// inithium:block:ecommerce:imports:end
 // inithium:anchor:imports
 
 export interface DbConfig {
@@ -66,5 +76,15 @@ export interface DbProvider {
 // inithium:block:children:members:start
   getChildRepository: () => ChildRepository;
 // inithium:block:children:members:end
+// inithium:block:ecommerce:members:start
+  getProductRepository: () => ProductRepository;
+  getCartRepository: () => CartRepository;
+  getOrderRepository: () => OrderRepository;
+  getDiscountRepository: () => DiscountRepository;
+  getBillingSubscriptionRepository: () => BillingSubscriptionRepository;
+  getShippingMethodRepository: () => ShippingMethodRepository;
+  getPaymentCustomerRepository: () => PaymentCustomerRepository;
+  getPaymentEventRepository: () => PaymentEventRepository;
+// inithium:block:ecommerce:members:end
   // inithium:anchor:members
 }

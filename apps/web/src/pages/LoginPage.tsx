@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { alert, Box, Button, Input, PasswordInput, Text, useNavigateWithTransition } from '@inithium/ui';
 import { useLoginMutation } from '@inithium/api-client';
 import { authStore } from '../app/authStore';
@@ -28,10 +29,18 @@ const validate = (email: string, password: string): FieldErrors => {
   return errors;
 };
 
+// Only same-site paths are honored ("/cart", not "//evil.com" or "https://..."), so a crafted
+// login link can never bounce a freshly signed-in user to another site.
+const resolveRedirect = (search: string): string => {
+  const target = new URLSearchParams(search).get('redirect');
+  return target && target.startsWith('/') && !target.startsWith('//') ? target : '/';
+};
+
 // Reachable via the Navbar's Login button. Register a user first via the "Auth" folder in the
 // Postman collection, then sign in here with the same credentials.
 export const LoginPage = () => {
   const navigate = useNavigateWithTransition();
+  const location = useLocation();
   const [login, { isLoading }] = useLoginMutation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -49,7 +58,7 @@ export const LoginPage = () => {
     try {
       const result = await login({ email, password }).unwrap();
       authStore.setToken(result.accessToken);
-      navigate('/');
+      navigate(resolveRedirect(location.search));
     } catch {
       setFieldErrors({ password: 'Invalid email or password.' });
       showSubmissionErrorAlert();

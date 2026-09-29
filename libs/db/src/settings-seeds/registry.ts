@@ -9,6 +9,9 @@ import appearanceTertiaryColorSettingSeed from './appearance-tertiary-color.sett
 import appearanceQuaternaryColorSettingSeed from './appearance-quaternary-color.setting-seed';
 import appearanceAccentColorSettingSeed from './appearance-accent-color.setting-seed';
 import appearanceSurfaceColorSettingSeed from './appearance-surface-color.setting-seed';
+// inithium:block:ecommerce:imports:start
+import ecommerceCurrencySettingSeed from './ecommerce-currency.setting-seed';
+// inithium:block:ecommerce:imports:end
 // inithium:anchor:imports
 
 // Every setting a fresh project's settings collection should already hold a value for,
@@ -41,5 +44,8 @@ export const settingSeeds: UpsertSettingInput[] = [
   appearanceQuaternaryColorSettingSeed,
   appearanceAccentColorSettingSeed,
   appearanceSurfaceColorSettingSeed,
+// inithium:block:ecommerce:seeds:start
+  ecommerceCurrencySettingSeed,
+// inithium:block:ecommerce:seeds:end
   // inithium:anchor:seeds
 ];

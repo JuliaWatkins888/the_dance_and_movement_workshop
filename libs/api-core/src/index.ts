@@ -33,6 +33,16 @@ import classesRouter from './routes/classes.route';
 // inithium:block:children:imports:start
 import childrenRouter from './routes/children.route';
 // inithium:block:children:imports:end
+// inithium:block:ecommerce:imports:start
+import productsRouter from './routes/ecommerce/products.route';
+import shippingMethodsRouter from './routes/ecommerce/shipping-methods.route';
+import discountsRouter from './routes/ecommerce/discounts.route';
+import cartRouter from './routes/ecommerce/cart.route';
+import checkoutRouter from './routes/ecommerce/checkout.route';
+import ordersRouter from './routes/ecommerce/orders.route';
+import subscriptionsRouter from './routes/ecommerce/subscriptions.route';
+import storeRouter from './routes/ecommerce/store.route';
+// inithium:block:ecommerce:imports:end
 // inithium:anchor:imports
 
 export const registerCoreRoutes = (app: Express): void => {
@@ -70,6 +80,16 @@ export const registerCoreRoutes = (app: Express): void => {
 // inithium:block:children:routes:start
   app.use(childrenRouter);
 // inithium:block:children:routes:end
+// inithium:block:ecommerce:routes:start
+  app.use(productsRouter);
+  app.use(shippingMethodsRouter);
+  app.use(discountsRouter);
+  app.use(cartRouter);
+  app.use(checkoutRouter);
+  app.use(ordersRouter);
+  app.use(subscriptionsRouter);
+  app.use(storeRouter);
+// inithium:block:ecommerce:routes:end
   // inithium:anchor:routes
   console.log('✅ Core routes registered');
 };

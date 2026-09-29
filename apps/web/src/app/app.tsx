@@ -24,6 +24,7 @@ import {
 import { useCurrentUser, useAuthToken } from './useCurrentUser';
 import { RealtimeConnectionBoundary } from './RealtimeConnectionBoundary';
 import { useResolvedNotificationHooks } from './notificationHooks/registry';
+import { navbarActions } from './navbarActions/registry';
 import { pageComponents } from '../pages/pageComponents';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { useOpenChangePasswordDialog } from '../pages/profile/openChangePasswordDialog';
@@ -38,7 +39,10 @@ const NAVBAR_HEIGHT = 72;
 // via useGetPageByRouteQuery, and PageShell maps its slug to the matching test page component.
 export function App() {
   const location = useLocation();
-  const route = `${location.pathname}${location.search}`;
+  // Pathname only: the server resolves pages by path and ignores the query string, so keying the
+  // lookup on `search` too would make every query-param change (?tab=, ?item=) a brand-new cache
+  // entry and flash the full-page loader for a page that is already on screen.
+  const route = location.pathname;
   const navigate = useNavigateWithTransition();
 
   const { data: page, isLoading: isPageLoading } = useGetPageByRouteQuery({ route });
@@ -114,6 +118,9 @@ export function App() {
             showPersistentNotificationCenter={showPersistentNotificationCenter}
             profileEnabled={profileEnabled}
             onChangePasswordClick={openChangePasswordDialog}
+            actions={navbarActions.map(({ id, Component }) => (
+              <Component key={id} />
+            ))}
             onNotificationClick={(notification) => {
               markAsRead(notification.id);
               // A plugin that needs custom notification-click behavior drops its own

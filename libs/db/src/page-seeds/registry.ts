@@ -19,6 +19,12 @@ import policiesPageSeed from './policies.page-seed';
 // inithium:block:classes:imports:start
 import classesPageSeed from './classes.page-seed';
 // inithium:block:classes:imports:end
+// inithium:block:ecommerce:imports:start
+import productsPageSeed from './products.page-seed';
+import cartPageSeed from './cart.page-seed';
+import checkoutPageSeed from './checkout.page-seed';
+import orderPageSeed from './order.page-seed';
+// inithium:block:ecommerce:imports:end
 // inithium:anchor:imports
 
 // Every page the app should always have a Page DB record for, reconciled once at API startup by
@@ -52,5 +58,11 @@ export const pageSeeds: CreatePageInput[] = [
 // inithium:block:classes:seeds:start
   classesPageSeed,
 // inithium:block:classes:seeds:end
+// inithium:block:ecommerce:seeds:start
+  productsPageSeed,
+  cartPageSeed,
+  checkoutPageSeed,
+  orderPageSeed,
+// inithium:block:ecommerce:seeds:end
   // inithium:anchor:seeds
 ];

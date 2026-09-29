@@ -1,0 +1,10 @@
+{
+  "name": "@inithium/payments",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "dependencies": {
+    "stripe": "^22.6.2"
+  }
+}
