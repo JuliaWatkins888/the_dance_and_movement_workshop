@@ -18,6 +18,8 @@ import policiesPageSeed from './policies.page-seed';
 // inithium:block:policy:imports:end
 // inithium:block:classes:imports:start
 import classesPageSeed from './classes.page-seed';
+import classDetailPageSeed from './class-detail.page-seed';
+import programDetailPageSeed from './program-detail.page-seed';
 // inithium:block:classes:imports:end
 // inithium:block:ecommerce:imports:start
 import productsPageSeed from './products.page-seed';
@@ -57,6 +59,8 @@ export const pageSeeds: CreatePageInput[] = [
 // inithium:block:policy:seeds:end
 // inithium:block:classes:seeds:start
   classesPageSeed,
+  classDetailPageSeed,
+  programDetailPageSeed,
 // inithium:block:classes:seeds:end
 // inithium:block:ecommerce:seeds:start
   productsPageSeed,

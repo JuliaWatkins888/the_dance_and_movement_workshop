@@ -36,6 +36,9 @@ export interface PageNavigationConfig {
   label: string;
   order: number;
   icon?: string;
+  // Pages sharing a group render together under one dropdown labeled with it (e.g. "Offerings")
+  // in the primary nav; ungrouped pages stay top-level links. Ignored by the footers.
+  group?: string;
 }
 
 export interface PageSeoConfig {

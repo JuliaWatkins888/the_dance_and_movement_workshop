@@ -18,6 +18,8 @@ import { PoliciesPage } from './PoliciesPage';
 // inithium:block:policy:imports:end
 // inithium:block:classes:imports:start
 import { ClassesPage } from './ClassesPage';
+import { ClassDetailPage } from './ClassDetailPage';
+import { ProgramPage } from './ProgramPage';
 // inithium:block:classes:imports:end
 // inithium:block:ecommerce:imports:start
 import { ProductsPage } from './ProductsPage';
@@ -53,6 +55,8 @@ export const pageComponents: PageComponentMap = {
 // inithium:block:policy:components:end
 // inithium:block:classes:components:start
   classes: ClassesPage,
+  'class-detail': ClassDetailPage,
+  'program-detail': ProgramPage,
 // inithium:block:classes:components:end
 // inithium:block:ecommerce:components:start
   merch: ProductsPage,
