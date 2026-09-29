@@ -4,6 +4,7 @@ import cors from 'cors';
 import {
   connectDatabase,
   ensureOwnerBootstrap,
+  ensureSeededClassCatalog,
   ensureSeededPages,
   ensureSeededPolicies,
   ensureSeededSettings,
@@ -69,6 +70,9 @@ const startServer = async () => {
     // added); see ensureSeededPolicies's own comment for why this doesn't need
     // ensureSeededPages's per-slug reconcile loop.
     await ensureSeededPolicies();
+    // Same one-time, empty-collection-only seed for the class catalog (programs, courses, time
+    // slots, and the school year they run in) - see ensureSeededClassCatalog.
+    await ensureSeededClassCatalog();
 
     getAuthProvider().assertConfigured?.();
     registerCoreRoutes(app);

@@ -40,7 +40,10 @@ import {
 } from './contracts/policy.contract';
 // inithium:block:policy:imports:end
 // inithium:block:classes:imports:start
-import { CreateClassInput, FindManyClassesOptions, UpdateClassInput } from './contracts/class.contract';
+import { CreateProgramInput, UpdateProgramInput } from './contracts/program.contract';
+import { CreateCourseInput, FindCoursesOptions, UpdateCourseInput } from './contracts/course.contract';
+import { CreateClassSectionInput, FindClassSectionsOptions, UpdateClassSectionInput } from './contracts/class-section.contract';
+import { CreateSchoolYearInput, UpdateSchoolYearInput } from './contracts/school-year.contract';
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import { CreateChildInput, FindManyChildrenOptions, UpdateChildInput } from './contracts/child.contract';
@@ -208,12 +211,35 @@ export const deletePolicyItem = (categoryId: string, itemId: string) =>
 
 // inithium:block:policy:repositories:end
 // inithium:block:classes:repositories:start
-export const getClassRepository = () => activeProvider.getClassRepository();
-export const listClasses = (options: FindManyClassesOptions) => getClassRepository().findMany(options);
-export const listPublishedClasses = () => getClassRepository().findPublished();
-export const createClass = (input: CreateClassInput) => getClassRepository().create(input);
-export const updateClass = (id: string, input: UpdateClassInput) => getClassRepository().update(id, input);
-export const deleteClass = (id: string) => getClassRepository().delete(id);
+export const getProgramRepository = () => activeProvider.getProgramRepository();
+export const listPrograms = () => getProgramRepository().findAll();
+export const getProgramById = (id: string) => getProgramRepository().findById(id);
+export const createProgram = (input: CreateProgramInput) => getProgramRepository().create(input);
+export const updateProgram = (id: string, input: UpdateProgramInput) => getProgramRepository().update(id, input);
+export const deleteProgram = (id: string) => getProgramRepository().delete(id);
+
+export const getCourseRepository = () => activeProvider.getCourseRepository();
+export const listCourses = (options?: FindCoursesOptions) => getCourseRepository().findAll(options);
+export const getCourseById = (id: string) => getCourseRepository().findById(id);
+export const getCourseBySlug = (slug: string) => getCourseRepository().findBySlug(slug);
+export const createCourse = (input: CreateCourseInput) => getCourseRepository().create(input);
+export const updateCourse = (id: string, input: UpdateCourseInput) => getCourseRepository().update(id, input);
+export const deleteCourse = (id: string) => getCourseRepository().delete(id);
+
+export const getClassSectionRepository = () => activeProvider.getClassSectionRepository();
+export const listClassSections = (options?: FindClassSectionsOptions) => getClassSectionRepository().findAll(options);
+export const getClassSectionById = (id: string) => getClassSectionRepository().findById(id);
+export const createClassSection = (input: CreateClassSectionInput) => getClassSectionRepository().create(input);
+export const updateClassSection = (id: string, input: UpdateClassSectionInput) =>
+  getClassSectionRepository().update(id, input);
+export const deleteClassSection = (id: string) => getClassSectionRepository().delete(id);
+
+export const getSchoolYearRepository = () => activeProvider.getSchoolYearRepository();
+export const listSchoolYears = () => getSchoolYearRepository().findAll();
+export const getSchoolYearById = (id: string) => getSchoolYearRepository().findById(id);
+export const createSchoolYear = (input: CreateSchoolYearInput) => getSchoolYearRepository().create(input);
+export const updateSchoolYear = (id: string, input: UpdateSchoolYearInput) => getSchoolYearRepository().update(id, input);
+export const deleteSchoolYear = (id: string) => getSchoolYearRepository().delete(id);
 
 // inithium:block:classes:repositories:end
 // inithium:block:children:repositories:start
@@ -359,16 +385,50 @@ export type {
 } from './contracts/policy.contract';
 // inithium:block:policy:type-exports:end
 // inithium:block:classes:type-exports:start
-export { DAYS_OF_WEEK } from './contracts/class.contract';
 export type {
-  ClassEntity,
-  CreateClassInput,
-  UpdateClassInput,
+  ProgramEntity,
+  CreateProgramInput,
+  UpdateProgramInput,
+  ProgramRepository,
+  ProgramBannerConfig,
+  ProgramImageSourceType,
+} from './contracts/program.contract';
+export { COURSE_LEVELS } from './contracts/course.contract';
+export type {
+  CourseEntity,
+  CourseLevel,
+  CreateCourseInput,
+  UpdateCourseInput,
+  FindCoursesOptions,
+  CourseRepository,
+} from './contracts/course.contract';
+export { DAYS_OF_WEEK } from './contracts/class-section.contract';
+export type {
+  ClassSectionEntity,
   DayOfWeek,
-  ClassSearchField,
-  FindManyClassesOptions,
-  ClassRepository,
-} from './contracts/class.contract';
+  CreateClassSectionInput,
+  UpdateClassSectionInput,
+  FindClassSectionsOptions,
+  ClassSectionRepository,
+} from './contracts/class-section.contract';
+export type {
+  SchoolYearEntity,
+  SemesterEntity,
+  SemesterInput,
+  CreateSchoolYearInput,
+  UpdateSchoolYearInput,
+  SchoolYearRepository,
+} from './contracts/school-year.contract';
+export {
+  SEMESTER_DISCOUNT_PERCENT,
+  YEAR_DISCOUNT_PERCENT,
+  applyDiscount,
+  countMonthsTouched,
+  resolveClassPlanOptions,
+  resolveSectionSemesters,
+  sortSemesters,
+} from './utils/class-pricing';
+export type { ClassPlanKind, ClassPlanOption, ClassPlanInput } from './utils/class-pricing';
 // inithium:block:classes:type-exports:end
 // inithium:block:children:type-exports:start
 export { CHILD_GENDERS } from './contracts/child.contract';
@@ -472,4 +532,5 @@ export { pruneOrphanedPluginPages } from './page-seeds/pruneOrphanedPluginPages'
 export { ensureSeededSettings } from './settings-seeds/ensureSeededSettings';
 export { ensureOwnerBootstrap } from './bootstrap/ensureOwnerBootstrap';
 export { ensureSeededPolicies } from './policy-seeds/ensureSeededPolicies';
+export { ensureSeededClassCatalog } from './class-seeds/ensureSeededClassCatalog';
 export { mongoProvider } from './providers/mongo/mongo.provider';

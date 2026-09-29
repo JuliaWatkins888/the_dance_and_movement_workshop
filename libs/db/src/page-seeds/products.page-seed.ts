@@ -10,7 +10,7 @@ const productsPageSeed: CreatePageInput = {
   backgroundColor: { color: 'surface', intensity: 100 },
   foregroundColor: { color: 'surface', intensity: 950 },
   access: { isPublic: true, isAnonymousOnly: false, requiredRoles: [] },
-  navigation: { locations: ['primary-nav', 'primary-footer'], label: 'Merch', order: 7 },
+  navigation: { locations: ['primary-nav', 'primary-footer'], label: 'Merch', order: 7, group: 'Offerings' },
   layoutTemplate: 'default',
   isPublished: true,
 };

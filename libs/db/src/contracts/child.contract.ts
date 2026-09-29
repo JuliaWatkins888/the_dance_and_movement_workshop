@@ -5,11 +5,11 @@ export type ChildGender = (typeof CHILD_GENDERS)[number];
 
 export type ChildSearchField = 'firstName' | 'lastName';
 
-// A placeholder slot for the not-yet-built class registration feature - referencing ClassEntity
+// A placeholder slot for the not-yet-built class registration feature - referencing ClassSectionEntity
 // by id only (no registration status/business logic here), the same "FK + resolve at the API
 // layer" shape as ChildEntity.parentUserId itself.
 export interface ChildRegistrationEntry {
-  classId: string;
+  sectionId: string;
   registeredAt: Date;
 }
 

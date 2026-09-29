@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
 import type { AvatarConfig, NotificationEntity, PageEntity } from '@inithium/db';
 import { AmpersandText, Avatar, Box, Button, Divider, Icon, Text } from '../components';
 import { drawer } from '../drawer/drawer';
@@ -90,11 +92,75 @@ const NavLink = ({ page, onNavigate }: { page: PageEntity; onNavigate: () => voi
   </Button>
 );
 
+type NavEntry = { kind: 'link'; page: PageEntity } | { kind: 'group'; label: string; pages: PageEntity[] };
+
+// Collapses pages sharing navigation.group into one entry, placed where the group's first
+// (lowest-order) page would have been - the incoming list is already sorted by nav order.
+const toNavEntries = (pages: PageEntity[]): NavEntry[] =>
+  pages.reduce<NavEntry[]>((entries, page) => {
+    const group = page.navigation.group?.trim();
+    if (!group) return [...entries, { kind: 'link', page }];
+    const existing = entries.find((entry) => entry.kind === 'group' && entry.label === group);
+    if (!existing) return [...entries, { kind: 'group', label: group, pages: [page] }];
+    return entries.map((entry) => (entry === existing && entry.kind === 'group' ? { ...entry, pages: [...entry.pages, page] } : entry));
+  }, []);
+
+const NavGroupMenu = ({ label, pages }: { label: string; pages: PageEntity[] }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+      <PopoverPrimitive.Trigger asChild>
+        <Button
+          variant={{ kind: 'link', color: 'accent' }}
+          textColor={{ color: 'surface', intensity: 950 }}
+          exitAdornment={
+            <Icon
+              as="span"
+              name="CaretDown"
+              size={14}
+              className={mergeClassNames('transition-transform', open && 'rotate-180')}
+            />
+          }
+        >
+          {label}
+        </Button>
+      </PopoverPrimitive.Trigger>
+      <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Content
+          align="start"
+          sideOffset={8}
+          collisionPadding={12}
+          className="z-[150] flex min-w-48 flex-col items-start gap-3 rounded-md border border-surface-300 bg-surface-100 px-5 py-4 shadow-lg"
+        >
+          {pages.map((page) => (
+            <NavLink key={page.id} page={page} onNavigate={() => setOpen(false)} />
+          ))}
+        </PopoverPrimitive.Content>
+      </PopoverPrimitive.Portal>
+    </PopoverPrimitive.Root>
+  );
+};
+
+// The drawer has room to show a group expanded - a small heading over its indented links.
 const NavLinkStack = ({ pages, onNavigate }: { pages: PageEntity[]; onNavigate: () => void }) => (
   <Box flex={{ direction: 'col', align: 'start', gap: 4 }}>
-    {pages.map((page) => (
-      <NavLink key={page.id} page={page} onNavigate={onNavigate} />
-    ))}
+    {toNavEntries(pages).map((entry) =>
+      entry.kind === 'link' ? (
+        <NavLink key={entry.page.id} page={entry.page} onNavigate={onNavigate} />
+      ) : (
+        <Box key={`group-${entry.label}`} flex={{ direction: 'col', align: 'start', gap: 4 }} padding={{ top: 4 }}>
+          <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-xs font-semibold uppercase tracking-wide">
+            {entry.label}
+          </Text>
+          <Box flex={{ direction: 'col', align: 'start', gap: 4 }} padding={{ left: 12 }}>
+            {entry.pages.map((page) => (
+              <NavLink key={page.id} page={page} onNavigate={onNavigate} />
+            ))}
+          </Box>
+        </Box>
+      ),
+    )}
   </Box>
 );
 
@@ -290,9 +356,13 @@ export const Navbar = ({
 
         <Box flex={{ direction: 'row', align: 'center', gap: 24 }}>
           <Box className="hidden lg:flex" flex={{ direction: 'row', align: 'center', gap: 16 }}>
-            {primaryNavPages.map((page) => (
-              <NavLink key={page.id} page={page} onNavigate={() => undefined} />
-            ))}
+            {toNavEntries(primaryNavPages).map((entry) =>
+              entry.kind === 'link' ? (
+                <NavLink key={entry.page.id} page={entry.page} onNavigate={() => undefined} />
+              ) : (
+                <NavGroupMenu key={`group-${entry.label}`} label={entry.label} pages={entry.pages} />
+              ),
+            )}
           </Box>
 
           {actions}

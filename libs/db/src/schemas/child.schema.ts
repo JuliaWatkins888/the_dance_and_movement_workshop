@@ -14,7 +14,7 @@ export interface ChildDocument extends Document {
 
 const childRegistrationEntrySchema = new Schema<ChildRegistrationEntry>(
   {
-    classId: { type: String, required: true },
+    sectionId: { type: String, required: true },
     registeredAt: { type: Date, required: true },
   },
   { _id: false },

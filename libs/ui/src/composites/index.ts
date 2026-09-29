@@ -61,4 +61,6 @@ export type {
   CommunicationThreadAuthorRole,
 } from './CommunicationThread';
 // inithium:block:contact:exports:end
+export { Breadcrumbs } from './Breadcrumbs';
+export type { BreadcrumbsProps, BreadcrumbItem } from './Breadcrumbs';
 // inithium:anchor:exports

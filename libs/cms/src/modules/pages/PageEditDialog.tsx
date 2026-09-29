@@ -108,6 +108,7 @@ export const PageEditDialog = ({ page, onDone }: PageEditDialogProps) => {
   const [navLabel, setNavLabel] = useState(page.navigation.label);
   const [navOrder, setNavOrder] = useState(page.navigation.order);
   const [navIcon, setNavIcon] = useState(page.navigation.icon ?? '');
+  const [navGroup, setNavGroup] = useState(page.navigation.group ?? '');
 
   // SEO
   const [metaTitle, setMetaTitle] = useState(page.seo?.metaTitle ?? '');
@@ -140,6 +141,7 @@ export const PageEditDialog = ({ page, onDone }: PageEditDialogProps) => {
         label: navLabel,
         order: navOrder,
         icon: navIcon || undefined,
+        group: navGroup.trim() || undefined,
       },
       seo: {
         metaTitle: metaTitle || undefined,
@@ -299,6 +301,13 @@ export const PageEditDialog = ({ page, onDone }: PageEditDialogProps) => {
               onChange={(event) => setNavOrder(Number(event.target.value))}
             />
             <IconPicker label="Nav Icon" value={navIcon} onValueChange={setNavIcon} />
+            <Input
+              label="Nav Group"
+              placeholder="e.g. Offerings"
+              helperText="Primary-nav pages with the same group are shown together in one dropdown."
+              value={navGroup}
+              onChange={(event) => setNavGroup(event.target.value)}
+            />
           </Box>
         </TabsContent>
 

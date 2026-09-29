@@ -108,6 +108,7 @@ export { resolveDicebearUrl } from './utils/resolveDicebearUrl';
 export { resolveComputedColorHex } from './utils/resolveComputedColorHex';
 export { createSeededRandom } from './utils/createSeededRandom';
 export { resolveStringHash } from './utils/resolveStringHash';
+export { generateSeededBannerConfig } from './utils/generateSeededBannerConfig';
 export { generateColorScale, mirrorColorScale } from './utils/generateColorScale';
 export type { ColorScale } from './utils/generateColorScale';
 export { resolveForegroundHex } from './utils/resolveForegroundHex';
@@ -251,6 +252,7 @@ export {
   ChangePasswordDialog,
   AvatarEditDialog,
   BannerEditDialog,
+  Breadcrumbs,
 // inithium:block:cms:composites:start
   SearchFilterBar,
   ListRow,
@@ -278,6 +280,8 @@ export type {
   ChangePasswordDialogProps,
   AvatarEditDialogProps,
   BannerEditDialogProps,
+  BreadcrumbsProps,
+  BreadcrumbItem,
 // inithium:block:cms:composite-types:start
   SearchFilterBarProps,
   SearchFilterFieldOption,

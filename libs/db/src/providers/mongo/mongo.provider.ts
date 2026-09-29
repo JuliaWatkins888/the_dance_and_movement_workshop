@@ -47,9 +47,18 @@ import { createMongoPolicyRepository } from './policy.repository';
 import { PolicyCategoryModel } from '../../schemas/policy.schema';
 // inithium:block:policy:imports:end
 // inithium:block:classes:imports:start
-import { ClassRepository } from '../../contracts/class.contract';
-import { createMongoClassRepository } from './class.repository';
-import { ClassModel } from '../../schemas/class.schema';
+import { ProgramRepository } from '../../contracts/program.contract';
+import { CourseRepository } from '../../contracts/course.contract';
+import { ClassSectionRepository } from '../../contracts/class-section.contract';
+import { SchoolYearRepository } from '../../contracts/school-year.contract';
+import { createMongoProgramRepository } from './program.repository';
+import { createMongoCourseRepository } from './course.repository';
+import { createMongoClassSectionRepository } from './class-section.repository';
+import { createMongoSchoolYearRepository } from './school-year.repository';
+import { ProgramModel } from '../../schemas/program.schema';
+import { CourseModel } from '../../schemas/course.schema';
+import { ClassSectionModel } from '../../schemas/class-section.schema';
+import { SchoolYearModel } from '../../schemas/school-year.schema';
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import { ChildRepository } from '../../contracts/child.contract';
@@ -107,7 +116,10 @@ const timeAuditLogRepository = createMongoTimeAuditLogRepository(TimeAuditLogMod
 const policyRepository = createMongoPolicyRepository(PolicyCategoryModel);
 // inithium:block:policy:repository-instances:end
 // inithium:block:classes:repository-instances:start
-const classRepository = createMongoClassRepository(ClassModel);
+const programRepository = createMongoProgramRepository(ProgramModel);
+const courseRepository = createMongoCourseRepository(CourseModel);
+const classSectionRepository = createMongoClassSectionRepository(ClassSectionModel);
+const schoolYearRepository = createMongoSchoolYearRepository(SchoolYearModel);
 // inithium:block:classes:repository-instances:end
 // inithium:block:children:repository-instances:start
 const childRepository = createMongoChildRepository(ChildModel);
@@ -161,7 +173,10 @@ export const mongoProvider: DbProvider = {
   getPolicyRepository: (): PolicyRepository => policyRepository,
 // inithium:block:policy:members:end
 // inithium:block:classes:members:start
-  getClassRepository: (): ClassRepository => classRepository,
+  getProgramRepository: (): ProgramRepository => programRepository,
+  getCourseRepository: (): CourseRepository => courseRepository,
+  getClassSectionRepository: (): ClassSectionRepository => classSectionRepository,
+  getSchoolYearRepository: (): SchoolYearRepository => schoolYearRepository,
 // inithium:block:classes:members:end
 // inithium:block:children:members:start
   getChildRepository: (): ChildRepository => childRepository,

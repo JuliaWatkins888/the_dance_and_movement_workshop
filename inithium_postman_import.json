@@ -47,7 +47,36 @@
 			"type": "string"
 		},
 		{
-			"key": "classId",
+			"key": "programId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "courseId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "programSlug",
+			"value": "early-childhood"
+		},
+		{
+			"key": "courseSlug",
+			"value": "mini-movers",
+			"type": "string"
+		},
+		{
+			"key": "sectionId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "schoolYearId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "semesterId",
 			"value": "",
 			"type": "string"
 		},
@@ -1161,7 +1190,7 @@
 			"name": "Classes",
 			"item": [
 				{
-					"name": "List Public Classes",
+					"name": "List Class Catalog",
 					"event": [
 						{
 							"listen": "test",
@@ -1189,14 +1218,74 @@
 					}
 				},
 				{
-					"name": "List Classes (Admin)",
+					"name": "Get Program By Slug",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"// A freshly registered/logged-in user always has role 'user' (see Auth > Register), which grants no capabilities by default, so this route's classes:manage guard should reject it.",
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/programs/{{programSlug}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"programs",
+								"{{programSlug}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Course By Slug",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/courses/{{courseSlug}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"courses",
+								"{{courseSlug}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Class Catalog (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
 									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
 								]
 							}
@@ -1211,30 +1300,138 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/classes/admin?page=1&pageSize=20",
+							"raw": "{{baseUrl}}/api/classes/admin/catalog",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"classes",
-								"admin"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "pageSize",
-									"value": "20"
-								}
+								"admin",
+								"catalog"
 							]
 						}
 					}
 				},
 				{
-					"name": "Create Class",
+					"name": "List School Years (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/admin/school-years",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"admin",
+								"school-years"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Instructors (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/admin/instructors",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"admin",
+								"instructors"
+							]
+						}
+					}
+				},
+				{
+					"name": "Upload Program Image",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/upload",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"upload"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Program",
 					"event": [
 						{
 							"listen": "test",
@@ -1261,7 +1458,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Adult Ballet\",\n  \"description\": \"For adult dancers of all levels.\",\n  \"categories\": [\n    \"Ballet\"\n  ],\n  \"instructors\": [\n    \"Lila Hodgin\"\n  ],\n  \"daysOfWeek\": [\n    \"Tuesday\"\n  ],\n  \"startTime\": \"19:30\",\n  \"endTime\": \"20:30\",\n  \"session\": \"Fall 2026\",\n  \"registrationStartDate\": \"2026-07-13\",\n  \"startDate\": \"2026-09-15\",\n  \"endDate\": \"2026-12-15\",\n  \"minAgeYears\": 18,\n  \"priceAmount\": 60,\n  \"billingCycle\": \"Monthly\",\n  \"capacity\": 10\n}",
+							"raw": "{\n  \"name\": \"Early Childhood\",\n  \"slug\": \"early-childhood\",\n  \"description\": \"Playful first steps into dance.\",\n  \"minAgeYears\": 1,\n  \"maxAgeYears\": 4,\n  \"imageUrl\": \"https://example.com/early-childhood.jpg\",\n  \"imageSourceType\": \"external\",\n  \"isPublished\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1269,19 +1466,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/classes",
+							"raw": "{{baseUrl}}/api/classes/programs",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"classes"
+								"classes",
+								"programs"
 							]
 						}
 					}
 				},
 				{
-					"name": "Update Class",
+					"name": "Update Program",
 					"event": [
 						{
 							"listen": "test",
@@ -1308,7 +1506,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"priceAmount\": 65,\n  \"capacity\": 12\n}",
+							"raw": "{\n  \"description\": null\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1316,20 +1514,21 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/classes/{{classId}}",
+							"raw": "{{baseUrl}}/api/classes/programs/{{programId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"classes",
-								"{{classId}}"
+								"programs",
+								"{{programId}}"
 							]
 						}
 					}
 				},
 				{
-					"name": "Delete Class",
+					"name": "Delete Program",
 					"event": [
 						{
 							"listen": "test",
@@ -1351,14 +1550,414 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/classes/{{classId}}",
+							"raw": "{{baseUrl}}/api/classes/programs/{{programId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"classes",
-								"{{classId}}"
+								"programs",
+								"{{programId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Course",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"programId\": \"{{programId}}\",\n  \"name\": \"Mini Movers\",\n  \"slug\": \"mini-movers\",\n  \"description\": \"A high-energy introduction to dance for toddlers.\",\n  \"dressCode\": \"Leggings or leotard. Ballet shoes required.\",\n  \"styles\": [\n    \"Creative Movement\"\n  ],\n  \"minAgeYears\": 2.5,\n  \"maxAgeYears\": 4,\n  \"monthlyPriceCents\": 4000,\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/courses",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"courses"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Course",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"monthlyPriceCents\": 4500\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/courses/{{courseId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"courses",
+								"{{courseId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Course",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/courses/{{courseId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"courses",
+								"{{courseId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Time Slot",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"courseId\": \"{{courseId}}\",\n  \"schoolYearId\": \"{{schoolYearId}}\",\n  \"semesterIds\": [\n    \"{{semesterId}}\"\n  ],\n  \"instructorStaffIds\": [],\n  \"daysOfWeek\": [\n    \"Tuesday\"\n  ],\n  \"startTime\": \"18:00\",\n  \"endTime\": \"18:30\",\n  \"capacity\": 10,\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/sections",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"sections"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Time Slot",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"capacity\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/sections/{{sectionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"sections",
+								"{{sectionId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Time Slot",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/sections/{{sectionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"sections",
+								"{{sectionId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create School Year",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"2026–2027\",\n  \"registrationOpensAt\": \"2026-07-13\",\n  \"semesters\": [\n    {\n      \"name\": \"Semester 1\",\n      \"startDate\": \"2026-09-14\",\n      \"endDate\": \"2026-12-20\"\n    },\n    {\n      \"name\": \"Semester 2\",\n      \"startDate\": \"2027-01-02\",\n      \"endDate\": \"2027-05-15\"\n    }\n  ],\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/school-years",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"school-years"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update School Year",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"registrationOpensAt\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/school-years/{{schoolYearId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"school-years",
+								"{{schoolYearId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete School Year",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks classes:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/school-years/{{schoolYearId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"school-years",
+								"{{schoolYearId}}"
 							]
 						}
 					}

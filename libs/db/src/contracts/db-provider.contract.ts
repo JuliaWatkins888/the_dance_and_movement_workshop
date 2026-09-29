@@ -21,7 +21,10 @@ import { TimeAuditLogRepository } from './time-audit-log.contract';
 import { PolicyRepository } from './policy.contract';
 // inithium:block:policy:imports:end
 // inithium:block:classes:imports:start
-import { ClassRepository } from './class.contract';
+import { ProgramRepository } from './program.contract';
+import { CourseRepository } from './course.contract';
+import { ClassSectionRepository } from './class-section.contract';
+import { SchoolYearRepository } from './school-year.contract';
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import { ChildRepository } from './child.contract';
@@ -71,7 +74,10 @@ export interface DbProvider {
   getPolicyRepository: () => PolicyRepository;
 // inithium:block:policy:members:end
 // inithium:block:classes:members:start
-  getClassRepository: () => ClassRepository;
+  getProgramRepository: () => ProgramRepository;
+  getCourseRepository: () => CourseRepository;
+  getClassSectionRepository: () => ClassSectionRepository;
+  getSchoolYearRepository: () => SchoolYearRepository;
 // inithium:block:classes:members:end
 // inithium:block:children:members:start
   getChildRepository: () => ChildRepository;
