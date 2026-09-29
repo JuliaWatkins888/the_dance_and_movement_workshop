@@ -1,5 +1,5 @@
 import type { ApiResponse } from '@inithium/api-utils';
-import type { ChildGender, ChildRegistrationEntry, ChildSearchField } from '@inithium/db';
+import type { ChildGender, ChildSearchField } from '@inithium/db';
 import { baseApi } from '../baseApi';
 
 // Frontend-facing shape - dates cross the HTTP boundary as ISO strings, mirroring every other
@@ -11,9 +11,9 @@ export interface ChildDto {
   parentUserId: string;
   firstName: string;
   lastName?: string;
-  age: number;
+  // ISO timestamp of UTC midnight on the birth date.
+  birthDate: string;
   gender: ChildGender;
-  activeRegistrations: ChildRegistrationEntry[];
   createdAt: string;
   updatedAt: string;
   parentFirstName: string;
@@ -52,7 +52,8 @@ export interface ChildWriteInput {
   parentUserId?: string;
   firstName: string;
   lastName?: string;
-  age: number;
+  // Calendar date, "YYYY-MM-DD".
+  birthDate: string;
   gender: ChildGender;
 }
 

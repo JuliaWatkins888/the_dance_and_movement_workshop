@@ -6,6 +6,7 @@ import {
   listPrograms,
   listSchoolYears,
   listStaff,
+  releaseExpiredClassSeats,
   resolveClassPlanOptions,
   resolveSectionSemesters,
 } from '@inithium/db';
@@ -175,6 +176,7 @@ interface PublishedCatalogData {
 }
 
 const loadPublishedCatalogData = async (): Promise<PublishedCatalogData> => {
+  await releaseExpiredClassSeats(new Date());
   const [programs, courses, sections, schoolYears, directory] = await Promise.all([
     listPrograms(),
     listCourses(),

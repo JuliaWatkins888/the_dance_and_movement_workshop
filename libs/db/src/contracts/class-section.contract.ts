@@ -38,4 +38,8 @@ export interface ClassSectionRepository {
   create: (input: CreateClassSectionInput) => Promise<ClassSectionEntity>;
   update: (id: string, input: UpdateClassSectionInput) => Promise<ClassSectionEntity | null>;
   delete: (id: string) => Promise<boolean>;
+  // Atomic claim that never takes enrolled past capacity - false when there's no room left.
+  reserveSeats: (id: string, count: number) => Promise<boolean>;
+  // Never takes enrolled below zero.
+  releaseSeats: (id: string, count: number) => Promise<void>;
 }

@@ -1,5 +1,5 @@
-import { Box, Button, IconButton, ListRow, Text, dialog } from '@inithium/ui';
-import { useDeleteChildMutation, useListMyChildrenQuery } from '@inithium/api-client';
+import { alert, Box, Button, IconButton, ListRow, Text, dialog } from '@inithium/ui';
+import { formatChildAge, readApiError, useDeleteChildMutation, useListMyChildrenQuery } from '@inithium/api-client';
 import type { ChildDto } from '@inithium/api-client';
 import type { ProfileTabDescriptor, ProfileTabProps } from './registry';
 import { ChildFormDialog } from './ChildFormDialog';
@@ -55,8 +55,12 @@ const ChildrenTab = (_props: ProfileTabProps) => {
       confirmVariant: { kind: 'filled', color: 'red' },
     });
     if (!confirmed) return;
-    await deleteChild(child.id).unwrap();
-    refetch();
+    try {
+      await deleteChild(child.id).unwrap();
+      refetch();
+    } catch (error) {
+      alert.danger(readApiError(error, 'Could not delete this child account.').message, { position: 'bottom-right' });
+    }
   };
 
   return (
@@ -97,7 +101,7 @@ const ChildrenTab = (_props: ProfileTabProps) => {
                 {fullNameOf(child)}
               </Text>
               <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
-                Age {child.age} · {CHILD_GENDER_LABELS[child.gender]}
+                {formatChildAge(child.birthDate)} · {CHILD_GENDER_LABELS[child.gender]}
               </Text>
             </ListRow>
           ))

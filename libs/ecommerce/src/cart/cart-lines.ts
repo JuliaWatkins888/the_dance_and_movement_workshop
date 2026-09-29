@@ -37,7 +37,12 @@ export const resolveLine = async (lineId: string, ref: PurchasableLineRef, ctx: 
   if (resolved.maxQuantity !== undefined && ref.quantity > resolved.maxQuantity) {
     return {
       ok: false,
-      reason: resolved.maxQuantity <= 0 ? 'This item is sold out.' : `Only ${resolved.maxQuantity} of this item are available.`,
+      reason:
+        resolved.maxQuantity <= 0
+          ? 'This item is sold out.'
+          : resolved.maxQuantity === 1
+            ? 'This item is already in your cart.'
+            : `Only ${resolved.maxQuantity} of this item are available.`,
     };
   }
 

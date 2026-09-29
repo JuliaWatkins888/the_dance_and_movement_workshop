@@ -5,22 +5,15 @@ export type ChildGender = (typeof CHILD_GENDERS)[number];
 
 export type ChildSearchField = 'firstName' | 'lastName';
 
-// A placeholder slot for the not-yet-built class registration feature - referencing ClassSectionEntity
-// by id only (no registration status/business logic here), the same "FK + resolve at the API
-// layer" shape as ChildEntity.parentUserId itself.
-export interface ChildRegistrationEntry {
-  sectionId: string;
-  registeredAt: Date;
-}
-
 export interface ChildEntity {
   id: string;
   parentUserId: string; // FK -> UserEntity.id; name/email resolved at API layer
   firstName: string;
   lastName?: string;
-  age: number;
+  // Stored as UTC midnight of the calendar date entered. Class eligibility compares the child's
+  // exact age on the day of registration against a course's age range (see class-eligibility.ts).
+  birthDate: Date;
   gender: ChildGender;
-  activeRegistrations: ChildRegistrationEntry[];
   createdAt: Date;
   updatedAt: Date;
 }
