@@ -104,11 +104,11 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 
 ### CMS Extension Pattern (Admin Modules & Dashboard Widgets)
 
-*   **Admin Modules:** @inithium/cms discovers admin modules dynamically at build time by scanning libs/cms/src/modules/\*.module.tsx via Vite's import.meta.glob. To add a new workshop management screen, drop a uniquely named \*.module.tsx file default-exporting a { id, navLabel, icon, order?, Component } descriptor.
+*   **Admin Modules:** @inithium/cms discovers admin modules dynamically at build time by scanning libs/cms/src/modules/\*.module.tsx via Vite's import.meta.glob. To add a new workshop management screen, drop a uniquely named \*.module.tsx file default-exporting a { id, navLabel, icon, requiredCapability?, Component } descriptor. The sidebar lists modules alphabetically by navLabel, except Dashboard (always first) and Settings (always last).
     
-*   **Dashboard Widgets:** Add custom dashboard widgets by placing files in libs/cms/src/dashboard/widgets/\*.widget.tsx default-exporting a { id, title?, order?, span?, Component } descriptor (DashboardWidget).
+*   **Dashboard Widgets:** Add custom dashboard widgets by placing files in libs/cms/src/dashboard/widgets/\*.widget.tsx default-exporting a { id, title?, order?, Component } descriptor (DashboardWidget).
     
-    *   span (1 | 2 | 3, default 1) dictates how many columns of the responsive 3-column grid the widget occupies.
+    *   Widgets render on a responsive 2-column grid (single column below md); each widget occupies exactly one half-width cell and additional widgets wrap onto new rows.
         
 
 5\. Theming & Semantic Color Tokens

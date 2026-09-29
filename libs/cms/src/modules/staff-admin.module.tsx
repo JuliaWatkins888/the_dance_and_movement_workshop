@@ -5,7 +5,6 @@ const staffAdminModule: CmsModule = {
   id: 'staff',
   navLabel: 'Staff',
   icon: 'IdentificationCard',
-  order: 35,
   requiredCapability: 'staff:manage',
   Component: StaffAdminModule,
 };

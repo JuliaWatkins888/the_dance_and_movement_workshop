@@ -5,7 +5,6 @@ const productsAdminModule: CmsModule = {
   id: 'products',
   navLabel: 'Products',
   icon: 'Package',
-  order: 40,
   requiredCapability: 'ecommerce:manage-products',
   Component: ProductsAdminModule,
 };

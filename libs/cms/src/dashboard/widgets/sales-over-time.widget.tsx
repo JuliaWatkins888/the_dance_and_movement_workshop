@@ -126,7 +126,6 @@ const salesOverTimeWidget: DashboardWidget = {
   id: 'sales-over-time',
   title: 'Sales',
   order: 5,
-  span: 3,
   requiredCapability: 'ecommerce:manage-orders',
   Component: SalesOverTimeWidget,
 };

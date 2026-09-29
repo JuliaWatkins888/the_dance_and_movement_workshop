@@ -5,7 +5,6 @@ const classesAdminModule: CmsModule = {
   id: 'classes',
   navLabel: 'Classes',
   icon: 'MusicNotes',
-  order: 37,
   requiredCapability: 'classes:manage',
   Component: ClassesAdminModule,
 };

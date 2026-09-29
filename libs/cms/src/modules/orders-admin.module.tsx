@@ -7,7 +7,6 @@ const ordersAdminModule: CmsModule = {
   id: 'orders',
   navLabel: 'Orders',
   icon: 'Receipt',
-  order: 41,
   requiredCapability: 'ecommerce:manage-orders',
   Component: OrdersAdminModule,
 };

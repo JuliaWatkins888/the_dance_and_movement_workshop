@@ -49,7 +49,6 @@ const usersOverTimeWidget: DashboardWidget = {
   id: 'users-over-time',
   title: 'Users Registered Over Time',
   order: 0,
-  span: 2,
   Component: UsersOverTimeWidget,
 };
 

@@ -5,7 +5,6 @@ const shippingAdminModule: CmsModule = {
   id: 'shipping',
   navLabel: 'Shipping',
   icon: 'Truck',
-  order: 43,
   requiredCapability: 'ecommerce:manage-shipping',
   Component: ShippingMethodsAdminModule,
 };

@@ -5,7 +5,6 @@ const galleryAdminModule: CmsModule = {
   id: 'gallery',
   navLabel: 'Gallery',
   icon: 'Images',
-  order: 30,
   requiredCapability: 'gallery:manage',
   Component: GalleryAdminModule,
 };

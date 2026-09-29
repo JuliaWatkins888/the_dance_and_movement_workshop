@@ -5,7 +5,6 @@ const discountsAdminModule: CmsModule = {
   id: 'discounts',
   navLabel: 'Discounts',
   icon: 'Tag',
-  order: 42,
   requiredCapability: 'ecommerce:manage-discounts',
   Component: DiscountsAdminModule,
 };

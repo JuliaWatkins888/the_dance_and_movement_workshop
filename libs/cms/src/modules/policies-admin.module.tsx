@@ -5,7 +5,6 @@ const policiesAdminModule: CmsModule = {
   id: 'policies',
   navLabel: 'Policies',
   icon: 'ClipboardText',
-  order: 36,
   requiredCapability: 'policies:manage',
   Component: PoliciesAdminModule,
 };

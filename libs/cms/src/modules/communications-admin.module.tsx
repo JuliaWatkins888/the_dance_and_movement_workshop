@@ -5,7 +5,6 @@ const communicationsAdminModule: CmsModule = {
   id: 'communications',
   navLabel: 'Communications',
   icon: 'Envelope',
-  order: 27,
   requiredCapability: 'contact:manageThreads',
   Component: CommunicationsAdminModule,
 };

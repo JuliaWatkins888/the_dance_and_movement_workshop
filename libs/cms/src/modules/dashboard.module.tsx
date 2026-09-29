@@ -5,7 +5,6 @@ const dashboardModule: CmsModule = {
   id: 'dashboard',
   navLabel: 'Dashboard',
   icon: 'Gauge',
-  order: 0,
   Component: DashboardPage,
 };
 

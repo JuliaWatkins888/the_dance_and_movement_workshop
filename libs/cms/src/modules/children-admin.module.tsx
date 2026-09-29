@@ -5,7 +5,6 @@ const childrenAdminModule: CmsModule = {
   id: 'children',
   navLabel: 'Child Accounts',
   icon: 'Baby',
-  order: 38,
   requiredCapability: 'children:manage',
   Component: ChildrenAdminModule,
 };

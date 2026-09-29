@@ -4,10 +4,6 @@ export interface DashboardWidget {
   readonly id: string;
   readonly title?: string;
   readonly order?: number;
-  // Grid columns this widget spans on the dashboard's md+ 3-column grid (1 by default) - lets a
-  // widget pick its own footprint (a small stat tile vs. a wide graph) without the dashboard
-  // itself needing to know anything about what any given widget renders.
-  readonly span?: 1 | 2 | 3;
   // Same gating contract as CmsModule.requiredCapability - omit for a widget every CMS-capable
   // viewer should see.
   readonly requiredCapability?: string;
