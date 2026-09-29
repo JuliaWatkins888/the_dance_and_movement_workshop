@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { alert, Box, Button, dialog, Divider, IconButton, Input, Loader, Text, useNavigateWithTransition } from '@inithium/ui';
 import {
+  CLASS_SOURCE_TYPE,
   describeRenewal,
   formatMoney,
   readApiError,
@@ -50,6 +51,8 @@ const CartLineRow = ({ line, currency }: CartLineRowProps) => {
 
   const renewal = line.billing ? describeRenewal(line.billing, line.quantity, currency) : null;
   const name = line.name ?? 'Unavailable item';
+  // A single-unit item (e.g. one dancer's class registration) has no quantity to choose.
+  const isSingleUnit = line.maxQuantity === 1;
 
   return (
     <Box flex={{ direction: 'row', gap: 16 }} padding={{ top: 16, bottom: 16 }} className={isBusy ? 'opacity-60' : undefined}>
@@ -74,7 +77,12 @@ const CartLineRow = ({ line, currency }: CartLineRowProps) => {
                 {name}
               </Text>
             )}
-            {line.available && line.unitAmountCents !== undefined ? (
+            {line.sourceType === CLASS_SOURCE_TYPE && line.description ? (
+              <Text as="span" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+                {line.description}
+              </Text>
+            ) : null}
+            {line.available && line.unitAmountCents !== undefined && !isSingleUnit ? (
               <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-sm tabular-nums">
                 {`${formatMoney(line.unitAmountCents, currency)} each`}
               </Text>
@@ -101,7 +109,7 @@ const CartLineRow = ({ line, currency }: CartLineRowProps) => {
         </Box>
 
         <Box flex={{ direction: 'row', justify: 'between', align: 'center', gap: 12 }}>
-          {line.available ? (
+          {line.available && !isSingleUnit ? (
             <QuantityStepper
               value={line.quantity}
               max={Math.min(MAX_QUANTITY, line.maxQuantity ?? MAX_QUANTITY)}

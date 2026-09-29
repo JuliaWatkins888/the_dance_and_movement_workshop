@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Box, Button, Input, Select, SelectItem, Text } from '@inithium/ui';
-import { useCreateChildMutation, useUpdateChildMutation } from '@inithium/api-client';
+import { toBirthDateInputValue, useCreateChildMutation, useUpdateChildMutation, validateChildBirthDate } from '@inithium/api-client';
 import type { ChildDto } from '@inithium/api-client';
 import { CHILD_GENDERS, CHILD_GENDER_LABELS } from './childGenders';
 
 interface FieldErrors {
   firstName?: string;
-  age?: string;
+  birthDate?: string;
 }
 
 export interface ChildFormDialogProps {
@@ -26,7 +26,7 @@ export const ChildFormDialog = ({ mode, initialChild, onDone }: ChildFormDialogP
 
   const [firstName, setFirstName] = useState(initialChild?.firstName ?? '');
   const [lastName, setLastName] = useState(initialChild?.lastName ?? '');
-  const [age, setAge] = useState(String(initialChild?.age ?? ''));
+  const [birthDate, setBirthDate] = useState(toBirthDateInputValue(initialChild?.birthDate));
   const [gender, setGender] = useState(initialChild?.gender ?? CHILD_GENDERS[0]);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
@@ -36,9 +36,9 @@ export const ChildFormDialog = ({ mode, initialChild, onDone }: ChildFormDialogP
     if (!firstName.trim()) {
       errors.firstName = "Your child's first name is required.";
     }
-    const parsedAge = Number(age);
-    if (!Number.isFinite(parsedAge) || parsedAge < 0 || parsedAge > 17) {
-      errors.age = 'Enter an age between 0 and 17.';
+    const birthDateError = validateChildBirthDate(birthDate);
+    if (birthDateError) {
+      errors.birthDate = birthDateError;
     }
     return errors;
   };
@@ -55,7 +55,7 @@ export const ChildFormDialog = ({ mode, initialChild, onDone }: ChildFormDialogP
     const commonFields = {
       firstName,
       lastName: lastName || undefined,
-      age: Number(age),
+      birthDate,
       gender,
     };
 
@@ -88,13 +88,14 @@ export const ChildFormDialog = ({ mode, initialChild, onDone }: ChildFormDialogP
 
       <Box flex={{ direction: 'row', gap: 12 }}>
         <Input
-          label="Age"
-          type="number"
+          label="Date of Birth"
+          type="date"
           required
-          value={age}
-          onChange={(event) => setAge(event.target.value)}
-          error={Boolean(fieldErrors.age)}
-          helperText={fieldErrors.age}
+          max={new Date().toISOString().slice(0, 10)}
+          value={birthDate}
+          onChange={(event) => setBirthDate(event.target.value)}
+          error={Boolean(fieldErrors.birthDate)}
+          helperText={fieldErrors.birthDate ?? 'Used to show which classes your child is eligible for.'}
           className="flex-1"
         />
         <Select label="Gender" value={gender} onValueChange={(value) => setGender(value as typeof gender)} className="flex-1">

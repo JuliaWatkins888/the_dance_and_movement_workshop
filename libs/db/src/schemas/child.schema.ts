@@ -1,24 +1,15 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { CHILD_GENDERS, ChildGender, ChildRegistrationEntry } from '../contracts/child.contract';
+import { CHILD_GENDERS, ChildGender } from '../contracts/child.contract';
 
 export interface ChildDocument extends Document {
   parentUserId: string;
   firstName: string;
   lastName?: string;
-  age: number;
+  birthDate: Date;
   gender: ChildGender;
-  activeRegistrations: ChildRegistrationEntry[];
   createdAt: Date;
   updatedAt: Date;
 }
-
-const childRegistrationEntrySchema = new Schema<ChildRegistrationEntry>(
-  {
-    sectionId: { type: String, required: true },
-    registeredAt: { type: Date, required: true },
-  },
-  { _id: false },
-);
 
 const childSchema = new Schema<ChildDocument>(
   {
@@ -27,9 +18,8 @@ const childSchema = new Schema<ChildDocument>(
     parentUserId: { type: String, required: true, index: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: false },
-    age: { type: Number, required: true },
+    birthDate: { type: Date, required: true },
     gender: { type: String, enum: CHILD_GENDERS, required: true },
-    activeRegistrations: { type: [childRegistrationEntrySchema], required: true, default: [] },
   },
   { timestamps: true },
 );

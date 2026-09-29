@@ -234,6 +234,8 @@ export const updateClassSection = (id: string, input: UpdateClassSectionInput) =
   getClassSectionRepository().update(id, input);
 export const deleteClassSection = (id: string) => getClassSectionRepository().delete(id);
 
+export const getClassRegistrationRepository = () => activeProvider.getClassRegistrationRepository();
+
 export const getSchoolYearRepository = () => activeProvider.getSchoolYearRepository();
 export const listSchoolYears = () => getSchoolYearRepository().findAll();
 export const getSchoolYearById = (id: string) => getSchoolYearRepository().findById(id);
@@ -429,6 +431,36 @@ export {
   sortSemesters,
 } from './utils/class-pricing';
 export type { ClassPlanKind, ClassPlanOption, ClassPlanInput } from './utils/class-pricing';
+export {
+  SELF_ENROLL_MIN_AGE_YEARS,
+  ageInMonths,
+  ageInYears,
+  coveragesOverlap,
+  isAgeEligible,
+  isSelfEnrollable,
+  nextClassDay,
+  resolveMonthlySchedule,
+  resolvePlanCoverage,
+} from './utils/class-eligibility';
+export type { MonthlySchedule, PlanCoverage } from './utils/class-eligibility';
+export { CLASS_REGISTRATION_STATUSES } from './contracts/class-registration.contract';
+export {
+  attendeeKey,
+  describeAttendee,
+  findOverlappingRegistration,
+  listEligibleAttendees,
+  releaseExpiredClassSeats,
+  resolveEligibleAttendee,
+} from './class-registrations/class-registration.rules';
+export type { AttendeeRef, AttendeeResolution } from './class-registrations/class-registration.rules';
+export type {
+  ClassAttendee,
+  ClassRegistrationEntity,
+  ClassRegistrationStatus,
+  CreateClassRegistrationInput,
+  UpdateClassRegistrationInput,
+  ClassRegistrationRepository,
+} from './contracts/class-registration.contract';
 // inithium:block:classes:type-exports:end
 // inithium:block:children:type-exports:start
 export { CHILD_GENDERS } from './contracts/child.contract';
@@ -438,7 +470,6 @@ export type {
   UpdateChildInput,
   ChildGender,
   ChildSearchField,
-  ChildRegistrationEntry,
   ChildAccountCount,
   FindManyChildrenOptions,
   ChildRepository,

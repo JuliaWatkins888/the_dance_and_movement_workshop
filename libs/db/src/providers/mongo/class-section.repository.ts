@@ -49,4 +49,15 @@ export const createMongoClassSectionRepository = (model: Model<ClassSectionDocum
     if (!isValidObjectId(id)) return false;
     return (await model.findByIdAndDelete(id).exec()) !== null;
   },
+  reserveSeats: async (id: string, count: number) => {
+    if (!isValidObjectId(id)) return false;
+    const result = await model
+      .updateOne({ _id: id, $expr: { $lte: [{ $add: ['$enrolled', count] }, '$capacity'] } }, { $inc: { enrolled: count } })
+      .exec();
+    return result.modifiedCount === 1;
+  },
+  releaseSeats: async (id: string, count: number) => {
+    if (!isValidObjectId(id)) return;
+    await model.updateOne({ _id: id, enrolled: { $gte: count } }, { $inc: { enrolled: -count } }).exec();
+  },
 });

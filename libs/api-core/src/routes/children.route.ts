@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import type { Request, Response, Router as RouterType } from 'express';
-import { asyncHandler, createSuccessResponse, ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '@inithium/api-utils';
+import { asyncHandler, ConflictError, createSuccessResponse, ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '@inithium/api-utils';
 import { requireAuth } from '@inithium/auth';
 import { requirePermission, hasCapability } from '@inithium/permissions';
 import {
+  getClassRegistrationRepository,
   createChild,
   deleteChild,
   getChildById,
@@ -23,6 +24,8 @@ const CHILDREN_MANAGE_CAPABILITY = 'children:manage';
 
 const normalizeParam = (raw: string | string[]): string => (Array.isArray(raw) ? raw[0] : raw);
 
+const toUtcDate = (calendarDate: string): Date => new Date(`${calendarDate}T00:00:00.000Z`);
+
 const SEARCH_FIELDS = ['firstName', 'lastName'] as const;
 const isSearchField = (value: unknown): value is ChildSearchField =>
   typeof value === 'string' && (SEARCH_FIELDS as readonly string[]).includes(value);
@@ -38,9 +41,8 @@ const toChildDto = async (child: ChildEntity) => {
     parentUserId: child.parentUserId,
     firstName: child.firstName,
     lastName: child.lastName,
-    age: child.age,
+    birthDate: child.birthDate,
     gender: child.gender,
-    activeRegistrations: child.activeRegistrations,
     createdAt: child.createdAt,
     updatedAt: child.updatedAt,
     parentFirstName: parent?.firstName ?? '',
@@ -193,9 +195,8 @@ router.post(
       parentUserId,
       firstName: parsed.data.firstName,
       lastName: parsed.data.lastName,
-      age: parsed.data.age,
+      birthDate: toUtcDate(parsed.data.birthDate),
       gender: parsed.data.gender,
-      activeRegistrations: [],
     });
     res.status(201).json(createSuccessResponse(await toChildDto(child)));
   }),
@@ -235,7 +236,7 @@ router.put(
       ...(parentUserId ? { parentUserId } : {}),
       firstName: parsed.data.firstName,
       lastName: parsed.data.lastName,
-      age: parsed.data.age,
+      ...(parsed.data.birthDate ? { birthDate: toUtcDate(parsed.data.birthDate) } : {}),
       gender: parsed.data.gender,
     });
     if (!child) {
@@ -258,6 +259,19 @@ router.delete(
     const requester = await loadRequester(req);
     if (child.parentUserId !== requester.id && !isManager(requester)) {
       throw ForbiddenError('You do not have access to this child account');
+    }
+
+    // A registration keeps billing and holding a seat, so it has to finish (or be cancelled) first.
+    const now = new Date();
+    const current = (await getClassRegistrationRepository().findByUserId(child.parentUserId)).filter(
+      (registration) =>
+        registration.attendee.type === 'child' &&
+        registration.attendee.childId === child.id &&
+        registration.status !== 'ended' &&
+        (registration.accessEndsAt ?? registration.endsAt) > now,
+    );
+    if (current.length > 0) {
+      throw ConflictError(`${child.firstName} is still registered for classes. Those registrations need to end before this profile can be removed.`);
     }
 
     await deleteChild(id);

@@ -1,15 +1,25 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { Box, Breadcrumbs, Button, Divider, Loader, Pill, Text } from '@inithium/ui';
-import { useGetClassCourseBySlugQuery, usePageParams } from '@inithium/api-client';
-import type { CatalogSectionDto, ClassPlanOptionDto } from '@inithium/api-client';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { alert, Box, Breadcrumbs, Button, Divider, Loader, Pill, Text, useNavigateWithTransition } from '@inithium/ui';
+import {
+  CLASS_SOURCE_TYPE,
+  readApiError,
+  toClassLineOptions,
+  useAddCartLineMutation,
+  useGetClassCourseBySlugQuery,
+  useListEligibleAttendeesQuery,
+} from '@inithium/api-client';
+import type { CatalogCourseDetailDto, CatalogSectionDto, ClassAttendeeDto, ClassPlanOptionDto } from '@inithium/api-client';
+import { useCurrentUser } from '../app/useCurrentUser';
+import { loginPathFor } from './ecommerce/SignInPrompt';
 import {
   LEVEL_LABELS,
   formatAgeRange,
   formatCents,
   formatDateRange,
   formatDays,
+  formatShortDate,
   formatInstructors,
   formatOpenings,
   formatTimeRange,
@@ -18,8 +28,28 @@ import {
   planTitle,
 } from './classes/classFormat';
 import { ProgramBanner } from './classes/ProgramBanner';
+import { useRouteSlug } from './classes/useRouteSlug';
+
+const ALERT_POSITION = 'bottom-right' as const;
 
 const planKey = (plan: ClassPlanOptionDto): string => `${plan.kind}:${plan.semesterId ?? ''}`;
+
+const attendeeKeyOf = (attendee: ClassAttendeeDto): string => (attendee.type === 'self' ? 'self' : attendee.childId);
+
+const registrationOpensLater = (section: CatalogSectionDto, now: Date): string | undefined => {
+  const opensAt = section.schoolYear.registrationOpensAt;
+  return opensAt && new Date(opensAt) > now ? opensAt : undefined;
+};
+
+// The contact page reads these to prefill its form - the admin decides whether to add room.
+const requestSpotPath = (course: CatalogCourseDetailDto, section: CatalogSectionDto, dancerName: string | undefined): string => {
+  const slot = `${formatDays(section.daysOfWeek)} · ${formatTimeRange(section.startTime, section.endTime)}`;
+  const params = new URLSearchParams({
+    subject: `Additional spot request: ${course.name}`,
+    message: `Hello! ${course.name} (${slot} with ${formatInstructors(section.instructors)}) is showing as full. I'd like to request an additional spot for ${dancerName ?? 'my dancer'}. Please let me know if room can be made. Thank you!`,
+  });
+  return `/contact?${params}`;
+};
 
 interface ChoiceCardProps {
   readonly name: string;
@@ -107,14 +137,35 @@ const DetailBlock = ({ title, children }: { title: string; children: ReactNode }
 );
 
 export const ClassDetailPage = () => {
-  const { slug } = usePageParams();
+  const slug = useRouteSlug('/classes/');
   const { data: course, isLoading, isError } = useGetClassCourseBySlugQuery(slug ?? '', { skip: !slug });
   const [searchParams] = useSearchParams();
   const requestedSectionId = searchParams.get('section');
   const [sectionId, setSectionId] = useState<string | undefined>(undefined);
   const [selectedPlanKey, setSelectedPlanKey] = useState<string | undefined>(undefined);
+  const [selectedAttendeeKey, setSelectedAttendeeKey] = useState<string | undefined>(undefined);
+  const { currentUser } = useCurrentUser();
+  const navigate = useNavigateWithTransition();
+  const location = useLocation();
+  const [addCartLine, { isLoading: isAdding }] = useAddCartLineMutation();
 
   const selectedSection = course?.sections.find((section) => section.id === sectionId);
+  const selectedPlan = selectedSection?.planOptions.find((plan) => planKey(plan) === selectedPlanKey);
+  const { data: attendees = [], isFetching: isLoadingAttendees } = useListEligibleAttendeesQuery(sectionId ?? '', {
+    skip: !currentUser || !sectionId,
+  });
+  const selectedAttendee = attendees.find((attendee) => attendeeKeyOf(attendee) === selectedAttendeeKey);
+
+  // Keeps a still-eligible pick when the time slot changes; preselects the only choice.
+  useEffect(() => {
+    setSelectedAttendeeKey((current) =>
+      attendees.some((attendee) => attendeeKeyOf(attendee) === current)
+        ? current
+        : attendees.length === 1 && attendees[0]
+          ? attendeeKeyOf(attendees[0])
+          : undefined,
+    );
+  }, [attendees]);
 
   // Preselects the time slot picked on the program page, or the only one when there's no choice.
   useEffect(() => {
@@ -148,6 +199,122 @@ export const ClassDetailPage = () => {
       </Box>
     );
   }
+
+  const currentPath = `${location.pathname}${location.search}`;
+  const isFull = selectedSection !== undefined && selectedSection.openings <= 0;
+  const opensAt = selectedSection ? registrationOpensLater(selectedSection, new Date()) : undefined;
+
+  const handleAddToCart = async () => {
+    if (!currentUser) {
+      navigate(loginPathFor(currentPath));
+      return;
+    }
+    if (!selectedSection || !selectedPlan || !selectedAttendee) return;
+    try {
+      await addCartLine({
+        sourceType: CLASS_SOURCE_TYPE,
+        sourceId: selectedSection.id,
+        options: toClassLineOptions(selectedAttendee, selectedPlan),
+        quantity: 1,
+      }).unwrap();
+      alert.success(`${course.name} for ${selectedAttendee.name} added to your cart.`, { position: ALERT_POSITION });
+    } catch (error) {
+      alert.danger(readApiError(error, 'Could not add this class to your cart.').message, { position: ALERT_POSITION });
+    }
+  };
+
+  const renderAction = () => {
+    if (!selectedSection) return null;
+    if (opensAt) {
+      return (
+        <Button variant={{ kind: 'filled', color: 'primary' }} className="w-full" disabled>
+          Registration opens {formatShortDate(opensAt)}
+        </Button>
+      );
+    }
+    if (isFull) {
+      return (
+        <Button
+          variant={{ kind: 'outlined', color: 'primary' }}
+          className="w-full"
+          onClick={() => navigate(requestSpotPath(course, selectedSection, selectedAttendee?.name))}
+        >
+          Request an additional spot
+        </Button>
+      );
+    }
+    if (!currentUser) {
+      return (
+        <Button variant={{ kind: 'filled', color: 'primary' }} className="w-full" onClick={handleAddToCart}>
+          Log in to register
+        </Button>
+      );
+    }
+    return (
+      <Button
+        variant={{ kind: 'filled', color: 'primary' }}
+        className="w-full"
+        onClick={handleAddToCart}
+        disabled={isAdding || !selectedPlan || !selectedAttendee}
+      >
+        {isAdding ? 'Adding…' : !selectedAttendee ? 'Choose a dancer' : 'Add to cart'}
+      </Button>
+    );
+  };
+
+  const renderAttendees = () => {
+    if (!currentUser) {
+      return (
+        <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
+          Log in to choose which dancer to register.
+        </Text>
+      );
+    }
+    if (!selectedSection) {
+      return (
+        <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
+          Pick a time above first.
+        </Text>
+      );
+    }
+    if (isLoadingAttendees && attendees.length === 0) {
+      return <Loader variant="spinner" color={{ color: 'primary', intensity: 500 }} />;
+    }
+    if (attendees.length === 0) {
+      return (
+        <Box flex={{ direction: 'col', align: 'start', gap: 6 }}>
+          <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+            None of your dancers are in this class’s age range ({formatAgeRange(course.minAgeYears, course.maxAgeYears)}).
+          </Text>
+          <Link to={`/profile/${currentUser.id}?tab=child-accounts`} className="text-sm font-medium text-primary-600 hover:underline">
+            Add a child profile
+          </Link>
+        </Box>
+      );
+    }
+    return (
+      <div role="radiogroup" aria-label="Dancer" className="flex flex-col gap-2">
+        {attendees.map((attendee) => (
+          <ChoiceCard
+            key={attendeeKeyOf(attendee)}
+            name="attendee"
+            value={attendeeKeyOf(attendee)}
+            checked={attendeeKeyOf(attendee) === selectedAttendeeKey}
+            onSelect={setSelectedAttendeeKey}
+          >
+            <Text as="span" textColor={{ color: 'surface', intensity: 950 }} className="font-semibold">
+              {attendee.name}
+            </Text>
+            {attendee.type === 'self' ? (
+              <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
+                You
+              </Text>
+            ) : null}
+          </ChoiceCard>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <Box flex={{ direction: 'col' }} className="w-full">
@@ -232,7 +399,11 @@ export const ClassDetailPage = () => {
 
                 <Divider />
 
-                <DetailBlock title="2. Choose how to pay">
+                <DetailBlock title="2. Who’s dancing?">{renderAttendees()}</DetailBlock>
+
+                <Divider />
+
+                <DetailBlock title="3. Choose how to pay">
                   {selectedSection ? (
                     <div role="radiogroup" aria-label="Payment plan" className="flex flex-col gap-2">
                       {selectedSection.planOptions.map((plan) => (
@@ -258,10 +429,12 @@ export const ClassDetailPage = () => {
                   </Text>
                 </DetailBlock>
 
-                {/* Registration wires into the ecommerce cart in the next pass. */}
-                <Button variant={{ kind: 'filled', color: 'primary' }} className="w-full" disabled>
-                  Online registration coming soon
-                </Button>
+                {renderAction()}
+                {isFull ? (
+                  <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
+                    This time is full. Send the studio a request and they’ll let you know if they can make room.
+                  </Text>
+                ) : null}
               </>
             )}
           </Box>

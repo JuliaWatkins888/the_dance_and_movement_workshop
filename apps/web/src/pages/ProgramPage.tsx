@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Breadcrumbs, Button, Icon, Input, Loader, Pill, Select, SelectItem, Text } from '@inithium/ui';
-import { useGetClassProgramBySlugQuery, usePageParams } from '@inithium/api-client';
+import { useGetClassProgramBySlugQuery } from '@inithium/api-client';
 import type { DayOfWeek } from '@inithium/db';
 import {
   LEVEL_LABELS,
@@ -16,6 +16,7 @@ import {
 import { collectDays, filterSectionListings } from './classes/catalogFilters';
 import type { SectionListing } from './classes/catalogFilters';
 import { ProgramBanner } from './classes/ProgramBanner';
+import { useRouteSlug } from './classes/useRouteSlug';
 
 const ALL_DAYS = 'all';
 
@@ -80,7 +81,7 @@ const SectionCard = ({ listing: { course, section } }: { listing: SectionListing
 };
 
 export const ProgramPage = () => {
-  const { slug } = usePageParams();
+  const slug = useRouteSlug('/programs/');
   const { data: program, isLoading, isError } = useGetClassProgramBySlugQuery(slug ?? '', { skip: !slug });
   const [search, setSearch] = useState('');
   const [ageInput, setAgeInput] = useState('');

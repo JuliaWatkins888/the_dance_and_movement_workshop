@@ -8,6 +8,7 @@ export type {
 } from './purchasables/purchasable.contract';
 export { purchasableSources, findPurchasableSource } from './purchasables/registry';
 export { PRODUCT_SOURCE_TYPE } from './purchasables/product.purchasable';
+export { CLASS_SOURCE_TYPE } from './purchasables/class.purchasable';
 
 export { addInterval } from './pricing/billing';
 export { getStoreCurrency } from './settings';

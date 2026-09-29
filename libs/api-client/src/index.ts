@@ -300,6 +300,21 @@ export type {
   UpdateChildInput,
   ChildAccountCount,
 } from './endpoints/children.endpoints';
+export { childAgeYears, formatChildAge, toBirthDateInputValue, validateChildBirthDate } from './endpoints/childBirthDate';
+export {
+  classRegistrationsApi,
+  useListEligibleAttendeesQuery,
+  useListMyClassRegistrationsQuery,
+  useCancelClassRegistrationMutation,
+  toClassLineOptions,
+  CLASS_SOURCE_TYPE,
+} from './endpoints/class-registrations.endpoints';
+export type {
+  ClassAttendeeDto,
+  ClassRegistrationDto,
+  ClassRegistrationStatus,
+  ClassLineOptions,
+} from './endpoints/class-registrations.endpoints';
 
 // inithium:block:children:exports:end
 // inithium:block:ecommerce:exports:start

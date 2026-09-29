@@ -59,6 +59,9 @@ import { ProgramModel } from '../../schemas/program.schema';
 import { CourseModel } from '../../schemas/course.schema';
 import { ClassSectionModel } from '../../schemas/class-section.schema';
 import { SchoolYearModel } from '../../schemas/school-year.schema';
+import { ClassRegistrationRepository } from '../../contracts/class-registration.contract';
+import { createMongoClassRegistrationRepository } from './class-registration.repository';
+import { ClassRegistrationModel } from '../../schemas/class-registration.schema';
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import { ChildRepository } from '../../contracts/child.contract';
@@ -120,6 +123,7 @@ const programRepository = createMongoProgramRepository(ProgramModel);
 const courseRepository = createMongoCourseRepository(CourseModel);
 const classSectionRepository = createMongoClassSectionRepository(ClassSectionModel);
 const schoolYearRepository = createMongoSchoolYearRepository(SchoolYearModel);
+const classRegistrationRepository = createMongoClassRegistrationRepository(ClassRegistrationModel);
 // inithium:block:classes:repository-instances:end
 // inithium:block:children:repository-instances:start
 const childRepository = createMongoChildRepository(ChildModel);
@@ -177,6 +181,7 @@ export const mongoProvider: DbProvider = {
   getCourseRepository: (): CourseRepository => courseRepository,
   getClassSectionRepository: (): ClassSectionRepository => classSectionRepository,
   getSchoolYearRepository: (): SchoolYearRepository => schoolYearRepository,
+  getClassRegistrationRepository: (): ClassRegistrationRepository => classRegistrationRepository,
 // inithium:block:classes:members:end
 // inithium:block:children:members:start
   getChildRepository: (): ChildRepository => childRepository,

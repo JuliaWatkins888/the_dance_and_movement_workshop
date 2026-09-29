@@ -67,6 +67,7 @@ export const baseApi = createApi({
 // inithium:block:classes:tag-types:start
     'Class',
     'SchoolYear',
+    'ClassRegistration',
 // inithium:block:classes:tag-types:end
 // inithium:block:children:tag-types:start
     'Child',

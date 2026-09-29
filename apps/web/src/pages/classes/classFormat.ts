@@ -56,7 +56,7 @@ export const planPriceLabel = (plan: ClassPlanOptionDto): string =>
   plan.kind === 'monthly' ? `${formatCents(plan.amountCents)}/mo` : formatCents(plan.amountCents);
 
 export const planDetail = (plan: ClassPlanOptionDto): string => {
-  if (plan.kind === 'monthly') return 'Billed each month you attend';
+  if (plan.kind === 'monthly') return 'First month charged at checkout, then on the 1st of each month';
   const range = plan.startDate && plan.endDate ? `${formatDateRange(plan.startDate, plan.endDate)} · ` : '';
   return `${range}${plan.months} months, paid once · save ${plan.discountPercent}%`;
 };

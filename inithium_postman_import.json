@@ -84,6 +84,10 @@
 			"key": "childId",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "registrationId",
+			"value": ""
 		}
 	],
 	"item": [
@@ -1999,7 +2003,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"firstName\": \"Riley\",\n  \"lastName\": \"Test\",\n  \"age\": 8,\n  \"gender\": \"they_them\"\n}",
+							"raw": "{\n  \"firstName\": \"Riley\",\n  \"lastName\": \"Test\",\n  \"birthDate\": \"2018-04-12\",\n  \"gender\": \"they_them\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2118,7 +2122,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"age\": 9\n}",
+							"raw": "{\n  \"birthDate\": \"2018-05-12\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2284,6 +2288,122 @@
 								"api",
 								"children",
 								"{{childId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Class Registrations",
+			"item": [
+				{
+					"name": "List Eligible Attendees",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/class-registrations/attendees?sectionId={{sectionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"class-registrations",
+								"attendees"
+							],
+							"query": [
+								{
+									"key": "sectionId",
+									"value": "{{sectionId}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List My Registrations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/class-registrations/mine",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"class-registrations",
+								"mine"
+							]
+						}
+					}
+				},
+				{
+					"name": "Cancel My Monthly Registration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// 200 for an active monthly registration; 409 for a paid-in-full or already-cancelled one.",
+									"pm.test('Status code is 200 or 409', () => pm.expect(pm.response.code).to.be.oneOf([200, 409]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/class-registrations/mine/{{registrationId}}/cancel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"class-registrations",
+								"mine",
+								"{{registrationId}}",
+								"cancel"
 							]
 						}
 					}

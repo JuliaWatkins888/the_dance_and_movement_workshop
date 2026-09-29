@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, IconButton, ListRow, Pagination, SearchFilterBar, Text, dialog, useSelection } from '@inithium/ui';
-import { useDeleteChildMutation, useListChildrenAdminQuery } from '@inithium/api-client';
+import { alert, Box, Button, IconButton, ListRow, Pagination, SearchFilterBar, Text, dialog, useSelection } from '@inithium/ui';
+import { formatChildAge, readApiError, useDeleteChildMutation, useListChildrenAdminQuery } from '@inithium/api-client';
 import type { ChildSearchField } from '@inithium/db';
 import type { ChildDto } from '@inithium/api-client';
 import { ChildEditDialog } from './ChildEditDialog';
@@ -9,6 +9,7 @@ import { CHILD_GENDER_LABELS } from './childGenderLabels';
 const PAGE_SIZE = 10;
 const SEARCH_DEBOUNCE_MS = 300;
 const DIALOG_WIDTH = 560;
+const ALERT_POSITION = 'bottom-right' as const;
 
 const FIELD_OPTIONS: { value: ChildSearchField; label: string }[] = [
   { value: 'firstName', label: 'First Name' },
@@ -84,7 +85,11 @@ export const ChildrenAdminModule = () => {
       confirmVariant: { kind: 'filled', color: 'red' },
     });
     if (!confirmed) return;
-    await deleteChild(child.id).unwrap();
+    try {
+      await deleteChild(child.id).unwrap();
+    } catch (error) {
+      alert.danger(readApiError(error, 'Could not delete this child account.').message, { position: ALERT_POSITION });
+    }
     refetch();
   };
 
@@ -97,7 +102,17 @@ export const ChildrenAdminModule = () => {
       confirmVariant: { kind: 'filled', color: 'red' },
     });
     if (!confirmed) return;
-    await Promise.all([...selection.selectedIds].map((id) => deleteChild(id).unwrap()));
+    // A child still registered for classes can't be removed - the rest are deleted regardless.
+    const results = await Promise.allSettled([...selection.selectedIds].map((id) => deleteChild(id).unwrap()));
+    const failures = results.filter((result): result is PromiseRejectedResult => result.status === 'rejected');
+    if (failures.length > 0) {
+      alert.danger(
+        failures.length === 1
+          ? readApiError(failures[0]?.reason, 'Could not delete one child account.').message
+          : `${failures.length} child accounts could not be deleted (still registered for classes).`,
+        { position: ALERT_POSITION },
+      );
+    }
     selection.clear();
     refetch();
   };
@@ -158,7 +173,7 @@ export const ChildrenAdminModule = () => {
                 {fullNameOf(child)}
               </Text>
               <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
-                Age {child.age} · {CHILD_GENDER_LABELS[child.gender]} · Parent: {parentNameOf(child)} ({child.parentEmail})
+                {formatChildAge(child.birthDate)} · {CHILD_GENDER_LABELS[child.gender]} · Parent: {parentNameOf(child)} ({child.parentEmail})
               </Text>
             </ListRow>
           ))

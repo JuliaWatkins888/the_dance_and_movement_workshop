@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Box, Button, Input, Select, SelectItem, Text } from '@inithium/ui';
-import { useCreateChildMutation, useUpdateChildMutation } from '@inithium/api-client';
+import { toBirthDateInputValue, useCreateChildMutation, useUpdateChildMutation, validateChildBirthDate } from '@inithium/api-client';
 import type { ChildDto, ChildParentCandidate } from '@inithium/api-client';
 import { LinkedParentField } from './ParentUserPicker';
 import { CHILD_GENDERS, CHILD_GENDER_LABELS } from './childGenderLabels';
@@ -24,7 +24,7 @@ export const ChildEditDialog = ({ mode, initialChild, onDone }: ChildEditDialogP
 
   const [firstName, setFirstName] = useState(initialChild?.firstName ?? '');
   const [lastName, setLastName] = useState(initialChild?.lastName ?? '');
-  const [age, setAge] = useState(String(initialChild?.age ?? ''));
+  const [birthDate, setBirthDate] = useState(toBirthDateInputValue(initialChild?.birthDate));
   const [gender, setGender] = useState(initialChild?.gender ?? CHILD_GENDERS[0]);
 
   const handleSubmit = async () => {
@@ -35,16 +35,20 @@ export const ChildEditDialog = ({ mode, initialChild, onDone }: ChildEditDialogP
       return;
     }
 
-    const parsedAge = Number(age);
-    if (!firstName.trim() || !Number.isFinite(parsedAge) || parsedAge < 0 || parsedAge > 17) {
-      setSubmitError('Enter a first name and an age between 0 and 17.');
+    if (!firstName.trim()) {
+      setSubmitError('Enter a first name.');
+      return;
+    }
+    const birthDateError = validateChildBirthDate(birthDate);
+    if (birthDateError) {
+      setSubmitError(birthDateError);
       return;
     }
 
     const commonFields = {
       firstName,
       lastName: lastName || undefined,
-      age: parsedAge,
+      birthDate,
       gender,
     };
 
@@ -77,11 +81,12 @@ export const ChildEditDialog = ({ mode, initialChild, onDone }: ChildEditDialogP
 
       <Box flex={{ direction: 'row', gap: 12 }}>
         <Input
-          label="Age"
-          type="number"
+          label="Date of Birth"
+          type="date"
           required
-          value={age}
-          onChange={(event) => setAge(event.target.value)}
+          max={new Date().toISOString().slice(0, 10)}
+          value={birthDate}
+          onChange={(event) => setBirthDate(event.target.value)}
           className="flex-1"
         />
         <Select label="Gender" value={gender} onValueChange={(value) => setGender(value as typeof gender)} className="flex-1">

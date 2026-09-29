@@ -16,9 +16,8 @@ const mapToChildEntity = (doc: ChildDocument): ChildEntity => ({
   parentUserId: doc.parentUserId,
   firstName: doc.firstName,
   lastName: doc.lastName,
-  age: doc.age,
+  birthDate: doc.birthDate,
   gender: doc.gender,
-  activeRegistrations: doc.activeRegistrations,
   createdAt: doc.createdAt,
   updatedAt: doc.updatedAt,
 });
