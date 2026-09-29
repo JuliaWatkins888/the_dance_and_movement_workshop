@@ -15,7 +15,7 @@ import { useGetPageByRouteQuery } from './endpoints/page.endpoints';
 // libs/api-core's /api/pages/resolve route uses server-side.
 export const usePageParams = (): Record<string, string> => {
   const location = useLocation();
-  const route = `${location.pathname}${location.search}`;
+  const route = location.pathname;
   const { data: page } = useGetPageByRouteQuery({ route });
 
   if (!page) return {};

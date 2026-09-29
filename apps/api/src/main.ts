@@ -13,6 +13,10 @@ import { getAuthProvider } from '@inithium/auth';
 import { registerCoreRoutes } from '@inithium/api-core';
 import { errorHandler } from '@inithium/api-utils';
 import { attachRealtimeGateway, connectRealtime } from '@inithium/realtime';
+// inithium:block:ecommerce:imports:start
+import { createPaymentWebhookRouter } from '@inithium/ecommerce';
+// inithium:block:ecommerce:imports:end
+// inithium:anchor:imports
 
 // A `mongodb+srv://` URI (MongoDB Atlas's default connection string format) resolves via a DNS
 // SRV lookup before the driver ever opens a socket. Node's own DNS resolver trusts whatever the
@@ -29,6 +33,12 @@ const app = express();
 // apps/web (Vite) runs on a different origin in dev - without this, the browser silently
 // blocks every request the SPA makes to this API.
 app.use(cors({ origin: process.env['WEB_ORIGIN'] || 'http://localhost:5173' }));
+// Routes that must see the untouched request body (e.g. a payment provider's signed webhook,
+// verified against the exact bytes sent) mount here, ahead of the global JSON parser below.
+// inithium:block:ecommerce:pre-body-parser:start
+app.use(createPaymentWebhookRouter());
+// inithium:block:ecommerce:pre-body-parser:end
+// inithium:anchor:pre-body-parser
 app.use(express.json());
 
 const startServer = async () => {

@@ -1,0 +1,24 @@
+{
+  "name": "ecommerce",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/ecommerce/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/ecommerce",
+        "main": "libs/ecommerce/src/index.ts",
+        "tsConfig": "libs/ecommerce/tsconfig.lib.json",
+        "assets": ["libs/ecommerce/*.md"]
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p libs/ecommerce/tsconfig.lib.json"
+      }
+    }
+  }
+}

@@ -87,6 +87,13 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:children:admin:start
   'children:manage',
 // inithium:block:children:admin:end
+// inithium:block:ecommerce:admin:start
+  'ecommerce:manage-products',
+  'ecommerce:manage-orders',
+  'ecommerce:manage-discounts',
+  'ecommerce:manage-shipping',
+  'ecommerce:record-sales',
+// inithium:block:ecommerce:admin:end
     // inithium:anchor:admin
   ],
 };

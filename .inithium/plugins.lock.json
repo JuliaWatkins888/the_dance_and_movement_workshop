@@ -942,6 +942,714 @@
           }
         }
       ]
+    },
+    "ecommerce": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-29T14:46:59.368Z",
+      "dependencies": [],
+      "npmDependencies": {
+        "stripe": "^22.6.2",
+        "@stripe/stripe-js": "^9.17.0",
+        "@stripe/react-stripe-js": "^6.12.0",
+        "multer": "^2.0.0",
+        "@types/multer": "^1.4.12"
+      },
+      "injections": [
+        {
+          "target": "libs/permissions/src/roles/role-capability-defaults.ts",
+          "source": "src/permissions/roles/role-capability-defaults.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/contracts/commerce.contract.ts",
+          "source": "src/db/contracts/commerce.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/product.contract.ts",
+          "source": "src/db/contracts/product.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/cart.contract.ts",
+          "source": "src/db/contracts/cart.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/order.contract.ts",
+          "source": "src/db/contracts/order.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/discount.contract.ts",
+          "source": "src/db/contracts/discount.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/billing-subscription.contract.ts",
+          "source": "src/db/contracts/billing-subscription.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/shipping-method.contract.ts",
+          "source": "src/db/contracts/shipping-method.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/payment-customer.contract.ts",
+          "source": "src/db/contracts/payment-customer.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/payment-event.contract.ts",
+          "source": "src/db/contracts/payment-event.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/db-provider.contract.ts",
+          "source": "src/db/contracts/db-provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/schemas/product.schema.ts",
+          "source": "src/db/schemas/product.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/schemas/cart.schema.ts",
+          "source": "src/db/schemas/cart.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/schemas/order.schema.ts",
+          "source": "src/db/schemas/order.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/schemas/discount.schema.ts",
+          "source": "src/db/schemas/discount.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/schemas/billing-subscription.schema.ts",
+          "source": "src/db/schemas/billing-subscription.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/schemas/shipping-method.schema.ts",
+          "source": "src/db/schemas/shipping-method.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/schemas/payment-customer.schema.ts",
+          "source": "src/db/schemas/payment-customer.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/schemas/payment-event.schema.ts",
+          "source": "src/db/schemas/payment-event.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/product.repository.ts",
+          "source": "src/db/providers/mongo/product.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/cart.repository.ts",
+          "source": "src/db/providers/mongo/cart.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/order.repository.ts",
+          "source": "src/db/providers/mongo/order.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/discount.repository.ts",
+          "source": "src/db/providers/mongo/discount.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/billing-subscription.repository.ts",
+          "source": "src/db/providers/mongo/billing-subscription.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/shipping-method.repository.ts",
+          "source": "src/db/providers/mongo/shipping-method.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/payment-customer.repository.ts",
+          "source": "src/db/providers/mongo/payment-customer.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/payment-event.repository.ts",
+          "source": "src/db/providers/mongo/payment-event.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/utils/toUpdateOperations.ts",
+          "source": "src/db/utils/toUpdateOperations.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/mongo.provider.ts",
+          "source": "src/db/providers/mongo/mongo.provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/index.ts",
+          "source": "src/db/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/settings-seeds/ecommerce-currency.setting-seed.ts",
+          "source": "src/db/settings-seeds/ecommerce-currency.setting-seed.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/settings-seeds/registry.ts",
+          "source": "src/db/settings-seeds/registry.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/page-seeds/products.page-seed.ts",
+          "source": "src/db/page-seeds/products.page-seed.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/page-seeds/cart.page-seed.ts",
+          "source": "src/db/page-seeds/cart.page-seed.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/page-seeds/checkout.page-seed.ts",
+          "source": "src/db/page-seeds/checkout.page-seed.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/page-seeds/order.page-seed.ts",
+          "source": "src/db/page-seeds/order.page-seed.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/page-seeds/registry.ts",
+          "source": "src/db/page-seeds/registry.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/payments/package.json",
+          "source": "src/payments/package.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/payments/project.json",
+          "source": "src/payments/project.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/payments/tsconfig.json",
+          "source": "src/payments/tsconfig.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/payments/tsconfig.lib.json",
+          "source": "src/payments/tsconfig.lib.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/payments/src",
+          "source": "src/payments/src",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ecommerce/package.json",
+          "source": "src/ecommerce/package.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ecommerce/project.json",
+          "source": "src/ecommerce/project.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ecommerce/tsconfig.json",
+          "source": "src/ecommerce/tsconfig.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ecommerce/tsconfig.lib.json",
+          "source": "src/ecommerce/tsconfig.lib.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ecommerce/src",
+          "source": "src/ecommerce/src",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "tsconfig.base.json",
+          "source": "src/tsconfig-paths.fragment.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "tsconfig-paths-merge",
+          "jsonPaths": {
+            "@inithium/payments": [
+              "./libs/payments/src/index.ts"
+            ],
+            "@inithium/ecommerce": [
+              "./libs/ecommerce/src/index.ts"
+            ]
+          }
+        },
+        {
+          "target": "libs/api-core/src/schemas/ecommerce.schema.ts",
+          "source": "src/api-core/schemas/ecommerce.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/ecommerce/ecommerceHttp.ts",
+          "source": "src/api-core/routes/ecommerce/ecommerceHttp.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/ecommerce/products.route.ts",
+          "source": "src/api-core/routes/ecommerce/products.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/ecommerce/shipping-methods.route.ts",
+          "source": "src/api-core/routes/ecommerce/shipping-methods.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/ecommerce/discounts.route.ts",
+          "source": "src/api-core/routes/ecommerce/discounts.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/ecommerce/cart.route.ts",
+          "source": "src/api-core/routes/ecommerce/cart.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/ecommerce/checkout.route.ts",
+          "source": "src/api-core/routes/ecommerce/checkout.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/ecommerce/orders.route.ts",
+          "source": "src/api-core/routes/ecommerce/orders.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/ecommerce/subscriptions.route.ts",
+          "source": "src/api-core/routes/ecommerce/subscriptions.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/ecommerce/store.route.ts",
+          "source": "src/api-core/routes/ecommerce/store.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/index.ts",
+          "source": "src/api-core/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-core/src/routes/ecommerce/products.route.ts",
+          "source": "src/api-core/routes/ecommerce/products.route.storage.ts",
+          "requires": "storage",
+          "status": "deferred",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/api/src/main.ts",
+          "source": "src/apps/api/main.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "apps/api/uploads/products/.gitkeep",
+          "source": "src/apps/api/uploads/products/.gitkeep",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/endpoints/ecommerce.endpoints.ts",
+          "source": "src/api-client/endpoints/ecommerce.endpoints.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/ecommerce/storefront.ts",
+          "source": "src/api-client/ecommerce/storefront.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/endpoints/ecommerce-admin.endpoints.ts",
+          "source": "src/api-client/endpoints/ecommerce-admin.endpoints.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/ecommerce/downloadOrdersCsv.ts",
+          "source": "src/api-client/ecommerce/downloadOrdersCsv.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/baseApi.ts",
+          "source": "src/api-client/baseApi.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-client/src/index.ts",
+          "source": "src/api-client/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "apps/web/src/pages/ecommerce",
+          "source": "src/pages/ecommerce",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/pages/ProductsPage.tsx",
+          "source": "src/pages/ProductsPage.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/pages/CartPage.tsx",
+          "source": "src/pages/CartPage.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/pages/CheckoutPage.tsx",
+          "source": "src/pages/CheckoutPage.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/pages/OrderPage.tsx",
+          "source": "src/pages/OrderPage.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/pages/pageComponents.ts",
+          "source": "src/pages/pageComponents.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "apps/web/src/pages/profile/tabs/orders.tab.tsx",
+          "source": "src/pages/profile/tabs/orders.tab.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "apps/web/src/app/navbarActions/cart.navbar-action.tsx",
+          "source": "src/app/navbarActions/cart.navbar-action.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/permissions/definitions/ecommerce-manage-products.capability.ts",
+          "source": "src/cms/permissions/definitions/ecommerce-manage-products.capability.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/permissions/definitions/ecommerce-manage-orders.capability.ts",
+          "source": "src/cms/permissions/definitions/ecommerce-manage-orders.capability.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/permissions/definitions/ecommerce-manage-discounts.capability.ts",
+          "source": "src/cms/permissions/definitions/ecommerce-manage-discounts.capability.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/permissions/definitions/ecommerce-manage-shipping.capability.ts",
+          "source": "src/cms/permissions/definitions/ecommerce-manage-shipping.capability.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/permissions/definitions/ecommerce-record-sales.capability.ts",
+          "source": "src/cms/permissions/definitions/ecommerce-record-sales.capability.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/ecommerce",
+          "source": "src/cms/modules/ecommerce",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/products-admin.module.tsx",
+          "source": "src/cms/modules/products-admin.module.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/products/ProductsAdminModule.tsx",
+          "source": "src/cms/modules/products/ProductsAdminModule.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/products/ProductEditDialog.tsx",
+          "source": "src/cms/modules/products/ProductEditDialog.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/products/VariantsEditor.tsx",
+          "source": "src/cms/modules/products/VariantsEditor.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/products/productImage.contract.ts",
+          "source": "src/cms/modules/products/productImage.contract.ts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/products/ProductImageField.tsx",
+          "source": "src/cms/modules/products/ProductImageField.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/products/ProductImageField.tsx",
+          "source": "src/cms/modules/products/ProductImageField.storage.tsx",
+          "requires": "storage",
+          "status": "deferred",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/orders-admin.module.tsx",
+          "source": "src/cms/modules/orders-admin.module.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/orders",
+          "source": "src/cms/modules/orders",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/discounts-admin.module.tsx",
+          "source": "src/cms/modules/discounts-admin.module.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/discounts",
+          "source": "src/cms/modules/discounts",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/shipping-admin.module.tsx",
+          "source": "src/cms/modules/shipping-admin.module.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/shipping",
+          "source": "src/cms/modules/shipping",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/subscriptions-admin.module.tsx",
+          "source": "src/cms/modules/subscriptions-admin.module.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/modules/subscriptions",
+          "source": "src/cms/modules/subscriptions",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/dashboard/widgets/sales-over-time.widget.tsx",
+          "source": "src/cms/dashboard/widgets/sales-over-time.widget.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        }
+      ]
     }
   }
 }

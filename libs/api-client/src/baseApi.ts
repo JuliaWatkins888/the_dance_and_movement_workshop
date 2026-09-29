@@ -70,6 +70,14 @@ export const baseApi = createApi({
 // inithium:block:children:tag-types:start
     'Child',
 // inithium:block:children:tag-types:end
+// inithium:block:ecommerce:tag-types:start
+    'Product',
+    'Cart',
+    'Order',
+    'Discount',
+    'ShippingMethod',
+    'Subscription',
+// inithium:block:ecommerce:tag-types:end
     // inithium:anchor:tag-types
   ],
   endpoints: () => ({}),

@@ -19,6 +19,12 @@ import { PoliciesPage } from './PoliciesPage';
 // inithium:block:classes:imports:start
 import { ClassesPage } from './ClassesPage';
 // inithium:block:classes:imports:end
+// inithium:block:ecommerce:imports:start
+import { ProductsPage } from './ProductsPage';
+import { CartPage } from './CartPage';
+import { CheckoutPage } from './CheckoutPage';
+import { OrderPage } from './OrderPage';
+// inithium:block:ecommerce:imports:end
 // inithium:anchor:imports
 
 // Keyed by Page.slug, matching libs/db/src/page-seeds/registry.ts's own seeded records: home
@@ -48,5 +54,11 @@ export const pageComponents: PageComponentMap = {
 // inithium:block:classes:components:start
   classes: ClassesPage,
 // inithium:block:classes:components:end
+// inithium:block:ecommerce:components:start
+  merch: ProductsPage,
+  cart: CartPage,
+  checkout: CheckoutPage,
+  order: OrderPage,
+// inithium:block:ecommerce:components:end
   // inithium:anchor:components
 };

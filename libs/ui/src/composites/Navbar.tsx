@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { AvatarConfig, NotificationEntity, PageEntity } from '@inithium/db';
 import { AmpersandText, Avatar, Box, Button, Divider, Icon, Text } from '../components';
@@ -63,6 +64,10 @@ export interface NavbarProps {
   // default-enabled fallback.
   readonly profileEnabled?: boolean;
   readonly onChangePasswordClick?: () => void;
+  // Extra controls rendered just left of the notification bell / login button, for signed-in and
+  // anonymous visitors alike (e.g. the ecommerce plugin's cart button). The app host builds this
+  // from its navbar-action registry, so a plugin adds one without editing this component.
+  readonly actions?: ReactNode;
 }
 
 const DEFAULT_HEIGHT = 72;
@@ -236,6 +241,7 @@ export const Navbar = ({
   showPersistentNotificationCenter = false,
   profileEnabled = true,
   onChangePasswordClick,
+  actions,
 }: NavbarProps) => {
   const openAuthenticatedDrawer = () => {
     if (!currentUser) return;
@@ -288,6 +294,8 @@ export const Navbar = ({
               <NavLink key={page.id} page={page} onNavigate={() => undefined} />
             ))}
           </Box>
+
+          {actions}
 
           {currentUser ? (
             <>

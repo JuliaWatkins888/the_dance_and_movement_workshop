@@ -52,6 +52,12 @@
       ],
       "@inithium/time": [
         "./libs/time/src/index.ts"
+      ],
+      "@inithium/payments": [
+        "./libs/payments/src/index.ts"
+      ],
+      "@inithium/ecommerce": [
+        "./libs/ecommerce/src/index.ts"
       ]
     }
   },
