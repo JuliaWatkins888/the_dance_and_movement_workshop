@@ -42,6 +42,9 @@ export type { AvatarEditDialogProps } from './AvatarEditDialog';
 export { BannerEditDialog } from './BannerEditDialog';
 export type { BannerEditDialogProps } from './BannerEditDialog';
 
+export { EventCalendar } from './EventCalendar';
+export type { EventCalendarItem, EventCalendarProps, EventCalendarRange, EventCalendarView } from './EventCalendar';
+
 // inithium:block:cms:exports:start
 export { SearchFilterBar } from './SearchFilterBar';
 export type { SearchFilterBarProps, SearchFilterFieldOption } from './SearchFilterBar';

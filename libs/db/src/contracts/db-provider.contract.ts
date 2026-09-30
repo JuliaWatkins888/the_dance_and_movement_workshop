@@ -50,6 +50,9 @@ import { WorkshopRegistrationRepository } from './workshop-registration.contract
 // inithium:block:events:imports:start
 import { EventRepository } from './event.contract';
 // inithium:block:events:imports:end
+// inithium:block:calendar:imports:start
+import { CalendarEntryRepository, HolidayOpeningRepository } from './calendar.contract';
+// inithium:block:calendar:imports:end
 // inithium:anchor:imports
 
 export interface DbConfig {
@@ -114,5 +117,9 @@ export interface DbProvider {
 // inithium:block:events:members:start
   getEventRepository: () => EventRepository;
 // inithium:block:events:members:end
+// inithium:block:calendar:members:start
+  getCalendarEntryRepository: () => CalendarEntryRepository;
+  getHolidayOpeningRepository: () => HolidayOpeningRepository;
+// inithium:block:calendar:members:end
   // inithium:anchor:members
 }

@@ -491,4 +491,26 @@ export type {
 } from './endpoints/events.endpoints';
 
 // inithium:block:events:exports:end
+// inithium:block:calendar:exports:start
+export {
+  calendarApi,
+  useGetCalendarQuery,
+  useListCalendarEntriesAdminQuery,
+  useCreateCalendarEntryMutation,
+  useUpdateCalendarEntryMutation,
+  useDeleteCalendarEntryMutation,
+  useListHolidaysAdminQuery,
+  useSetHolidayStudioOpenMutation,
+} from './endpoints/calendar.endpoints';
+export type {
+  CalendarItemKind,
+  CalendarItemCategory,
+  CalendarItemLocationDto,
+  CalendarItemDto,
+  CalendarRangeArgs,
+  CalendarEntryDto,
+  CalendarEntryWriteInput,
+  HolidayDto,
+} from './endpoints/calendar.endpoints';
+// inithium:block:calendar:exports:end
 // inithium:anchor:exports
