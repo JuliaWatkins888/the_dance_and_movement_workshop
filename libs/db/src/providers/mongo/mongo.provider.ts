@@ -99,6 +99,14 @@ import { AssetRepository } from '../../contracts/asset.contract';
 import { createMongoAssetRepository } from './asset.repository';
 import { AssetModel } from '../../schemas/asset.schema';
 // inithium:block:storage:imports:end
+// inithium:block:workshops:imports:start
+import { WorkshopRepository } from '../../contracts/workshop.contract';
+import { WorkshopRegistrationRepository } from '../../contracts/workshop-registration.contract';
+import { createMongoWorkshopRepository } from './workshop.repository';
+import { createMongoWorkshopRegistrationRepository } from './workshop-registration.repository';
+import { WorkshopModel } from '../../schemas/workshop.schema';
+import { WorkshopRegistrationModel } from '../../schemas/workshop-registration.schema';
+// inithium:block:workshops:imports:end
 // inithium:anchor:imports
 
 const userRepository = createMongoUserRepository(UserModel);
@@ -146,6 +154,10 @@ const paymentEventRepository = createMongoPaymentEventRepository(PaymentEventMod
 // inithium:block:storage:repository-instances:start
 const assetRepository = createMongoAssetRepository(AssetModel);
 // inithium:block:storage:repository-instances:end
+// inithium:block:workshops:repository-instances:start
+const workshopRepository = createMongoWorkshopRepository(WorkshopModel);
+const workshopRegistrationRepository = createMongoWorkshopRegistrationRepository(WorkshopRegistrationModel);
+// inithium:block:workshops:repository-instances:end
 // inithium:anchor:repository-instances
 
 export const mongoProvider: DbProvider = {
@@ -207,5 +219,9 @@ export const mongoProvider: DbProvider = {
 // inithium:block:storage:members:start
   getAssetRepository: (): AssetRepository => assetRepository,
 // inithium:block:storage:members:end
+// inithium:block:workshops:members:start
+  getWorkshopRepository: (): WorkshopRepository => workshopRepository,
+  getWorkshopRegistrationRepository: (): WorkshopRegistrationRepository => workshopRegistrationRepository,
+// inithium:block:workshops:members:end
   // inithium:anchor:members
 };

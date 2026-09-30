@@ -8,7 +8,7 @@ export interface UploadAssetResult {
 
 // Mirrors the server's closed UPLOAD_PURPOSE_CAPABILITIES (storage.schema.ts) - each purpose is
 // gated by the capability owning that image field, and there is deliberately no avatar/banner.
-export type UploadPurpose = 'gallery' | 'staff' | 'program' | 'product' | 'setting';
+export type UploadPurpose = 'gallery' | 'staff' | 'program' | 'workshop' | 'product' | 'setting';
 
 export interface UploadAssetInput {
   file: File;

@@ -1,6 +1,7 @@
 import type { PurchasableSource } from './purchasable.contract';
 import productPurchasable from './product.purchasable';
 import classPurchasable from './class.purchasable';
+import workshopPurchasable from './workshop.purchasable';
 // inithium:anchor:imports
 
 // Every source a cart line may point at. A workspace makes another collection purchasable by
@@ -11,6 +12,7 @@ import classPurchasable from './class.purchasable';
 export const purchasableSources: PurchasableSource[] = [
   productPurchasable,
   classPurchasable,
+  workshopPurchasable,
   // inithium:anchor:sources
 ];
 

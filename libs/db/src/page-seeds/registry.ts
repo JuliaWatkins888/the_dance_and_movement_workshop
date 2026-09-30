@@ -27,6 +27,10 @@ import cartPageSeed from './cart.page-seed';
 import checkoutPageSeed from './checkout.page-seed';
 import orderPageSeed from './order.page-seed';
 // inithium:block:ecommerce:imports:end
+// inithium:block:workshops:imports:start
+import workshopsPageSeed from './workshops.page-seed';
+import workshopDetailPageSeed from './workshop-detail.page-seed';
+// inithium:block:workshops:imports:end
 // inithium:anchor:imports
 
 // Every page the app should always have a Page DB record for, reconciled once at API startup by
@@ -68,5 +72,9 @@ export const pageSeeds: CreatePageInput[] = [
   checkoutPageSeed,
   orderPageSeed,
 // inithium:block:ecommerce:seeds:end
+// inithium:block:workshops:seeds:start
+  workshopsPageSeed,
+  workshopDetailPageSeed,
+// inithium:block:workshops:seeds:end
   // inithium:anchor:seeds
 ];

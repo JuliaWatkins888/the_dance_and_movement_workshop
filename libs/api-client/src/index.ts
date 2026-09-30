@@ -436,4 +436,37 @@ export { storageApi, useUploadAssetMutation, useDeleteAssetMutation } from './en
 export type { UploadAssetResult, UploadAssetInput, UploadPurpose } from './endpoints/storage.endpoints';
 
 // inithium:block:storage:exports:end
+// inithium:block:workshops:exports:start
+export {
+  workshopsApi,
+  useListWorkshopsQuery,
+  useGetWorkshopBySlugQuery,
+  useListWorkshopsAdminQuery,
+  useListWorkshopStaffOptionsQuery,
+  useGetWorkshopRosterQuery,
+  useCreateWorkshopMutation,
+  useUpdateWorkshopMutation,
+  useDeleteWorkshopMutation,
+  useListEligibleWorkshopAttendeesQuery,
+  useListMyWorkshopRegistrationsQuery,
+  toWorkshopLineOptions,
+  WORKSHOP_SOURCE_TYPE,
+} from './endpoints/workshops.endpoints';
+export type {
+  WorkshopStatus,
+  WorkshopInstructorDto,
+  PublicWorkshopDayDto,
+  PublicWorkshopDto,
+  WorkshopInstructorRecord,
+  WorkshopDayDto,
+  WorkshopDto,
+  WorkshopStaffOptionDto,
+  WorkshopRosterEntryDto,
+  WorkshopDayWriteInput,
+  WorkshopWriteInput,
+  WorkshopRegistrationStatus,
+  WorkshopRegistrationDto,
+} from './endpoints/workshops.endpoints';
+
+// inithium:block:workshops:exports:end
 // inithium:anchor:exports

@@ -7,6 +7,7 @@ export const UPLOAD_PURPOSE_CAPABILITIES = {
   gallery: 'gallery:manage',
   staff: 'staff:manage',
   program: 'classes:manage',
+  workshop: 'workshops:manage',
   product: 'ecommerce:manage-products',
   setting: 'settings:manage',
 } as const;

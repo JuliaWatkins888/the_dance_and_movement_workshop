@@ -2,7 +2,7 @@ import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { Box, Button, DEFAULT_BANNER_HEIGHT, DEFAULT_MESH_WIDTH, MediaField } from '@inithium/ui';
 import type { MediaFieldHandle, UploadedAsset } from '@inithium/ui';
 import { useUploadAssetMutation } from '@inithium/api-client';
-import type { ProgramImageSourceType } from '@inithium/api-client';
+import type { ProgramImageSourceType, UploadPurpose } from '@inithium/api-client';
 
 export interface ProgramImageValue {
   readonly imageUrl?: string;
@@ -18,15 +18,20 @@ export interface ProgramImageFieldHandle {
 export interface ProgramImageFieldProps {
   readonly value: ProgramImageValue;
   readonly onChange: (value: ProgramImageValue) => void;
+  // Workshops reuse this field for their banner image and guest instructor photos.
+  readonly purpose?: UploadPurpose;
+  readonly aspectRatio?: number;
+  readonly label?: string;
 }
 
 // Cropped to the same ratio as the live program banner (ProgramBanner / Banner's reference mesh
 // size), so the saved image matches how it's displayed on the program page.
-const PROGRAM_IMAGE_ASPECT_RATIO = DEFAULT_MESH_WIDTH / DEFAULT_BANNER_HEIGHT;
+const BANNER_IMAGE_ASPECT_RATIO = DEFAULT_MESH_WIDTH / DEFAULT_BANNER_HEIGHT;
 
 // An R2 upload (cropped) or an external URL. Removing the image falls back to the program's
 // generated placeholder banner.
-export const ProgramImageField = forwardRef<ProgramImageFieldHandle, ProgramImageFieldProps>(({ value, onChange }, ref) => {
+export const ProgramImageField = forwardRef<ProgramImageFieldHandle, ProgramImageFieldProps>(({ value, onChange, ...options }, ref) => {
+  const { purpose = 'program', aspectRatio = BANNER_IMAGE_ASPECT_RATIO, label = 'Image' } = options;
   const [uploadAsset] = useUploadAssetMutation();
   const mediaFieldRef = useRef<MediaFieldHandle>(null);
   // Remounts MediaField on Remove so a half-finished crop doesn't survive the removal.
@@ -54,12 +59,12 @@ export const ProgramImageField = forwardRef<ProgramImageFieldHandle, ProgramImag
       <MediaField
         key={fieldKey}
         ref={mediaFieldRef}
-        label="Image"
+        label={label}
         value={value.imageUrl ?? ''}
         onValueChange={(url) => onChange({ imageUrl: url, imageSourceType: 'external' })}
         onAssetChange={handleAssetChange}
-        onUpload={async (file) => await uploadAsset({ file, purpose: 'program' }).unwrap()}
-        aspectRatio={PROGRAM_IMAGE_ASPECT_RATIO}
+        onUpload={async (file) => await uploadAsset({ file, purpose }).unwrap()}
+        aspectRatio={aspectRatio}
         defaultMode={value.imageSourceType === 'external' ? 'url' : 'upload'}
       />
       {value.imageUrl ? (

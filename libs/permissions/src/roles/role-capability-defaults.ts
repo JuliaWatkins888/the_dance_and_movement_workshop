@@ -23,6 +23,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:classes:contributor:start
   'classes:manage',
 // inithium:block:classes:contributor:end
+// inithium:block:workshops:contributor:start
+  'workshops:manage',
+// inithium:block:workshops:contributor:end
 // inithium:block:children:contributor:start
   'children:manage',
 // inithium:block:children:contributor:end
@@ -50,6 +53,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:classes:editor:start
   'classes:manage',
 // inithium:block:classes:editor:end
+// inithium:block:workshops:editor:start
+  'workshops:manage',
+// inithium:block:workshops:editor:end
 // inithium:block:children:editor:start
   'children:manage',
 // inithium:block:children:editor:end
@@ -87,6 +93,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:classes:admin:start
   'classes:manage',
 // inithium:block:classes:admin:end
+// inithium:block:workshops:admin:start
+  'workshops:manage',
+// inithium:block:workshops:admin:end
 // inithium:block:children:admin:start
   'children:manage',
 // inithium:block:children:admin:end

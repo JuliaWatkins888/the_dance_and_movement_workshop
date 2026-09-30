@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { alert, Box, Button, dialog, Divider, IconButton, Input, Loader, Text, useNavigateWithTransition } from '@inithium/ui';
 import {
   CLASS_SOURCE_TYPE,
+  WORKSHOP_SOURCE_TYPE,
   describeRenewal,
   formatMoney,
   readApiError,
@@ -77,7 +78,7 @@ const CartLineRow = ({ line, currency }: CartLineRowProps) => {
                 {name}
               </Text>
             )}
-            {line.sourceType === CLASS_SOURCE_TYPE && line.description ? (
+            {(line.sourceType === CLASS_SOURCE_TYPE || line.sourceType === WORKSHOP_SOURCE_TYPE) && line.description ? (
               <Text as="span" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
                 {line.description}
               </Text>
