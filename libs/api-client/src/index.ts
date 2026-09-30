@@ -469,4 +469,26 @@ export type {
 } from './endpoints/workshops.endpoints';
 
 // inithium:block:workshops:exports:end
+// inithium:block:events:exports:start
+export {
+  eventsApi,
+  useListEventsQuery,
+  useGetEventBySlugQuery,
+  useListEventsAdminQuery,
+  useCreateEventMutation,
+  useUpdateEventMutation,
+  useDeleteEventMutation,
+  EVENT_SOURCE_TYPE,
+} from './endpoints/events.endpoints';
+export type {
+  EventStatus,
+  EventBulkDiscountKind,
+  EventBulkDiscountDto,
+  EventTicketTypeDto,
+  PublicEventDto,
+  EventDto,
+  EventWriteInput,
+} from './endpoints/events.endpoints';
+
+// inithium:block:events:exports:end
 // inithium:anchor:exports

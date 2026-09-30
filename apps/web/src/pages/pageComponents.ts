@@ -31,6 +31,10 @@ import { OrderPage } from './OrderPage';
 import { WorkshopsPage } from './WorkshopsPage';
 import { WorkshopDetailPage } from './WorkshopDetailPage';
 // inithium:block:workshops:imports:end
+// inithium:block:events:imports:start
+import { EventsPage } from './EventsPage';
+import { EventDetailPage } from './EventDetailPage';
+// inithium:block:events:imports:end
 // inithium:anchor:imports
 
 // Keyed by Page.slug, matching libs/db/src/page-seeds/registry.ts's own seeded records: home
@@ -72,5 +76,9 @@ export const pageComponents: PageComponentMap = {
   workshops: WorkshopsPage,
   'workshop-detail': WorkshopDetailPage,
 // inithium:block:workshops:components:end
+// inithium:block:events:components:start
+  events: EventsPage,
+  'event-detail': EventDetailPage,
+// inithium:block:events:components:end
   // inithium:anchor:components
 };

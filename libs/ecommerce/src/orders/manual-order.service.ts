@@ -49,22 +49,15 @@ const prepareManualOrder = async (input: ManualOrderInput): Promise<PreparedManu
   if (input.lines.length > MAX_MANUAL_ORDER_LINES) throw ValidationError(`An order can have at most ${MAX_MANUAL_ORDER_LINES} items`);
 
   // Availability and each source's own rules are checked for the customer, not the staff member.
-  const ctx = { userId: customer.id, now: new Date() };
-  const resolutions = await Promise.all(
-    input.lines.map((line) =>
-      resolveLine(
-        randomUUID(),
-        {
-          sourceType: line.sourceType,
-          sourceId: line.sourceId,
-          ...(line.variantId ? { variantId: line.variantId } : {}),
-          options: line.options ?? {},
-          quantity: line.quantity,
-        },
-        ctx,
-      ),
-    ),
-  );
+  const refs = input.lines.map((line) => ({
+    sourceType: line.sourceType,
+    sourceId: line.sourceId,
+    ...(line.variantId ? { variantId: line.variantId } : {}),
+    options: line.options ?? {},
+    quantity: line.quantity,
+  }));
+  const ctx = { userId: customer.id, now: new Date(), lines: refs };
+  const resolutions = await Promise.all(refs.map((ref) => resolveLine(randomUUID(), ref, ctx)));
   const problems = resolutions.flatMap((resolution, index) => (resolution.ok ? [] : [{ index, reason: resolution.reason }]));
   if (problems.length > 0) throw ValidationError('Some items can’t be added to this order', { lines: problems });
 

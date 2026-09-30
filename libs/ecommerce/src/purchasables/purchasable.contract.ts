@@ -20,6 +20,9 @@ export interface PurchasableLineRef {
 export interface PurchasableContext {
   userId: string;
   now: Date;
+  // Every line being priced together with this one (the whole cart or order), when there is such a
+  // set - lets a source price across its own lines, e.g. an event's multi-ticket discount.
+  lines?: PurchasableLineRef[];
 }
 
 export type ResolvedBilling =

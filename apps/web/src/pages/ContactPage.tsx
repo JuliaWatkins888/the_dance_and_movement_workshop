@@ -5,8 +5,8 @@ import type { IconName } from '@inithium/ui';
 import { useIsContactCaptchaEnabled, useContactCaptchaSiteKey, useSubmitContactMutation } from '@inithium/api-client';
 import { useSearchParams } from 'react-router-dom';
 import { useCurrentUser } from '../app/useCurrentUser';
+import { STUDIO_ADDRESS, googleMapsLink } from '../app/studioLocation';
 
-const STUDIO_ADDRESS = '64007 Van Dyke Rd. Ste. 2, Washington, MI 48095';
 const STUDIO_PHONE = '(248) 495-4756';
 const STUDIO_PHONE_TEL = '+12484954756';
 const STUDIO_EMAIL = 'thedanceandmovementworkshop@gmail.com';
@@ -30,7 +30,7 @@ const STUDIO_HOURS: ReadonlyArray<{ readonly day: string; readonly hours: string
 // filtering, etc.) that the keyless form doesn't support.
 const GOOGLE_MAPS_QUERY = encodeURIComponent(STUDIO_ADDRESS);
 const GOOGLE_MAPS_EMBED_SRC = `https://www.google.com/maps?q=${GOOGLE_MAPS_QUERY}&output=embed`;
-const GOOGLE_MAPS_LINK = `https://www.google.com/maps/search/?api=1&query=${GOOGLE_MAPS_QUERY}`;
+const GOOGLE_MAPS_LINK = googleMapsLink(STUDIO_ADDRESS);
 
 interface ContactInfoRowProps {
   readonly icon: IconName;

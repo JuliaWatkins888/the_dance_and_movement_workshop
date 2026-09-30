@@ -107,6 +107,11 @@ import { createMongoWorkshopRegistrationRepository } from './workshop-registrati
 import { WorkshopModel } from '../../schemas/workshop.schema';
 import { WorkshopRegistrationModel } from '../../schemas/workshop-registration.schema';
 // inithium:block:workshops:imports:end
+// inithium:block:events:imports:start
+import { EventRepository } from '../../contracts/event.contract';
+import { createMongoEventRepository } from './event.repository';
+import { EventModel } from '../../schemas/event.schema';
+// inithium:block:events:imports:end
 // inithium:anchor:imports
 
 const userRepository = createMongoUserRepository(UserModel);
@@ -158,6 +163,9 @@ const assetRepository = createMongoAssetRepository(AssetModel);
 const workshopRepository = createMongoWorkshopRepository(WorkshopModel);
 const workshopRegistrationRepository = createMongoWorkshopRegistrationRepository(WorkshopRegistrationModel);
 // inithium:block:workshops:repository-instances:end
+// inithium:block:events:repository-instances:start
+const eventRepository = createMongoEventRepository(EventModel);
+// inithium:block:events:repository-instances:end
 // inithium:anchor:repository-instances
 
 export const mongoProvider: DbProvider = {
@@ -223,5 +231,8 @@ export const mongoProvider: DbProvider = {
   getWorkshopRepository: (): WorkshopRepository => workshopRepository,
   getWorkshopRegistrationRepository: (): WorkshopRegistrationRepository => workshopRegistrationRepository,
 // inithium:block:workshops:members:end
+// inithium:block:events:members:start
+  getEventRepository: (): EventRepository => eventRepository,
+// inithium:block:events:members:end
   // inithium:anchor:members
 };
