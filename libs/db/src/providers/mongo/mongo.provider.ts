@@ -112,6 +112,12 @@ import { EventRepository } from '../../contracts/event.contract';
 import { createMongoEventRepository } from './event.repository';
 import { EventModel } from '../../schemas/event.schema';
 // inithium:block:events:imports:end
+// inithium:block:calendar:imports:start
+import { CalendarEntryRepository, HolidayOpeningRepository } from '../../contracts/calendar.contract';
+import { createMongoCalendarEntryRepository, createMongoHolidayOpeningRepository } from './calendar.repository';
+import { CalendarEntryModel } from '../../schemas/calendar-entry.schema';
+import { HolidayOpeningModel } from '../../schemas/holiday-opening.schema';
+// inithium:block:calendar:imports:end
 // inithium:anchor:imports
 
 const userRepository = createMongoUserRepository(UserModel);
@@ -166,6 +172,10 @@ const workshopRegistrationRepository = createMongoWorkshopRegistrationRepository
 // inithium:block:events:repository-instances:start
 const eventRepository = createMongoEventRepository(EventModel);
 // inithium:block:events:repository-instances:end
+// inithium:block:calendar:repository-instances:start
+const calendarEntryRepository = createMongoCalendarEntryRepository(CalendarEntryModel);
+const holidayOpeningRepository = createMongoHolidayOpeningRepository(HolidayOpeningModel);
+// inithium:block:calendar:repository-instances:end
 // inithium:anchor:repository-instances
 
 export const mongoProvider: DbProvider = {
@@ -234,5 +244,9 @@ export const mongoProvider: DbProvider = {
 // inithium:block:events:members:start
   getEventRepository: (): EventRepository => eventRepository,
 // inithium:block:events:members:end
+// inithium:block:calendar:members:start
+  getCalendarEntryRepository: (): CalendarEntryRepository => calendarEntryRepository,
+  getHolidayOpeningRepository: (): HolidayOpeningRepository => holidayOpeningRepository,
+// inithium:block:calendar:members:end
   // inithium:anchor:members
 };

@@ -57,6 +57,9 @@ import { CreateWorkshopInput, UpdateWorkshopInput } from './contracts/workshop.c
 // inithium:block:events:imports:start
 import { CreateEventInput, UpdateEventInput } from './contracts/event.contract';
 // inithium:block:events:imports:end
+// inithium:block:calendar:imports:start
+import { CreateCalendarEntryInput, UpdateCalendarEntryInput } from './contracts/calendar.contract';
+// inithium:block:calendar:imports:end
 // inithium:anchor:imports
 import { activeProvider as defaultProvider } from './providers/active-provider';
 
@@ -308,6 +311,21 @@ export const updateEvent = (id: string, input: UpdateEventInput) => getEventRepo
 export const deleteEvent = (id: string) => getEventRepository().delete(id);
 
 // inithium:block:events:repositories:end
+// inithium:block:calendar:repositories:start
+export const getCalendarEntryRepository = () => activeProvider.getCalendarEntryRepository();
+export const listCalendarEntries = () => getCalendarEntryRepository().findAll();
+export const listCalendarEntriesOverlapping = (from: Date, to: Date) => getCalendarEntryRepository().findOverlapping(from, to);
+export const getCalendarEntryById = (id: string) => getCalendarEntryRepository().findById(id);
+export const createCalendarEntry = (input: CreateCalendarEntryInput) => getCalendarEntryRepository().create(input);
+export const updateCalendarEntry = (id: string, input: UpdateCalendarEntryInput) => getCalendarEntryRepository().update(id, input);
+export const deleteCalendarEntry = (id: string) => getCalendarEntryRepository().delete(id);
+
+export const getHolidayOpeningRepository = () => activeProvider.getHolidayOpeningRepository();
+export const listHolidayOpenings = (from: Date, to: Date) => getHolidayOpeningRepository().findInRange(from, to);
+export const openStudioOnHoliday = (date: Date, holidayKey: string) => getHolidayOpeningRepository().open(date, holidayKey);
+export const closeStudioOnHoliday = (date: Date) => getHolidayOpeningRepository().close(date);
+
+// inithium:block:calendar:repositories:end
 // inithium:anchor:repositories
 
 export type { DbProvider, DbConfig } from './contracts/db-provider.contract';
@@ -639,6 +657,18 @@ export type {
 } from './contracts/event.contract';
 export { eventSalesCloseAt, isBulkDiscountReached, isEventOnSale, resolveEventTicketPrice } from './utils/event-pricing';
 // inithium:block:events:type-exports:end
+// inithium:block:calendar:type-exports:start
+export type {
+  CalendarEntryEntity,
+  CreateCalendarEntryInput,
+  UpdateCalendarEntryInput,
+  CalendarEntryRepository,
+  HolidayOpeningEntity,
+  HolidayOpeningRepository,
+} from './contracts/calendar.contract';
+export { findFederalHoliday, listFederalHolidays, listFederalHolidaysBetween } from './utils/us-federal-holidays';
+export type { FederalHoliday } from './utils/us-federal-holidays';
+// inithium:block:calendar:type-exports:end
 // inithium:anchor:type-exports
 export { ensureSeededPages } from './page-seeds/ensureSeededPages';
 export { pruneOrphanedPluginPages } from './page-seeds/pruneOrphanedPluginPages';

@@ -37,6 +37,9 @@ import workshopRegistrationsRouter from './routes/workshop-registrations.route';
 // inithium:block:events:imports:start
 import eventsRouter from './routes/events.route';
 // inithium:block:events:imports:end
+// inithium:block:calendar:imports:start
+import calendarRouter from './routes/calendar.route';
+// inithium:block:calendar:imports:end
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import childrenRouter from './routes/children.route';
@@ -96,6 +99,9 @@ export const registerCoreRoutes = (app: Express): void => {
 // inithium:block:events:routes:start
   app.use(eventsRouter);
 // inithium:block:events:routes:end
+// inithium:block:calendar:routes:start
+  app.use(calendarRouter);
+// inithium:block:calendar:routes:end
 // inithium:block:children:routes:start
   app.use(childrenRouter);
 // inithium:block:children:routes:end

@@ -253,6 +253,7 @@ export {
   AvatarEditDialog,
   BannerEditDialog,
   Breadcrumbs,
+  EventCalendar,
 // inithium:block:cms:composites:start
   SearchFilterBar,
   ListRow,
@@ -285,6 +286,10 @@ export type {
   BannerEditDialogProps,
   BreadcrumbsProps,
   BreadcrumbItem,
+  EventCalendarItem,
+  EventCalendarProps,
+  EventCalendarRange,
+  EventCalendarView,
 // inithium:block:cms:composite-types:start
   SearchFilterBarProps,
   SearchFilterFieldOption,

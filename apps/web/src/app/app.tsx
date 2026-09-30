@@ -24,6 +24,7 @@ import {
 } from '@inithium/api-client';
 import { useCurrentUser, useAuthToken } from './useCurrentUser';
 import { RealtimeConnectionBoundary } from './RealtimeConnectionBoundary';
+import { NAVBAR_HEIGHT } from './navbarHeight';
 import { useResolvedNotificationHooks } from './notificationHooks/registry';
 import { navbarActions } from './navbarActions/registry';
 import { pageComponents } from '../pages/pageComponents';
@@ -31,9 +32,6 @@ import { NotFoundPage } from '../pages/NotFoundPage';
 import { useOpenChangePasswordDialog } from '../pages/profile/openChangePasswordDialog';
 // inithium:anchor:imports
 
-// Kept in one place and passed to both Navbar (`height`) and PageShell (`navbarHeight`) so the
-// two composites' sizing always stays in sync.
-const NAVBAR_HEIGHT = 72;
 // Bundled fallback until an admin uploads a logo to R2 via CMS > Settings (app.logo).
 const DEFAULT_LOGO_SRC = '/logo.webp';
 

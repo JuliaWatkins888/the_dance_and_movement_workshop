@@ -492,3 +492,136 @@ h1, h2, h3, h4, h5, h6 {
  * just keyed off Radix's "indeterminate" data-state instead of "checked".
  */
 @source inline("data-[state=indeterminate]:bg-{primary,secondary,tertiary,quaternary,accent,surface,primary-foreground,secondary-foreground,tertiary-foreground,quaternary-foreground,accent-foreground,surface-foreground,slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{100,200,300,400,500,600,700,800,900,950}{,/10,/20,/30,/40,/50,/60,/70,/80,/90}");
+
+/*
+ * EventCalendar (composites/EventCalendar.tsx) - FullCalendar declares its palette as --fc-*
+ * variables on :root, so redefining them on the wrapper repaints it from the semantic tokens and
+ * inherits dark-mode inversion for free. Rules below are scoped under .ui-calendar so they
+ * outrank FullCalendar's own injected (unlayered) styles.
+ */
+.ui-calendar {
+  --fc-border-color: var(--color-surface-300);
+  --fc-page-bg-color: var(--color-surface-100);
+  --fc-neutral-bg-color: var(--color-surface-200);
+  --fc-neutral-text-color: var(--color-surface-700);
+  --fc-list-event-hover-bg-color: var(--color-surface-200);
+  --fc-today-bg-color: color-mix(in srgb, var(--color-accent-500) 14%, transparent);
+  --fc-now-indicator-color: var(--color-accent-500);
+  --fc-highlight-color: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
+  --fc-more-link-bg-color: transparent;
+  --fc-more-link-text-color: var(--color-primary-600);
+  --fc-small-font-size: 0.8em;
+}
+
+.ui-calendar .fc {
+  color: var(--color-surface-950);
+}
+
+.ui-calendar .fc a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ui-calendar .fc .fc-col-header-cell-cushion {
+  font-weight: 600;
+  padding: 6px 4px;
+  color: var(--color-surface-800);
+}
+
+.ui-calendar .fc .fc-daygrid-day-number {
+  font-size: 0.85rem;
+  color: var(--color-surface-800);
+}
+
+.ui-calendar .fc .fc-day-today .fc-daygrid-day-number {
+  font-weight: 700;
+  color: var(--color-surface-950);
+}
+
+.ui-calendar .fc .fc-daygrid-more-link {
+  font-weight: 600;
+}
+
+.ui-calendar .fc .fc-popover {
+  background-color: var(--color-surface-100);
+  border-color: var(--color-surface-300);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-surface-950) 20%, transparent);
+}
+
+.ui-calendar .fc .fc-popover-header {
+  background-color: var(--color-surface-200);
+  color: var(--color-surface-950);
+}
+
+.ui-calendar .fc-event {
+  cursor: pointer;
+}
+
+.ui-calendar .fc-event:focus-visible {
+  outline: 2px solid var(--color-accent-500);
+  outline-offset: 1px;
+}
+
+.ui-calendar .fc-timegrid-slot-label-cushion,
+.ui-calendar .fc-timegrid-axis-cushion {
+  font-size: 0.75rem;
+  color: var(--color-surface-700);
+}
+
+.ui-calendar-event {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 2px;
+  white-space: nowrap;
+}
+
+.ui-calendar-event--stacked {
+  flex-direction: column;
+  gap: 0;
+  white-space: normal;
+}
+
+.ui-calendar-event-time {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.ui-calendar-event-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.ui-calendar-event-subtitle {
+  font-size: 0.9em;
+  opacity: 0.85;
+}
+
+.ui-calendar .fc-multimonth-daygrid-table .fc-daygrid-day {
+  cursor: pointer;
+}
+
+.ui-calendar .fc-multimonth-daygrid-table .fc-daygrid-day:hover {
+  background-color: var(--color-surface-200);
+}
+
+.ui-calendar-year-day {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-height: 1.75rem;
+}
+
+.ui-calendar-year-dots {
+  display: flex;
+  gap: 2px;
+}
+
+.ui-calendar-year-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+}

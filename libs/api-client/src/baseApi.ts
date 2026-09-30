@@ -76,6 +76,9 @@ export const baseApi = createApi({
 // inithium:block:events:tag-types:start
     'Event',
 // inithium:block:events:tag-types:end
+// inithium:block:calendar:tag-types:start
+    'Calendar',
+// inithium:block:calendar:tag-types:end
 // inithium:block:children:tag-types:start
     'Child',
 // inithium:block:children:tag-types:end

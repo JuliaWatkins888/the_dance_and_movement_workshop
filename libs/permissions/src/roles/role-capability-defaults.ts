@@ -29,6 +29,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:events:contributor:start
   'events:manage',
 // inithium:block:events:contributor:end
+// inithium:block:calendar:contributor:start
+  'calendar:manage',
+// inithium:block:calendar:contributor:end
 // inithium:block:children:contributor:start
   'children:manage',
 // inithium:block:children:contributor:end
@@ -62,6 +65,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:events:editor:start
   'events:manage',
 // inithium:block:events:editor:end
+// inithium:block:calendar:editor:start
+  'calendar:manage',
+// inithium:block:calendar:editor:end
 // inithium:block:children:editor:start
   'children:manage',
 // inithium:block:children:editor:end
@@ -105,6 +111,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:events:admin:start
   'events:manage',
 // inithium:block:events:admin:end
+// inithium:block:calendar:admin:start
+  'calendar:manage',
+// inithium:block:calendar:admin:end
 // inithium:block:children:admin:start
   'children:manage',
 // inithium:block:children:admin:end
