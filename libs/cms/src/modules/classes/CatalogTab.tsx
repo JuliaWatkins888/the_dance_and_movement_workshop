@@ -203,7 +203,7 @@ export const CatalogTab = () => {
                   const courseSections = sectionsOf(course.id);
                   return (
                     <AccordionItem key={course.id} value={course.id}>
-                      <AccordionTrigger>
+                      <AccordionTrigger className="cursor-pointer rounded px-2 hover:bg-surface-200">
                         <span className="flex flex-1 flex-wrap items-center gap-2 text-left">
                           <Text as="span" textColor={{ color: 'surface', intensity: 950 }} className="font-medium">
                             {course.name}

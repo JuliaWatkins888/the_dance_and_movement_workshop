@@ -212,9 +212,10 @@ export const stripePaymentProvider: PaymentProvider = {
           customer: input.customerId,
           confirmation_token: input.paymentToken,
           confirm: true,
-          // Redirect-based methods would need a return_url round trip the checkout flow doesn't
-          // model yet; cards and wallets complete in-page (3-D Secure via requires_action).
-          automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
+          // Must match the Payment Element's paymentMethodTypes (StripePaymentFields.tsx) - Stripe
+          // rejects a ConfirmationToken whose collection mode differs from the intent's. Cards and
+          // wallets complete in-page (3-D Secure via requires_action), so no return_url is needed.
+          payment_method_types: ['card'],
           ...(input.savePaymentMethod ? { setup_future_usage: 'off_session' as const } : {}),
           ...(input.description ? { description: input.description } : {}),
           metadata: input.metadata,
