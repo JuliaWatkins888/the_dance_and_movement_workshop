@@ -36,7 +36,7 @@ export interface ProgramBannerDto {
   yColors: string[];
 }
 
-export type ProgramImageSourceType = 'local' | 'external';
+export type ProgramImageSourceType = 'cloud' | 'external';
 
 export interface ProgramDto {
   id: string;
@@ -47,7 +47,7 @@ export interface ProgramDto {
   maxAgeYears?: number;
   imageUrl?: string;
   imageSourceType?: ProgramImageSourceType;
-  imageStorageKey?: string;
+  imageAssetId?: string;
   banner?: ProgramBannerDto;
   order: number;
   isPublished: boolean;
@@ -129,7 +129,7 @@ export type CatalogCourseDto = Omit<CourseDto, 'order' | 'isPublished' | 'create
 
 export type PublicProgramDto = Omit<
   ProgramDto,
-  'order' | 'isPublished' | 'createdAt' | 'updatedAt' | 'imageSourceType' | 'imageStorageKey'
+  'order' | 'isPublished' | 'createdAt' | 'updatedAt' | 'imageSourceType' | 'imageAssetId'
 >;
 
 export type CatalogProgramDto = PublicProgramDto & {
@@ -149,7 +149,7 @@ export interface ProgramWriteInput {
   maxAgeYears?: number;
   imageUrl?: string;
   imageSourceType?: ProgramImageSourceType;
-  imageStorageKey?: string;
+  imageAssetId?: string;
   banner?: ProgramBannerDto;
   order?: number;
   isPublished?: boolean;
@@ -254,14 +254,6 @@ export const classesApi = baseApi.injectEndpoints({
       query: (id) => ({ url: `/api/classes/programs/${id}`, method: 'DELETE' }),
       invalidatesTags: ['Class'],
     }),
-    uploadClassImage: builder.mutation<{ url: string; storageKey: string }, { file: File }>({
-      query: ({ file }) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        return { url: '/api/classes/upload', method: 'POST', body: formData };
-      },
-      transformResponse: unwrap<{ url: string; storageKey: string }>,
-    }),
 
     createCourse: builder.mutation<CourseDto, CourseWriteInput>({
       query: (input) => ({ url: '/api/classes/courses', method: 'POST', body: input }),
@@ -321,7 +313,6 @@ export const {
   useCreateProgramMutation,
   useUpdateProgramMutation,
   useDeleteProgramMutation,
-  useUploadClassImageMutation,
   useCreateCourseMutation,
   useUpdateCourseMutation,
   useDeleteCourseMutation,

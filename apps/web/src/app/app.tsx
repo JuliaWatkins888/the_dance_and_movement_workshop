@@ -18,6 +18,7 @@ import {
   useGetPageByRouteQuery,
   useIsProfileEnabled,
   useNotificationCenter,
+  usePublicImageSetting,
   useRealtimeConnectionStatus,
   useShowPersistentNotificationCenter,
 } from '@inithium/api-client';
@@ -33,6 +34,8 @@ import { useOpenChangePasswordDialog } from '../pages/profile/openChangePassword
 // Kept in one place and passed to both Navbar (`height`) and PageShell (`navbarHeight`) so the
 // two composites' sizing always stays in sync.
 const NAVBAR_HEIGHT = 72;
+// Bundled fallback until an admin uploads a logo to R2 via CMS > Settings (app.logo).
+const DEFAULT_LOGO_SRC = '/logo.webp';
 
 // Routing here is entirely data-driven: react-router-dom only supplies history/location, not
 // <Route> elements — every path change re-resolves the current Page record from the backend
@@ -60,6 +63,7 @@ export function App() {
   // Backed by the CMS plugin's app.name setting when installed (falls back to "Inithium"
   // otherwise or before anything's ever been saved) - see @inithium/api-client's useAppName.
   const appName = useAppName();
+  const logoSrc = usePublicImageSetting('app.logo', DEFAULT_LOGO_SRC);
   const showPersistentNotificationCenter = useShowPersistentNotificationCenter();
   const profileEnabled = useIsProfileEnabled();
   const openChangePasswordDialog = useOpenChangePasswordDialog();
@@ -77,6 +81,15 @@ export function App() {
   useEffect(() => {
     document.title = appName;
   }, [appName]);
+
+  // index.html ships the bundled logo as the favicon; this swaps in the uploaded one. The static
+  // type attribute is dropped since an uploaded logo may be png/jpeg rather than webp.
+  useEffect(() => {
+    const favicon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+    if (!favicon) return;
+    favicon.removeAttribute('type');
+    favicon.href = logoSrc;
+  }, [logoSrc]);
 
   // Gates the very first render of the real shell on everything it depends on: auth resolving
   // (so the Navbar never flashes logged-out right before a stored token resolves into a real
@@ -148,7 +161,7 @@ export function App() {
             onLogin={() => navigate('/login')}
             onLogout={logout}
             // inithium:anchor:navbar-props
-            logo={{ src: '/logo.webp', alt: appName }}
+            logo={{ src: logoSrc, alt: appName }}
             title={isHomePage ? undefined : appName}
             height={NAVBAR_HEIGHT}
           />

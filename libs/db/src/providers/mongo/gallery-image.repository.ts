@@ -9,6 +9,7 @@ import {
 } from '../../contracts/gallery-image.contract';
 import type { PaginatedResult } from '../../contracts/pagination.contract';
 import { escapeRegExp } from '../../utils/escapeRegExp';
+import { toUpdateOperations } from '../../utils/toUpdateOperations';
 import { GalleryImageDocument } from '../../schemas/gallery-image.schema';
 
 const mapToGalleryImageEntity = (doc: GalleryImageDocument): GalleryImageEntity => ({
@@ -20,7 +21,6 @@ const mapToGalleryImageEntity = (doc: GalleryImageDocument): GalleryImageEntity 
   sourceType: doc.sourceType,
   url: doc.url,
   assetId: doc.assetId,
-  storageKey: doc.storageKey,
   isPublished: doc.isPublished,
   uploadedBy: doc.uploadedBy,
   createdAt: doc.createdAt,
@@ -64,7 +64,7 @@ export const createMongoGalleryImageRepository = (model: Model<GalleryImageDocum
     return mapToGalleryImageEntity(doc);
   },
   update: async (id: string, input: UpdateGalleryImageInput): Promise<GalleryImageEntity | null> => {
-    const doc = await model.findByIdAndUpdate(id, { $set: input }, { new: true, runValidators: true }).exec();
+    const doc = await model.findByIdAndUpdate(id, toUpdateOperations(input), { new: true, runValidators: true }).exec();
     return doc ? mapToGalleryImageEntity(doc) : null;
   },
   delete: async (id: string): Promise<boolean> => {

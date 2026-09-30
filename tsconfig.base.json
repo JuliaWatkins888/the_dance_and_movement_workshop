@@ -58,6 +58,9 @@
       ],
       "@inithium/ecommerce": [
         "./libs/ecommerce/src/index.ts"
+      ],
+      "@inithium/storage": [
+        "./libs/storage/src/index.ts"
       ]
     }
   },

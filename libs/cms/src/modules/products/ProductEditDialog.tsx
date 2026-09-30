@@ -11,6 +11,7 @@ import {
 import type { AdminProductDto, ProductBillingDto, ProductOptionDto, ProductVariantInput, ProductWriteInput } from '@inithium/api-client';
 import type { BillingInterval } from '@inithium/db';
 import { FormError, MoneyInput, TagInput, useStoreCurrency } from '../ecommerce/shared';
+import { useSessionUploads } from '../../media/useSessionUploads';
 import { ProductImageField } from './ProductImageField';
 import type { ProductImageFieldHandle } from './productImage.contract';
 import { generateVariantRows, newVariantRow, VariantsEditor, variantLabel } from './VariantsEditor';
@@ -75,6 +76,7 @@ export const ProductEditDialog = ({ product, onDone, onCancel }: ProductEditDial
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
   const isSaving = isCreating || isUpdating;
   const imageFieldRef = useRef<ProductImageFieldHandle>(null);
+  const sessionUploads = useSessionUploads();
 
   const [name, setName] = useState(product?.name ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
@@ -120,7 +122,13 @@ export const ProductEditDialog = ({ product, onDone, onCancel }: ProductEditDial
     const variants = parseVariants(syncedRows, cleanOptions, currency);
     if (!variants.ok) return setError(variants.error);
 
-    const image = (await imageFieldRef.current?.finalize()) ?? {};
+    let image: Awaited<ReturnType<ProductImageFieldHandle['finalize']>>;
+    try {
+      image = await imageFieldRef.current?.finalize() ?? {};
+    } catch {
+      return setError('Could not upload the image. Please try again.');
+    }
+    if (image.imageAssetId && image.imageAssetId !== product?.imageAssetId) sessionUploads.track(image.imageAssetId);
     const input: ProductWriteInput = {
       name: name.trim(),
       slug: slug.trim(),
@@ -148,11 +156,11 @@ export const ProductEditDialog = ({ product, onDone, onCancel }: ProductEditDial
           imageUrl: image.imageUrl ?? null,
           imageSourceType: image.imageSourceType ?? null,
           imageAssetId: image.imageAssetId ?? null,
-          imageStorageKey: image.imageStorageKey ?? null,
         }).unwrap();
       } else {
         await createProduct(input).unwrap();
       }
+      sessionUploads.discardUnsaved(image.imageAssetId);
       onDone();
     } catch (saveError) {
       setError(readApiError(saveError, 'Could not save this product. Check the fields and try again.').message);
@@ -242,7 +250,12 @@ export const ProductEditDialog = ({ product, onDone, onCancel }: ProductEditDial
       ) : null}
 
       <Box flex={{ direction: 'row', gap: 8, justify: 'end' }}>
-        <Button variant={{ kind: 'ghost', color: 'surface' }} onClick={onCancel} disabled={isSaving}>
+        <Button variant={{ kind: 'ghost', color: 'surface' }} onClick={() => {
+            sessionUploads.discardUnsaved();
+            onCancel();
+          }}
+          disabled={isSaving}
+        >
           Cancel
         </Button>
         <Button variant={{ kind: 'filled', color: 'primary' }} onClick={handleSubmit} disabled={isSaving}>

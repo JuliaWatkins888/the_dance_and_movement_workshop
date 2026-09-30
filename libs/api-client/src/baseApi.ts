@@ -80,6 +80,9 @@ export const baseApi = createApi({
     'ShippingMethod',
     'Subscription',
 // inithium:block:ecommerce:tag-types:end
+// inithium:block:storage:tag-types:start
+    'Asset',
+// inithium:block:storage:tag-types:end
     // inithium:anchor:tag-types
   ],
   endpoints: () => ({}),

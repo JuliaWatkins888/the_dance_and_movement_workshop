@@ -1,6 +1,7 @@
 import type { PaginatedResult } from './pagination.contract';
+import type { ClearableUpdate } from './commerce.contract';
 
-export const STAFF_PHOTO_SOURCE_TYPES = ['local', 'cloud', 'external'] as const;
+export const STAFF_PHOTO_SOURCE_TYPES = ['cloud', 'external'] as const;
 export type StaffPhotoSourceType = (typeof STAFF_PHOTO_SOURCE_TYPES)[number];
 
 export type StaffSearchField = 'title';
@@ -14,13 +15,11 @@ export interface StaffEntity {
   title: string;
   bio?: string;
   photoUrl?: string;
-  // Mirrors GalleryImageEntity's own sourceType/assetId/storageKey trio (see
-  // gallery-image.contract.ts) so photo cleanup on delete can find and remove the right
-  // underlying file/object - all undefined when no photo has ever been set, since a photo is
-  // entirely optional here (unlike a gallery image).
+  // Mirrors GalleryImageEntity's own sourceType/assetId pair (see gallery-image.contract.ts) so
+  // cleanup can find and release the right R2 object - all undefined when no photo has ever been
+  // set, since a photo is entirely optional here (unlike a gallery image).
   photoSourceType?: StaffPhotoSourceType;
   photoAssetId?: string;
-  photoStorageKey?: string;
   // Display order on the public staff page (ascending, ties broken by createdAt) - lets an admin
   // control who appears first without that being tied to creation order.
   order: number;
@@ -29,7 +28,7 @@ export interface StaffEntity {
 }
 
 export type CreateStaffInput = Omit<StaffEntity, 'id' | 'createdAt' | 'updatedAt'>;
-export type UpdateStaffInput = Partial<CreateStaffInput>;
+export type UpdateStaffInput = ClearableUpdate<CreateStaffInput>;
 
 export interface FindManyStaffOptions {
   page: number;

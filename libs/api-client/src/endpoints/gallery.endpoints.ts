@@ -13,7 +13,6 @@ export interface GalleryImageDto {
   sourceType: GalleryImageSourceType;
   url: string;
   assetId?: string;
-  storageKey?: string;
   isPublished: boolean;
   uploadedBy: string;
   createdAt: string;
@@ -49,15 +48,9 @@ export interface GalleryImageWriteInput {
   sourceType: GalleryImageSourceType;
   url: string;
   assetId?: string;
-  storageKey?: string;
 }
 
 export type UpdateGalleryImageInput = Partial<GalleryImageWriteInput> & { id: string };
-
-export interface UploadGalleryImageLocalResult {
-  url: string;
-  storageKey: string;
-}
 
 const buildListResult = (response: ApiResponse<GalleryImageDto[]>): ListGalleryImagesResult => ({
   items: response.data,
@@ -84,17 +77,6 @@ export const galleryApi = baseApi.injectEndpoints({
       transformResponse: buildListResult,
       providesTags: ['GalleryImage'],
     }),
-    // fetchBaseQuery passes a FormData body through untouched (no JSON.stringify, the browser
-    // sets the multipart boundary), so no baseApi.ts change is needed for this - same pattern
-    // storage.endpoints.ts's own uploadAsset mutation already uses.
-    uploadGalleryImageLocal: builder.mutation<UploadGalleryImageLocalResult, { file: File }>({
-      query: ({ file }) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        return { url: '/api/gallery/upload', method: 'POST', body: formData };
-      },
-      transformResponse: (response: ApiResponse<UploadGalleryImageLocalResult>) => response.data,
-    }),
     createGalleryImage: builder.mutation<GalleryImageDto, GalleryImageWriteInput>({
       query: (input) => ({ url: '/api/gallery', method: 'POST', body: input }),
       transformResponse: (response: ApiResponse<GalleryImageDto>) => response.data,
@@ -115,7 +97,6 @@ export const galleryApi = baseApi.injectEndpoints({
 export const {
   useListPublishedGalleryImagesQuery,
   useListGalleryImagesAdminQuery,
-  useUploadGalleryImageLocalMutation,
   useCreateGalleryImageMutation,
   useUpdateGalleryImageMutation,
   useDeleteGalleryImageMutation,

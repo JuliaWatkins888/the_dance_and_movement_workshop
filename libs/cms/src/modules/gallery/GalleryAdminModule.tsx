@@ -153,9 +153,6 @@ export const GalleryAdminModule = () => {
                 <Pill color={image.isPublished ? { color: 'primary', intensity: 100 } : { color: 'surface', intensity: 200 }}>
                   {image.isPublished ? 'Published' : 'Draft'}
                 </Pill>
-                {image.sourceType === 'local' ? (
-                  <Pill color={{ color: 'amber', intensity: 100 }}>Local - needs redeploy to persist</Pill>
-                ) : null}
               </Box>
               <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
                 {image.sourceType}

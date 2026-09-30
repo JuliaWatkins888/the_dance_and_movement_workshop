@@ -8,6 +8,7 @@ import {
 } from '../../contracts/staff.contract';
 import type { PaginatedResult } from '../../contracts/pagination.contract';
 import { escapeRegExp } from '../../utils/escapeRegExp';
+import { toUpdateOperations } from '../../utils/toUpdateOperations';
 import { StaffDocument } from '../../schemas/staff.schema';
 
 const mapToStaffEntity = (doc: StaffDocument): StaffEntity => ({
@@ -18,7 +19,6 @@ const mapToStaffEntity = (doc: StaffDocument): StaffEntity => ({
   photoUrl: doc.photoUrl,
   photoSourceType: doc.photoSourceType,
   photoAssetId: doc.photoAssetId,
-  photoStorageKey: doc.photoStorageKey,
   order: doc.order,
   createdAt: doc.createdAt,
   updatedAt: doc.updatedAt,
@@ -57,7 +57,7 @@ export const createMongoStaffRepository = (model: Model<StaffDocument>): StaffRe
     return mapToStaffEntity(doc);
   },
   update: async (id: string, input: UpdateStaffInput): Promise<StaffEntity | null> => {
-    const doc = await model.findByIdAndUpdate(id, { $set: input }, { new: true, runValidators: true }).exec();
+    const doc = await model.findByIdAndUpdate(id, toUpdateOperations(input), { new: true, runValidators: true }).exec();
     return doc ? mapToStaffEntity(doc) : null;
   },
   delete: async (id: string): Promise<boolean> => {

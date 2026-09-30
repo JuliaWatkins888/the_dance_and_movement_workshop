@@ -6,6 +6,7 @@ import { requirePermission } from '@inithium/permissions';
 import { getSetting, listSettings, upsertSetting } from '@inithium/db';
 import type { UpsertSettingInput } from '@inithium/db';
 import { upsertSettingSchema } from '../schemas/settings.schema';
+import { releaseReplacedCloudAsset, resolveCloudAssetUrl } from '../services/cloud-image.service';
 
 const router: RouterType = Router();
 
@@ -54,7 +55,16 @@ router.patch(
     // alone, so this cast reflects a check that already happened, not one being skipped.
     const input = { key, type: parsed.data.type, value: parsed.data.value } as UpsertSettingInput;
 
-    const setting = await upsertSetting(input);
+    if (input.type !== 'image') {
+      res.status(200).json(createSuccessResponse(await upsertSetting(input)));
+      return;
+    }
+
+    const assetId = input.value.assetId;
+    const value = assetId ? { url: await resolveCloudAssetUrl(assetId), assetId } : { url: '' };
+    const previous = await getSetting(key);
+    const setting = await upsertSetting({ key, type: 'image', value });
+    await releaseReplacedCloudAsset(previous?.type === 'image' ? previous.value.assetId : undefined, assetId);
     res.status(200).json(createSuccessResponse(setting));
   }),
 );

@@ -1,6 +1,7 @@
 import type { PaginatedResult } from './pagination.contract';
+import type { ClearableUpdate } from './commerce.contract';
 
-export const GALLERY_IMAGE_SOURCE_TYPES = ['local', 'cloud', 'external'] as const;
+export const GALLERY_IMAGE_SOURCE_TYPES = ['cloud', 'external'] as const;
 export type GalleryImageSourceType = (typeof GALLERY_IMAGE_SOURCE_TYPES)[number];
 
 export type GalleryImageSearchField = 'title';
@@ -16,16 +17,12 @@ export interface GalleryImageEntity {
   metadata?: Record<string, unknown>;
   sourceType: GalleryImageSourceType;
   // Always a directly-usable <img src> value regardless of sourceType - resolved once at write
-  // time (S3 public URL, this API's own /api/gallery/uploads/:filename URL, or a pasted external
-  // URL), so nothing downstream ever needs to branch on sourceType just to render an image.
+  // time (the R2 public URL or a pasted external URL), so nothing downstream ever needs to branch
+  // on sourceType just to render an image.
   url: string;
-  // cloud only - the storage plugin's AssetEntity id, needed by the storage-aware route variant
-  // to clean up the underlying S3 object on delete. This DB record (not the id) is still the
-  // real ownership source of truth, same rationale as AssetEntity.providerKey's own comment.
+  // cloud only - the storage plugin's AssetEntity id, needed to release the underlying R2 object
+  // when the image is replaced or deleted.
   assetId?: string;
-  // local only - the filename under apps/api/uploads/gallery, needed by the route layer to
-  // unlink the file on delete.
-  storageKey?: string;
   isPublished: boolean;
   uploadedBy: string;
   createdAt: Date;
@@ -33,7 +30,7 @@ export interface GalleryImageEntity {
 }
 
 export type CreateGalleryImageInput = Omit<GalleryImageEntity, 'id' | 'createdAt' | 'updatedAt'>;
-export type UpdateGalleryImageInput = Partial<CreateGalleryImageInput>;
+export type UpdateGalleryImageInput = ClearableUpdate<CreateGalleryImageInput>;
 
 export interface FindManyGalleryImagesOptions {
   page: number;

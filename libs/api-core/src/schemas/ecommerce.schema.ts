@@ -56,7 +56,6 @@ const productShape = {
   imageUrl: z.string().min(1).optional(),
   imageSourceType: z.enum(PRODUCT_IMAGE_SOURCE_TYPES).optional(),
   imageAssetId: z.string().min(1).optional(),
-  imageStorageKey: z.string().min(1).optional(),
   basePriceCents: cents,
   taxCode: z.string().max(50).optional(),
   requiresShipping: z.boolean().default(false),
@@ -66,19 +65,17 @@ const productShape = {
   isPublished: z.boolean().default(false),
 };
 
-// Same cross-field image rule as the staff/gallery schemas: which of assetId/storageKey is
-// required depends on imageSourceType.
+// Same cross-field image rule as the staff/gallery schemas: a cloud image carries its assetId (the
+// route derives imageUrl from it), an external one its imageUrl.
 const requireImageSourceFields = (
-  data: { imageSourceType?: string | null; imageUrl?: string | null; imageAssetId?: string | null; imageStorageKey?: string | null },
+  data: { imageSourceType?: string | null; imageUrl?: string | null; imageAssetId?: string | null },
   ctx: IssueContext,
 ) => {
-  if (!data.imageSourceType) return;
-  if (!data.imageUrl) ctx.addIssue({ code: 'custom', path: ['imageUrl'], message: 'imageUrl is required when imageSourceType is set' });
   if (data.imageSourceType === 'cloud' && !data.imageAssetId) {
     ctx.addIssue({ code: 'custom', path: ['imageAssetId'], message: 'imageAssetId is required for imageSourceType "cloud"' });
   }
-  if (data.imageSourceType === 'local' && !data.imageStorageKey) {
-    ctx.addIssue({ code: 'custom', path: ['imageStorageKey'], message: 'imageStorageKey is required for imageSourceType "local"' });
+  if (data.imageSourceType === 'external' && !data.imageUrl) {
+    ctx.addIssue({ code: 'custom', path: ['imageUrl'], message: 'imageUrl is required for imageSourceType "external"' });
   }
 };
 
@@ -116,7 +113,6 @@ export const updateProductSchema = z
     imageUrl: productShape.imageUrl.unwrap().nullable(),
     imageSourceType: productShape.imageSourceType.unwrap().nullable(),
     imageAssetId: productShape.imageAssetId.unwrap().nullable(),
-    imageStorageKey: productShape.imageStorageKey.unwrap().nullable(),
     taxCode: productShape.taxCode.unwrap().nullable(),
     categories: z.array(z.string().min(1).max(100)),
     requiresShipping: z.boolean(),

@@ -18,7 +18,7 @@ const mapToProgramEntity = (doc: ProgramDocument): ProgramEntity => ({
   maxAgeYears: doc.maxAgeYears ?? undefined,
   imageUrl: doc.imageUrl ?? undefined,
   imageSourceType: doc.imageSourceType ?? undefined,
-  imageStorageKey: doc.imageStorageKey ?? undefined,
+  imageAssetId: doc.imageAssetId ?? undefined,
   banner: doc.banner
     ? { cellSize: doc.banner.cellSize, variance: doc.banner.variance, xColors: [...doc.banner.xColors], yColors: [...doc.banner.yColors] }
     : undefined,

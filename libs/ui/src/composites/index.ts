@@ -63,4 +63,8 @@ export type {
 // inithium:block:contact:exports:end
 export { Breadcrumbs } from './Breadcrumbs';
 export type { BreadcrumbsProps, BreadcrumbItem } from './Breadcrumbs';
+// inithium:block:storage:exports:start
+export { MediaField } from './MediaField';
+export type { MediaFieldProps, MediaFieldTab, MediaFieldHandle, UploadedAsset } from './MediaField';
+// inithium:block:storage:exports:end
 // inithium:anchor:exports

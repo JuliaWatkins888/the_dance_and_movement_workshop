@@ -261,6 +261,9 @@ export {
 // inithium:block:contact:composites:start
   CommunicationThread,
 // inithium:block:contact:composites:end
+// inithium:block:storage:composites:start
+  MediaField,
+// inithium:block:storage:composites:end
   // inithium:anchor:composites
 } from './composites';
 export type {
@@ -294,5 +297,11 @@ export type {
   CommunicationThreadMessage,
   CommunicationThreadAuthorRole,
 // inithium:block:contact:composite-types:end
+// inithium:block:storage:composite-types:start
+  MediaFieldProps,
+  MediaFieldTab,
+  MediaFieldHandle,
+  UploadedAsset,
+// inithium:block:storage:composite-types:end
   // inithium:anchor:composite-types
 } from './composites';

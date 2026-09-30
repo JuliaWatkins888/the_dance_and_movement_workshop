@@ -44,6 +44,9 @@ import ordersRouter from './routes/ecommerce/orders.route';
 import subscriptionsRouter from './routes/ecommerce/subscriptions.route';
 import storeRouter from './routes/ecommerce/store.route';
 // inithium:block:ecommerce:imports:end
+// inithium:block:storage:imports:start
+import storageRouter from './routes/storage.route';
+// inithium:block:storage:imports:end
 // inithium:anchor:imports
 
 export const registerCoreRoutes = (app: Express): void => {
@@ -92,6 +95,9 @@ export const registerCoreRoutes = (app: Express): void => {
   app.use(subscriptionsRouter);
   app.use(storeRouter);
 // inithium:block:ecommerce:routes:end
+// inithium:block:storage:routes:start
+  app.use(storageRouter);
+// inithium:block:storage:routes:end
   // inithium:anchor:routes
   console.log('✅ Core routes registered');
 };

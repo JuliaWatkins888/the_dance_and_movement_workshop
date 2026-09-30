@@ -94,6 +94,11 @@ import { ShippingMethodModel } from '../../schemas/shipping-method.schema';
 import { PaymentCustomerModel } from '../../schemas/payment-customer.schema';
 import { PaymentEventModel } from '../../schemas/payment-event.schema';
 // inithium:block:ecommerce:imports:end
+// inithium:block:storage:imports:start
+import { AssetRepository } from '../../contracts/asset.contract';
+import { createMongoAssetRepository } from './asset.repository';
+import { AssetModel } from '../../schemas/asset.schema';
+// inithium:block:storage:imports:end
 // inithium:anchor:imports
 
 const userRepository = createMongoUserRepository(UserModel);
@@ -138,6 +143,9 @@ const shippingMethodRepository = createMongoShippingMethodRepository(ShippingMet
 const paymentCustomerRepository = createMongoPaymentCustomerRepository(PaymentCustomerModel);
 const paymentEventRepository = createMongoPaymentEventRepository(PaymentEventModel);
 // inithium:block:ecommerce:repository-instances:end
+// inithium:block:storage:repository-instances:start
+const assetRepository = createMongoAssetRepository(AssetModel);
+// inithium:block:storage:repository-instances:end
 // inithium:anchor:repository-instances
 
 export const mongoProvider: DbProvider = {
@@ -196,5 +204,8 @@ export const mongoProvider: DbProvider = {
   getPaymentCustomerRepository: (): PaymentCustomerRepository => paymentCustomerRepository,
   getPaymentEventRepository: (): PaymentEventRepository => paymentEventRepository,
 // inithium:block:ecommerce:members:end
+// inithium:block:storage:members:start
+  getAssetRepository: (): AssetRepository => assetRepository,
+// inithium:block:storage:members:end
   // inithium:anchor:members
 };

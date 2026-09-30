@@ -41,9 +41,21 @@ const programBanner = z.object({
   yColors: z.array(hexColor).min(1).max(8),
 });
 const imageUrl = z.string().trim().url().max(2000);
-const imageSourceType = z.enum(['local', 'external']);
-// Only ever a filename this API generated (see classes.route.ts's upload handler) - never a path.
-const imageStorageKey = z.string().regex(/^[a-z0-9-]+\.[a-z]+$/i, 'Invalid storage key');
+const imageSourceType = z.enum(['cloud', 'external']);
+const imageAssetId = z.string().min(1);
+// A cloud image carries its assetId - the route derives imageUrl from the Asset row.
+const withProgramImageCheck = (
+  data: { imageSourceType?: string | null; imageAssetId?: string | null; imageUrl?: string | null; minAgeYears?: number | null; maxAgeYears?: number | null },
+  ctx: z.RefinementCtx,
+) => {
+  withAgeRangeCheck(data, ctx);
+  if (data.imageSourceType === 'cloud' && !data.imageAssetId) {
+    ctx.addIssue({ code: 'custom', path: ['imageAssetId'], message: 'imageAssetId is required for imageSourceType "cloud"' });
+  }
+  if (data.imageSourceType === 'external' && !data.imageUrl) {
+    ctx.addIssue({ code: 'custom', path: ['imageUrl'], message: 'imageUrl is required for imageSourceType "external"' });
+  }
+};
 const programSlug = z.string().trim().regex(SLUG_REGEX, 'Use lowercase letters, numbers, and single dashes');
 
 export const createProgramSchema = z
@@ -55,12 +67,12 @@ export const createProgramSchema = z
     maxAgeYears: ageYears.optional(),
     imageUrl: imageUrl.optional(),
     imageSourceType: imageSourceType.optional(),
-    imageStorageKey: imageStorageKey.optional(),
+    imageAssetId: imageAssetId.optional(),
     banner: programBanner.optional(),
     order: z.number().int().optional(),
     isPublished: z.boolean().optional(),
   })
-  .superRefine(withAgeRangeCheck);
+  .superRefine(withProgramImageCheck);
 
 export const updateProgramSchema = z
   .object({
@@ -71,12 +83,12 @@ export const updateProgramSchema = z
     maxAgeYears: ageYears.nullable().optional(),
     imageUrl: imageUrl.nullable().optional(),
     imageSourceType: imageSourceType.nullable().optional(),
-    imageStorageKey: imageStorageKey.nullable().optional(),
+    imageAssetId: imageAssetId.nullable().optional(),
     banner: programBanner.nullable().optional(),
     order: z.number().int().optional(),
     isPublished: z.boolean().optional(),
   })
-  .superRefine(withAgeRangeCheck);
+  .superRefine(withProgramImageCheck);
 
 export const createCourseSchema = z
   .object({

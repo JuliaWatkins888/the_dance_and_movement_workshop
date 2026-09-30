@@ -15,7 +15,6 @@ export interface ProductDocument extends Document {
   imageUrl?: string;
   imageSourceType?: ProductImageSourceType;
   imageAssetId?: string;
-  imageStorageKey?: string;
   basePriceCents: number;
   taxCode?: string;
   requiresShipping: boolean;
@@ -65,7 +64,6 @@ const productSchema = new Schema<ProductDocument>(
     imageUrl: { type: String, required: false },
     imageSourceType: { type: String, enum: PRODUCT_IMAGE_SOURCE_TYPES, required: false },
     imageAssetId: { type: String, required: false },
-    imageStorageKey: { type: String, required: false },
     basePriceCents: { type: Number, required: true, min: 0 },
     taxCode: { type: String, required: false },
     requiresShipping: { type: Boolean, default: false },

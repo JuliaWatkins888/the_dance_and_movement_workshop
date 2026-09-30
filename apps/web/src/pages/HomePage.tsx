@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { AmpersandText, AutoIncrementingList, Box, ColorPicker, Text } from '@inithium/ui';
-import { useAppName } from '@inithium/api-client';
-import heroImage from '../assets/hero-image.png';
+import { useAppName, usePublicImageSetting } from '@inithium/api-client';
+import defaultHeroImage from '../assets/hero-image.png';
 
 export const HomePage = () => {
   const [color, setColor] = useState('#006a8e');
   const appName = useAppName();
+  // Bundled fallback until an admin uploads one to R2 via CMS > Settings (home.heroImage).
+  const heroImage = usePublicImageSetting('home.heroImage', defaultHeroImage);
 
   return (
     <Box flex={{ direction: 'col', gap: 12 }} padding={{ base: 32 }} className="flex-1">

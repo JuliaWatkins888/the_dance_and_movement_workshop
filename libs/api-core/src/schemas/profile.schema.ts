@@ -23,20 +23,25 @@ const avatarDicebearSchema = z.object({
   options: z.record(z.string(), z.string()).optional(),
 });
 
-const avatarConfigSchema = z.object({
-  variant: z.enum(AVATAR_VARIANTS),
-  style: avatarStyleSchema,
-  dicebear: avatarDicebearSchema.optional(),
-  imageUrl: z.url().optional(),
-});
+// .strict() with no imageUrl: users can't upload or link their own avatar/banner images on this
+// site - only the generated looks - so a request carrying an imageUrl is rejected, not silently
+// stripped.
+const avatarConfigSchema = z
+  .object({
+    variant: z.enum(AVATAR_VARIANTS),
+    style: avatarStyleSchema,
+    dicebear: avatarDicebearSchema.optional(),
+  })
+  .strict();
 
-const profileBannerConfigSchema = z.object({
-  cellSize: z.number().positive(),
-  variance: z.number().min(0).max(1),
-  xColors: z.array(z.string().min(1)).min(1),
-  yColors: z.array(z.string().min(1)).min(1),
-  imageUrl: z.url().optional(),
-});
+const profileBannerConfigSchema = z
+  .object({
+    cellSize: z.number().positive(),
+    variance: z.number().min(0).max(1),
+    xColors: z.array(z.string().min(1)).min(1),
+    yColors: z.array(z.string().min(1)).min(1),
+  })
+  .strict();
 
 // Mirrors users.schema.ts's userShape minus `role`/`password` - self-service editing never
 // touches role (admin-only, see users.route.ts's self-lockout guard) or the password (handled

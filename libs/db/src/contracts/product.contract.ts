@@ -1,7 +1,7 @@
 import type { PaginatedResult } from './pagination.contract';
 import type { ClearableUpdate, ProductBilling } from './commerce.contract';
 
-export const PRODUCT_IMAGE_SOURCE_TYPES = ['local', 'cloud', 'external'] as const;
+export const PRODUCT_IMAGE_SOURCE_TYPES = ['cloud', 'external'] as const;
 export type ProductImageSourceType = (typeof PRODUCT_IMAGE_SOURCE_TYPES)[number];
 
 export type ProductSearchField = 'name' | 'slug';
@@ -33,12 +33,11 @@ export interface ProductEntity {
   slug: string;
   description?: string;
   categories: string[];
-  // Same resolved-once url + sourceType/assetId/storageKey shape as StaffEntity's photo, so the
-  // storage-aware route variant can clean up the right underlying object on delete.
+  // Same resolved-once url + sourceType/assetId shape as StaffEntity's photo, so the route can
+  // release the right R2 object when the image is replaced or the product deleted.
   imageUrl?: string;
   imageSourceType?: ProductImageSourceType;
   imageAssetId?: string;
-  imageStorageKey?: string;
   basePriceCents: number;
   // Stripe Tax product tax code (e.g. "txcd_99999999" general tangible goods). Absent falls back
   // to the tax provider's account default.
