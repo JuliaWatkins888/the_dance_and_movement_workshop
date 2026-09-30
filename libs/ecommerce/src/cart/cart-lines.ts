@@ -63,7 +63,9 @@ export interface ResolvedCartLines {
 }
 
 export const resolveCartLines = async (lines: CartLine[], ctx: PurchasableContext): Promise<ResolvedCartLines> => {
-  const resolutions = await Promise.all(lines.map((line) => resolveLine(line.id, toLineRef(line), ctx)));
+  const refs = lines.map(toLineRef);
+  const cartCtx = { ...ctx, lines: refs };
+  const resolutions = await Promise.all(lines.map((line, index) => resolveLine(line.id, refs[index] as PurchasableLineRef, cartCtx)));
   return resolutions.reduce<ResolvedCartLines>(
     (acc, resolution, index) =>
       resolution.ok

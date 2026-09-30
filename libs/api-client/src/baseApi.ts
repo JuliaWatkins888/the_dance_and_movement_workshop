@@ -73,6 +73,9 @@ export const baseApi = createApi({
     'Workshop',
     'WorkshopRegistration',
 // inithium:block:workshops:tag-types:end
+// inithium:block:events:tag-types:start
+    'Event',
+// inithium:block:events:tag-types:end
 // inithium:block:children:tag-types:start
     'Child',
 // inithium:block:children:tag-types:end

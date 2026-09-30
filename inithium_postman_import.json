@@ -102,6 +102,16 @@
 			"key": "workshopSlug",
 			"value": "contemporary-intensive",
 			"type": "string"
+		},
+		{
+			"key": "eventId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "eventSlug",
+			"value": "winter-recital-2026",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -2753,6 +2763,234 @@
 								"api",
 								"workshop-registrations",
 								"mine"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Events",
+			"item": [
+				{
+					"name": "List Events",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/events",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"events"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Event By Slug",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/events/{{eventSlug}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"{{eventSlug}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Events (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks events:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/events/admin/all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"admin",
+								"all"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks events:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Winter Recital 2026\",\n  \"slug\": \"winter-recital-2026\",\n  \"description\": \"Our dancers show off everything they learned this semester.\",\n  \"attendeeNotes\": \"Parking is in the rear lot. No flash photography during the performance.\",\n  \"date\": \"2026-12-12\",\n  \"startTime\": \"18:00\",\n  \"endTime\": \"20:00\",\n  \"doorsOpenTime\": \"17:30\",\n  \"isAtStudio\": false,\n  \"venueName\": \"Romeo High School Auditorium\",\n  \"venueAddress\": \"11091 32 Mile Rd, Romeo, MI 48065\",\n  \"ticketTypes\": [\n    {\n      \"name\": \"Adult\",\n      \"priceCents\": 1500\n    },\n    {\n      \"name\": \"Child (3-12)\",\n      \"priceCents\": 1000\n    },\n    {\n      \"name\": \"Under 3\",\n      \"priceCents\": 0\n    }\n  ],\n  \"bulkDiscount\": {\n    \"minTickets\": 4,\n    \"kind\": \"percent\",\n    \"value\": 10\n  },\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/events",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"events"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks events:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Winter Recital 2026\",\n  \"slug\": \"winter-recital-2026\",\n  \"description\": \"Our dancers show off everything they learned this semester.\",\n  \"attendeeNotes\": \"Parking is in the rear lot. No flash photography during the performance.\",\n  \"date\": \"2026-12-12\",\n  \"startTime\": \"18:00\",\n  \"endTime\": \"20:00\",\n  \"doorsOpenTime\": \"17:30\",\n  \"isAtStudio\": false,\n  \"venueName\": \"Romeo High School Auditorium\",\n  \"venueAddress\": \"11091 32 Mile Rd, Romeo, MI 48065\",\n  \"ticketTypes\": [\n    {\n      \"name\": \"Adult\",\n      \"priceCents\": 1500\n    },\n    {\n      \"name\": \"Child (3-12)\",\n      \"priceCents\": 1000\n    },\n    {\n      \"name\": \"Under 3\",\n      \"priceCents\": 0\n    }\n  ],\n  \"bulkDiscount\": {\n    \"minTickets\": 4,\n    \"kind\": \"percent\",\n    \"value\": 10\n  },\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/events/{{eventId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"{{eventId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks events:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/events/{{eventId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"{{eventId}}"
 							]
 						}
 					}

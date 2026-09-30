@@ -31,6 +31,10 @@ import orderPageSeed from './order.page-seed';
 import workshopsPageSeed from './workshops.page-seed';
 import workshopDetailPageSeed from './workshop-detail.page-seed';
 // inithium:block:workshops:imports:end
+// inithium:block:events:imports:start
+import eventsPageSeed from './events.page-seed';
+import eventDetailPageSeed from './event-detail.page-seed';
+// inithium:block:events:imports:end
 // inithium:anchor:imports
 
 // Every page the app should always have a Page DB record for, reconciled once at API startup by
@@ -76,5 +80,9 @@ export const pageSeeds: CreatePageInput[] = [
   workshopsPageSeed,
   workshopDetailPageSeed,
 // inithium:block:workshops:seeds:end
+// inithium:block:events:seeds:start
+  eventsPageSeed,
+  eventDetailPageSeed,
+// inithium:block:events:seeds:end
   // inithium:anchor:seeds
 ];

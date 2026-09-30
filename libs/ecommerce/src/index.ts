@@ -10,6 +10,7 @@ export { purchasableSources, findPurchasableSource } from './purchasables/regist
 export { PRODUCT_SOURCE_TYPE } from './purchasables/product.purchasable';
 export { CLASS_SOURCE_TYPE } from './purchasables/class.purchasable';
 export { WORKSHOP_SOURCE_TYPE } from './purchasables/workshop.purchasable';
+export { EVENT_SOURCE_TYPE } from './purchasables/event.purchasable';
 
 export { addInterval } from './pricing/billing';
 export { getStoreCurrency } from './settings';

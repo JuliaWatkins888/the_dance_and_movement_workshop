@@ -3,6 +3,7 @@ import { alert, Box, Button, dialog, Divider, IconButton, Input, Loader, Text, u
 import {
   CLASS_SOURCE_TYPE,
   WORKSHOP_SOURCE_TYPE,
+  EVENT_SOURCE_TYPE,
   describeRenewal,
   formatMoney,
   readApiError,
@@ -22,6 +23,8 @@ import { SignInPrompt } from './ecommerce/SignInPrompt';
 
 const ALERT_POSITION = 'bottom-right' as const;
 const MAX_QUANTITY = 99;
+// Lines whose source writes a useful subtitle (who's registered, which days, which date).
+const DESCRIBED_SOURCE_TYPES = [CLASS_SOURCE_TYPE, WORKSHOP_SOURCE_TYPE, EVENT_SOURCE_TYPE];
 
 interface CartLineRowProps {
   readonly line: CartLineDto;
@@ -78,7 +81,7 @@ const CartLineRow = ({ line, currency }: CartLineRowProps) => {
                 {name}
               </Text>
             )}
-            {(line.sourceType === CLASS_SOURCE_TYPE || line.sourceType === WORKSHOP_SOURCE_TYPE) && line.description ? (
+            {DESCRIBED_SOURCE_TYPES.includes(line.sourceType) && line.description ? (
               <Text as="span" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
                 {line.description}
               </Text>

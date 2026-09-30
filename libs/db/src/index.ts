@@ -54,6 +54,9 @@ import { CreateAssetInput, ListAssetsForUserOptions } from './contracts/asset.co
 // inithium:block:workshops:imports:start
 import { CreateWorkshopInput, UpdateWorkshopInput } from './contracts/workshop.contract';
 // inithium:block:workshops:imports:end
+// inithium:block:events:imports:start
+import { CreateEventInput, UpdateEventInput } from './contracts/event.contract';
+// inithium:block:events:imports:end
 // inithium:anchor:imports
 import { activeProvider as defaultProvider } from './providers/active-provider';
 
@@ -295,6 +298,16 @@ export const deleteWorkshop = (id: string) => getWorkshopRepository().delete(id)
 export const getWorkshopRegistrationRepository = () => activeProvider.getWorkshopRegistrationRepository();
 
 // inithium:block:workshops:repositories:end
+// inithium:block:events:repositories:start
+export const getEventRepository = () => activeProvider.getEventRepository();
+export const listEvents = () => getEventRepository().findAll();
+export const getEventById = (id: string) => getEventRepository().findById(id);
+export const getEventBySlug = (slug: string) => getEventRepository().findBySlug(slug);
+export const createEvent = (input: CreateEventInput) => getEventRepository().create(input);
+export const updateEvent = (id: string, input: UpdateEventInput) => getEventRepository().update(id, input);
+export const deleteEvent = (id: string) => getEventRepository().delete(id);
+
+// inithium:block:events:repositories:end
 // inithium:anchor:repositories
 
 export type { DbProvider, DbConfig } from './contracts/db-provider.contract';
@@ -610,6 +623,22 @@ export { isWorkshopRegistrationOpen, resolveWorkshopPrice, workshopEndsAt, works
 export type { WorkshopPrice } from './utils/workshop-pricing';
 export { findRegisteredWorkshopDays } from './workshop-registrations/workshop-registration.rules';
 // inithium:block:workshops:type-exports:end
+// inithium:block:events:type-exports:start
+export { EVENT_BULK_DISCOUNT_KINDS, EVENT_IMAGE_SOURCE_TYPES } from './contracts/event.contract';
+export type {
+  EventEntity,
+  EventTicketTypeEntity,
+  EventTicketTypeInput,
+  EventBulkDiscount,
+  EventBulkDiscountKind,
+  EventImageSourceType,
+  EventBannerConfig,
+  CreateEventInput,
+  UpdateEventInput,
+  EventRepository,
+} from './contracts/event.contract';
+export { eventSalesCloseAt, isBulkDiscountReached, isEventOnSale, resolveEventTicketPrice } from './utils/event-pricing';
+// inithium:block:events:type-exports:end
 // inithium:anchor:type-exports
 export { ensureSeededPages } from './page-seeds/ensureSeededPages';
 export { pruneOrphanedPluginPages } from './page-seeds/pruneOrphanedPluginPages';
