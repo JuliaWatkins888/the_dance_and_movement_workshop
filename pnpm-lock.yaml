@@ -380,6 +380,24 @@ importers:
 
   libs/ui:
     dependencies:
+      '@fullcalendar/core':
+        specifier: ~6.1.21
+        version: 6.1.21
+      '@fullcalendar/daygrid':
+        specifier: ~6.1.21
+        version: 6.1.21(@fullcalendar/core@6.1.21)
+      '@fullcalendar/interaction':
+        specifier: ~6.1.21
+        version: 6.1.21(@fullcalendar/core@6.1.21)
+      '@fullcalendar/multimonth':
+        specifier: ~6.1.21
+        version: 6.1.21(@fullcalendar/core@6.1.21)
+      '@fullcalendar/react':
+        specifier: ~6.1.21
+        version: 6.1.21(@fullcalendar/core@6.1.21)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@fullcalendar/timegrid':
+        specifier: ~6.1.21
+        version: 6.1.21(@fullcalendar/core@6.1.21)
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
