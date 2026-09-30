@@ -7,9 +7,11 @@ import {
   useCancelClassRegistrationMutation,
   useGetStoreConfigQuery,
   useListMyClassRegistrationsQuery,
+  useListMyWorkshopRegistrationsQuery,
 } from '@inithium/api-client';
-import type { ClassRegistrationDto } from '@inithium/api-client';
+import type { ClassRegistrationDto, WorkshopRegistrationDto } from '@inithium/api-client';
 import { formatDays, formatTimeRange } from '../../classes/classFormat';
+import { formatDateSpan, formatDayShort } from '../../workshops/workshopFormat';
 import type { ProfileTabDescriptor, ProfileTabProps } from './registry';
 
 const ALERT_POSITION = 'bottom-right' as const;
@@ -120,13 +122,73 @@ const RegistrationRow = ({ registration, currency }: { readonly registration: Cl
   );
 };
 
+const WORKSHOP_STATUS_LABELS: Record<WorkshopRegistrationDto['status'], string> = {
+  upcoming: 'Upcoming',
+  in_progress: 'In progress',
+  ended: 'Ended',
+};
+
+const workshopDaysSummary = (registration: WorkshopRegistrationDto): string => {
+  if (registration.days.length === 1 && registration.days[0]) {
+    const day = registration.days[0];
+    return `${formatDayShort(day.date)} · ${formatTimeRange(day.startTime, day.endTime)}`;
+  }
+  const span = formatDateSpan(registration.days);
+  return registration.isFullWorkshop ? `All ${registration.days.length} days · ${span}` : registration.days.map((day) => formatDayShort(day.date)).join(', ');
+};
+
+// Paid in full at checkout, so there's nothing to cancel here.
+const WorkshopRegistrationRow = ({ registration }: { readonly registration: WorkshopRegistrationDto }) => {
+  const title = registration.workshop?.title ?? 'Workshop';
+  return (
+    <Box flex={{ direction: 'row', align: 'start', gap: 16 }} padding={{ top: 16, bottom: 16 }} className="flex-wrap sm:flex-nowrap">
+      <Box flex={{ direction: 'col', gap: 4 }} className="min-w-0 flex-1">
+        {registration.workshop ? (
+          <Link
+            to={`/workshops/${registration.workshop.slug}`}
+            className="truncate font-semibold text-surface-950 underline-offset-4 hover:text-accent-500 hover:underline"
+          >
+            {title}
+          </Link>
+        ) : (
+          <Text as="span" textColor={{ color: 'surface', intensity: 950 }} className="font-semibold">
+            {title}
+          </Text>
+        )}
+        <Text as="span" textColor={{ color: 'surface', intensity: 800 }} className="text-sm">
+          {registration.attendee.name}
+          {registration.days.length > 0 ? ` · ${workshopDaysSummary(registration)}` : ''}
+        </Text>
+        <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
+          Workshop · paid in full
+        </Text>
+      </Box>
+      <Box flex={{ direction: 'row', align: 'center', gap: 12 }} className="shrink-0">
+        {registration.status === 'ended' ? (
+          <Pill color={{ color: 'surface', intensity: 300 }} className="text-surface-800">
+            {WORKSHOP_STATUS_LABELS.ended}
+          </Pill>
+        ) : (
+          <Pill color={{ color: 'primary', intensity: 500 }} className="text-primary-foreground-500">
+            {WORKSHOP_STATUS_LABELS[registration.status]}
+          </Pill>
+        )}
+      </Box>
+    </Box>
+  );
+};
+
+type RegistrationEntry =
+  | { readonly kind: 'class'; readonly registration: ClassRegistrationDto }
+  | { readonly kind: 'workshop'; readonly registration: WorkshopRegistrationDto };
+
 const RegistrationGroup = ({
   title,
-  registrations,
+  entries,
   currency,
 }: {
   readonly title: string;
-  readonly registrations: ClassRegistrationDto[];
+  readonly entries: RegistrationEntry[];
   readonly currency?: string;
 }) => (
   <Box flex={{ direction: 'col', gap: 4 }}>
@@ -134,21 +196,27 @@ const RegistrationGroup = ({
       {title}
     </Text>
     <Box>
-      {registrations.map((registration, index) => (
-        <Box key={registration.id}>
+      {entries.map((entry, index) => (
+        <Box key={`${entry.kind}:${entry.registration.id}`}>
           {index > 0 ? <Divider color={{ color: 'surface', intensity: 300 }} /> : null}
-          <RegistrationRow registration={registration} currency={currency} />
+          {entry.kind === 'class' ? (
+            <RegistrationRow registration={entry.registration} currency={currency} />
+          ) : (
+            <WorkshopRegistrationRow registration={entry.registration} />
+          )}
         </Box>
       ))}
     </Box>
   </Box>
 );
 
-// Every class the account's dancers are (or were) registered for. Monthly plans that are still
-// renewing can be cancelled here; semester and full-year plans are paid in full and can't be.
+// Every class and workshop the account's dancers are (or were) registered for. Monthly class plans
+// that are still renewing can be cancelled here; everything else is paid in full and can't be.
 const RegistrationsTab = (_props: ProfileTabProps) => {
-  const { data: registrations = [], isLoading } = useListMyClassRegistrationsQuery();
+  const { data: registrations = [], isLoading: isLoadingClasses } = useListMyClassRegistrationsQuery();
+  const { data: workshopRegistrations = [], isLoading: isLoadingWorkshops } = useListMyWorkshopRegistrationsQuery();
   const { data: storeConfig } = useGetStoreConfigQuery();
+  const isLoading = isLoadingClasses || isLoadingWorkshops;
 
   if (isLoading) {
     return (
@@ -158,26 +226,37 @@ const RegistrationsTab = (_props: ProfileTabProps) => {
     );
   }
 
-  if (registrations.length === 0) {
+  if (registrations.length === 0 && workshopRegistrations.length === 0) {
     return (
       <Box flex={{ direction: 'col', align: 'center', gap: 12 }} padding={{ base: 24 }}>
         <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-center">
-          You haven’t registered for any classes yet.
+          You haven’t registered for any classes or workshops yet.
         </Text>
-        <Button asChild variant={{ kind: 'outlined', color: 'primary' }}>
-          <Link to="/classes">Browse classes</Link>
-        </Button>
+        <Box flex={{ direction: 'row', gap: 8 }} className="flex-wrap justify-center">
+          <Button asChild variant={{ kind: 'outlined', color: 'primary' }}>
+            <Link to="/classes">Browse classes</Link>
+          </Button>
+          <Button asChild variant={{ kind: 'outlined', color: 'primary' }}>
+            <Link to="/workshops">Browse workshops</Link>
+          </Button>
+        </Box>
       </Box>
     );
   }
 
-  const current = registrations.filter(isCurrent);
-  const past = registrations.filter((registration) => !isCurrent(registration));
+  const entries: RegistrationEntry[] = [
+    ...registrations.map((registration): RegistrationEntry => ({ kind: 'class', registration })),
+    ...workshopRegistrations.map((registration): RegistrationEntry => ({ kind: 'workshop', registration })),
+  ];
+  const isCurrentEntry = (entry: RegistrationEntry): boolean =>
+    entry.kind === 'class' ? isCurrent(entry.registration) : entry.registration.status !== 'ended';
+  const current = entries.filter(isCurrentEntry);
+  const past = entries.filter((entry) => !isCurrentEntry(entry));
 
   return (
     <Box flex={{ direction: 'col', gap: 24 }}>
-      {current.length > 0 ? <RegistrationGroup title="Current" registrations={current} currency={storeConfig?.currency} /> : null}
-      {past.length > 0 ? <RegistrationGroup title="Past" registrations={past} currency={storeConfig?.currency} /> : null}
+      {current.length > 0 ? <RegistrationGroup title="Current" entries={current} currency={storeConfig?.currency} /> : null}
+      {past.length > 0 ? <RegistrationGroup title="Past" entries={past} currency={storeConfig?.currency} /> : null}
     </Box>
   );
 };

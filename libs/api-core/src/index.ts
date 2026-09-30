@@ -30,6 +30,10 @@ import policyRouter from './routes/policy.route';
 // inithium:block:classes:imports:start
 import classesRouter from './routes/classes.route';
 import classRegistrationsRouter from './routes/class-registrations.route';
+// inithium:block:workshops:imports:start
+import workshopsRouter from './routes/workshops.route';
+import workshopRegistrationsRouter from './routes/workshop-registrations.route';
+// inithium:block:workshops:imports:end
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import childrenRouter from './routes/children.route';
@@ -82,6 +86,10 @@ export const registerCoreRoutes = (app: Express): void => {
   app.use(classesRouter);
   app.use(classRegistrationsRouter);
 // inithium:block:classes:routes:end
+// inithium:block:workshops:routes:start
+  app.use(workshopsRouter);
+  app.use(workshopRegistrationsRouter);
+// inithium:block:workshops:routes:end
 // inithium:block:children:routes:start
   app.use(childrenRouter);
 // inithium:block:children:routes:end

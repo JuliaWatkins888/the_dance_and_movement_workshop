@@ -92,6 +92,16 @@
 		{
 			"key": "assetId",
 			"value": ""
+		},
+		{
+			"key": "workshopId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "workshopSlug",
+			"value": "contemporary-intensive",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -2363,6 +2373,386 @@
 								"mine",
 								"{{registrationId}}",
 								"cancel"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Workshops",
+			"item": [
+				{
+					"name": "List Workshops",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/workshops",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"workshops"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Workshop By Slug",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/workshops/{{workshopSlug}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"workshops",
+								"{{workshopSlug}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Workshops (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks workshops:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/workshops/admin/all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"workshops",
+								"admin",
+								"all"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Workshop Staff (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks workshops:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/workshops/admin/staff",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"workshops",
+								"admin",
+								"staff"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Workshop Registrations (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks workshops:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/workshops/admin/{{workshopId}}/registrations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"workshops",
+								"admin",
+								"{{workshopId}}",
+								"registrations"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Workshop",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks workshops:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Contemporary Intensive\",\n  \"slug\": \"contemporary-intensive\",\n  \"description\": \"A three-day contemporary intensive with a visiting guest artist.\",\n  \"dressCode\": \"Fitted clothing. Bare feet or socks.\",\n  \"styles\": [\n    \"Contemporary\"\n  ],\n  \"level\": \"intermediate\",\n  \"minAgeYears\": 11,\n  \"maxAgeYears\": 18,\n  \"instructors\": [\n    {\n      \"type\": \"guest\",\n      \"name\": \"Jada Reyes\",\n      \"bio\": \"Touring contemporary artist and choreographer.\"\n    }\n  ],\n  \"days\": [\n    {\n      \"date\": \"2026-11-13\",\n      \"startTime\": \"17:00\",\n      \"endTime\": \"20:00\",\n      \"agenda\": \"Warm-up, floorwork, and improvisation\",\n      \"capacity\": 20\n    },\n    {\n      \"date\": \"2026-11-14\",\n      \"startTime\": \"10:00\",\n      \"endTime\": \"14:00\",\n      \"agenda\": \"Technique and combination\",\n      \"capacity\": 20\n    },\n    {\n      \"date\": \"2026-11-15\",\n      \"startTime\": \"10:00\",\n      \"endTime\": \"14:00\",\n      \"agenda\": \"Choreography and showing\",\n      \"capacity\": 20\n    }\n  ],\n  \"pricePerDayCents\": 5000,\n  \"fullWorkshopDiscountPercent\": 15,\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/workshops",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"workshops"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Workshop",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks workshops:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Contemporary Intensive\",\n  \"slug\": \"contemporary-intensive\",\n  \"description\": \"A three-day contemporary intensive with a visiting guest artist.\",\n  \"dressCode\": \"Fitted clothing. Bare feet or socks.\",\n  \"styles\": [\n    \"Contemporary\"\n  ],\n  \"level\": \"intermediate\",\n  \"minAgeYears\": 11,\n  \"maxAgeYears\": 18,\n  \"instructors\": [\n    {\n      \"type\": \"guest\",\n      \"name\": \"Jada Reyes\",\n      \"bio\": \"Touring contemporary artist and choreographer.\"\n    }\n  ],\n  \"days\": [\n    {\n      \"date\": \"2026-11-13\",\n      \"startTime\": \"17:00\",\n      \"endTime\": \"20:00\",\n      \"agenda\": \"Warm-up, floorwork, and improvisation\",\n      \"capacity\": 20\n    },\n    {\n      \"date\": \"2026-11-14\",\n      \"startTime\": \"10:00\",\n      \"endTime\": \"14:00\",\n      \"agenda\": \"Technique and combination\",\n      \"capacity\": 20\n    },\n    {\n      \"date\": \"2026-11-15\",\n      \"startTime\": \"10:00\",\n      \"endTime\": \"14:00\",\n      \"agenda\": \"Choreography and showing\",\n      \"capacity\": 20\n    }\n  ],\n  \"pricePerDayCents\": 5000,\n  \"fullWorkshopDiscountPercent\": 15,\n  \"isPublished\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/workshops/{{workshopId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"workshops",
+								"{{workshopId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Workshop",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks workshops:manage capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/workshops/{{workshopId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"workshops",
+								"{{workshopId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Workshop Registrations",
+			"item": [
+				{
+					"name": "List Eligible Workshop Attendees",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/workshop-registrations/attendees?workshopId={{workshopId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"workshop-registrations",
+								"attendees"
+							],
+							"query": [
+								{
+									"key": "workshopId",
+									"value": "{{workshopId}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List My Workshop Registrations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/workshop-registrations/mine",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"workshop-registrations",
+								"mine"
 							]
 						}
 					}

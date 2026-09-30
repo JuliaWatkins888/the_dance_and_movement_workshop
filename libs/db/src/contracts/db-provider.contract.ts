@@ -43,6 +43,10 @@ import { PaymentEventRepository } from './payment-event.contract';
 // inithium:block:storage:imports:start
 import { AssetRepository } from './asset.contract';
 // inithium:block:storage:imports:end
+// inithium:block:workshops:imports:start
+import { WorkshopRepository } from './workshop.contract';
+import { WorkshopRegistrationRepository } from './workshop-registration.contract';
+// inithium:block:workshops:imports:end
 // inithium:anchor:imports
 
 export interface DbConfig {
@@ -100,5 +104,9 @@ export interface DbProvider {
 // inithium:block:storage:members:start
   getAssetRepository: () => AssetRepository;
 // inithium:block:storage:members:end
+// inithium:block:workshops:members:start
+  getWorkshopRepository: () => WorkshopRepository;
+  getWorkshopRegistrationRepository: () => WorkshopRegistrationRepository;
+// inithium:block:workshops:members:end
   // inithium:anchor:members
 }

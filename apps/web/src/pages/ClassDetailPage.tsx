@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { alert, Box, Breadcrumbs, Button, Divider, Loader, Pill, Text, useNavigateWithTransition } from '@inithium/ui';
 import {
@@ -10,9 +9,10 @@ import {
   useGetClassCourseBySlugQuery,
   useListEligibleAttendeesQuery,
 } from '@inithium/api-client';
-import type { CatalogCourseDetailDto, CatalogSectionDto, ClassAttendeeDto, ClassPlanOptionDto } from '@inithium/api-client';
+import type { CatalogCourseDetailDto, CatalogSectionDto, ClassPlanOptionDto } from '@inithium/api-client';
 import { useCurrentUser } from '../app/useCurrentUser';
 import { loginPathFor } from './ecommerce/SignInPrompt';
+import { AttendeeChoices, ChoiceCard, DetailBlock, attendeeKeyOf } from './classes/registrationChoices';
 import {
   LEVEL_LABELS,
   formatAgeRange,
@@ -34,8 +34,6 @@ const ALERT_POSITION = 'bottom-right' as const;
 
 const planKey = (plan: ClassPlanOptionDto): string => `${plan.kind}:${plan.semesterId ?? ''}`;
 
-const attendeeKeyOf = (attendee: ClassAttendeeDto): string => (attendee.type === 'self' ? 'self' : attendee.childId);
-
 const registrationOpensLater = (section: CatalogSectionDto, now: Date): string | undefined => {
   const opensAt = section.schoolYear.registrationOpensAt;
   return opensAt && new Date(opensAt) > now ? opensAt : undefined;
@@ -50,38 +48,6 @@ const requestSpotPath = (course: CatalogCourseDetailDto, section: CatalogSection
   });
   return `/contact?${params}`;
 };
-
-interface ChoiceCardProps {
-  readonly name: string;
-  readonly value: string;
-  readonly checked: boolean;
-  readonly disabled?: boolean;
-  readonly onSelect: (value: string) => void;
-  readonly children: ReactNode;
-}
-
-// A native radio styled as a selectable card, so keyboard and screen-reader behavior come for
-// free while the whole card stays the click target.
-const ChoiceCard = ({ name, value, checked, disabled, onSelect, children }: ChoiceCardProps) => (
-  <label
-    className={[
-      'flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary-500',
-      checked ? 'border-primary-500 bg-primary-500/10' : 'border-surface-300 hover:border-surface-500',
-      disabled ? 'cursor-not-allowed opacity-60' : '',
-    ].join(' ')}
-  >
-    <input
-      type="radio"
-      name={name}
-      value={value}
-      checked={checked}
-      disabled={disabled}
-      onChange={() => onSelect(value)}
-      className="mt-1 accent-primary-500"
-    />
-    <span className="flex min-w-0 flex-1 flex-col gap-1">{children}</span>
-  </label>
-);
 
 const SectionChoice = ({ section }: { section: CatalogSectionDto }) => (
   <>
@@ -125,15 +91,6 @@ const PlanChoice = ({ plan }: { plan: ClassPlanOptionDto }) => (
       {planDetail(plan)}
     </Text>
   </>
-);
-
-const DetailBlock = ({ title, children }: { title: string; children: ReactNode }) => (
-  <Box flex={{ direction: 'col', gap: 6 }}>
-    <Text as="h2" textColor={{ color: 'surface', intensity: 950 }} className="text-lg font-semibold">
-      {title}
-    </Text>
-    {children}
-  </Box>
 );
 
 export const ClassDetailPage = () => {
@@ -292,28 +249,7 @@ export const ClassDetailPage = () => {
         </Box>
       );
     }
-    return (
-      <div role="radiogroup" aria-label="Dancer" className="flex flex-col gap-2">
-        {attendees.map((attendee) => (
-          <ChoiceCard
-            key={attendeeKeyOf(attendee)}
-            name="attendee"
-            value={attendeeKeyOf(attendee)}
-            checked={attendeeKeyOf(attendee) === selectedAttendeeKey}
-            onSelect={setSelectedAttendeeKey}
-          >
-            <Text as="span" textColor={{ color: 'surface', intensity: 950 }} className="font-semibold">
-              {attendee.name}
-            </Text>
-            {attendee.type === 'self' ? (
-              <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
-                You
-              </Text>
-            ) : null}
-          </ChoiceCard>
-        ))}
-      </div>
-    );
+    return <AttendeeChoices attendees={attendees} selectedKey={selectedAttendeeKey} onSelect={setSelectedAttendeeKey} />;
   };
 
   return (

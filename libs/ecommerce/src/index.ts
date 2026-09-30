@@ -9,6 +9,7 @@ export type {
 export { purchasableSources, findPurchasableSource } from './purchasables/registry';
 export { PRODUCT_SOURCE_TYPE } from './purchasables/product.purchasable';
 export { CLASS_SOURCE_TYPE } from './purchasables/class.purchasable';
+export { WORKSHOP_SOURCE_TYPE } from './purchasables/workshop.purchasable';
 
 export { addInterval } from './pricing/billing';
 export { getStoreCurrency } from './settings';

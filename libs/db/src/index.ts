@@ -51,6 +51,9 @@ import { CreateChildInput, FindManyChildrenOptions, UpdateChildInput } from './c
 // inithium:block:storage:imports:start
 import { CreateAssetInput, ListAssetsForUserOptions } from './contracts/asset.contract';
 // inithium:block:storage:imports:end
+// inithium:block:workshops:imports:start
+import { CreateWorkshopInput, UpdateWorkshopInput } from './contracts/workshop.contract';
+// inithium:block:workshops:imports:end
 // inithium:anchor:imports
 import { activeProvider as defaultProvider } from './providers/active-provider';
 
@@ -280,6 +283,18 @@ export const listAssetsForUser = (userId: string, options?: ListAssetsForUserOpt
   getAssetRepository().listForUser(userId, options);
 
 // inithium:block:storage:repositories:end
+// inithium:block:workshops:repositories:start
+export const getWorkshopRepository = () => activeProvider.getWorkshopRepository();
+export const listWorkshops = () => getWorkshopRepository().findAll();
+export const getWorkshopById = (id: string) => getWorkshopRepository().findById(id);
+export const getWorkshopBySlug = (slug: string) => getWorkshopRepository().findBySlug(slug);
+export const createWorkshop = (input: CreateWorkshopInput) => getWorkshopRepository().create(input);
+export const updateWorkshop = (id: string, input: UpdateWorkshopInput) => getWorkshopRepository().update(id, input);
+export const deleteWorkshop = (id: string) => getWorkshopRepository().delete(id);
+
+export const getWorkshopRegistrationRepository = () => activeProvider.getWorkshopRegistrationRepository();
+
+// inithium:block:workshops:repositories:end
 // inithium:anchor:repositories
 
 export type { DbProvider, DbConfig } from './contracts/db-provider.contract';
@@ -573,6 +588,28 @@ export type { PaymentEventEntity, PaymentEventRepository } from './contracts/pay
 // inithium:block:storage:type-exports:start
 export type { AssetEntity, CreateAssetInput, AssetRepository, ListAssetsForUserOptions } from './contracts/asset.contract';
 // inithium:block:storage:type-exports:end
+// inithium:block:workshops:type-exports:start
+export { WORKSHOP_IMAGE_SOURCE_TYPES } from './contracts/workshop.contract';
+export type {
+  WorkshopEntity,
+  WorkshopDayEntity,
+  WorkshopDayInput,
+  WorkshopInstructor,
+  WorkshopImageSourceType,
+  WorkshopBannerConfig,
+  CreateWorkshopInput,
+  UpdateWorkshopInput,
+  WorkshopRepository,
+} from './contracts/workshop.contract';
+export type {
+  WorkshopRegistrationEntity,
+  CreateWorkshopRegistrationInput,
+  WorkshopRegistrationRepository,
+} from './contracts/workshop-registration.contract';
+export { isWorkshopRegistrationOpen, resolveWorkshopPrice, workshopEndsAt, workshopRegistrationClosesAt } from './utils/workshop-pricing';
+export type { WorkshopPrice } from './utils/workshop-pricing';
+export { findRegisteredWorkshopDays } from './workshop-registrations/workshop-registration.rules';
+// inithium:block:workshops:type-exports:end
 // inithium:anchor:type-exports
 export { ensureSeededPages } from './page-seeds/ensureSeededPages';
 export { pruneOrphanedPluginPages } from './page-seeds/pruneOrphanedPluginPages';

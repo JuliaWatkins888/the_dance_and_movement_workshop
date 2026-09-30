@@ -15,8 +15,8 @@ export const useSessionUploads = () => {
 
   // Best-effort: a failed discard only leaves an orphan behind, never breaks the edit itself.
   const discardUnsaved = useCallback(
-    (savedAssetId?: string) => {
-      const unsaved = uploadedIds.current.filter((id) => id !== savedAssetId);
+    (...savedAssetIds: (string | undefined)[]) => {
+      const unsaved = uploadedIds.current.filter((id) => !savedAssetIds.includes(id));
       uploadedIds.current = [];
       unsaved.forEach((id) => void deleteAsset(id).unwrap().catch(() => undefined));
     },

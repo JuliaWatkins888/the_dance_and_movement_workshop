@@ -26,29 +26,32 @@ export const describeAttendee = async (userId: string, userName: string, ref: At
   return { type: 'child', childId: child.id, name: [child.firstName, child.lastName].filter(Boolean).join(' ') };
 };
 
-// Checks the attendee belongs to the account and is eligible for the course today.
+// Checks the attendee belongs to the account and is eligible for the course (or workshop - any
+// age range works) today. `offering` only words the rejection reason.
 export const resolveEligibleAttendee = async (
   userId: string,
   userName: string,
   ref: AttendeeRef,
   course: Pick<CourseEntity, 'minAgeYears' | 'maxAgeYears'>,
   now: Date,
+  offering = 'class',
 ): Promise<AttendeeResolution> => {
   if (ref.type === 'self') {
     return isSelfEnrollable(course)
       ? { ok: true, attendee: { type: 'self', name: userName } }
-      : { ok: false, reason: 'This class is for children - choose one of your child profiles.' };
+      : { ok: false, reason: `This ${offering} is for children - choose one of your child profiles.` };
   }
   const child = await getChildRepository().findById(ref.childId);
   if (!child || child.parentUserId !== userId) return { ok: false, reason: 'Choose one of your own child profiles.' };
   const name = [child.firstName, child.lastName].filter(Boolean).join(' ');
   if (!isAgeEligible(child.birthDate, now, course)) {
-    return { ok: false, reason: `${child.firstName} isn’t in this class’s age range.` };
+    return { ok: false, reason: `${child.firstName} isn’t in this ${offering}’s age range.` };
   }
   return { ok: true, attendee: { type: 'child', childId: child.id, name } };
 };
 
-// Every attendee on the account who may take the course today - the options the class page offers.
+// Every attendee on the account who may take the course (or workshop) today - the options its
+// page offers.
 export const listEligibleAttendees = async (
   userId: string,
   userName: string,
