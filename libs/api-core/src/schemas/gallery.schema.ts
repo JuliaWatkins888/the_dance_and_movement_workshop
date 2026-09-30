@@ -1,30 +1,21 @@
 import { z } from 'zod';
 import { GALLERY_IMAGE_SOURCE_TYPES } from '@inithium/db';
 
-// Cross-field: which of assetId/storageKey is required depends on sourceType, the same
-// discriminated-shape validation settings.schema.ts's upsertSettingSchema already does for
-// type/value - superRefine (not a z.discriminatedUnion) because every other field on the object
-// is shared and optional regardless of sourceType, so a union would just duplicate the shape
-// three times for no benefit.
+// Cross-field: a cloud image must carry its assetId (the route derives the public url from it),
+// an external one its url - superRefine (not a z.discriminatedUnion) because every other field on
+// the object is shared and optional regardless of sourceType.
 //
 // ctx is typed structurally (just the one method actually used) rather than importing zod's own
-// refinement-context type by name - that name has changed across zod's own versions/subpaths
-// (v3 exported it as RefinementCtx; this workspace's installed v4 exports it from a different
-// subpath as $RefinementCtx), so pinning to whichever one happens to be installed is more fragile
-// than describing the shape this function actually depends on.
+// refinement-context type by name - that name has changed across zod's own versions/subpaths.
 const requireSourceFields = (
-  data: { sourceType?: string; url?: string; assetId?: string; storageKey?: string },
+  data: { sourceType?: string; url?: string; assetId?: string },
   ctx: { addIssue: (issue: { code: 'custom'; path: (string | number)[]; message: string }) => void },
 ) => {
-  if (!data.sourceType) return;
-  if (!data.url) {
-    ctx.addIssue({ code: 'custom', path: ['url'], message: 'url is required when sourceType is set' });
-  }
   if (data.sourceType === 'cloud' && !data.assetId) {
     ctx.addIssue({ code: 'custom', path: ['assetId'], message: 'assetId is required for sourceType "cloud"' });
   }
-  if (data.sourceType === 'local' && !data.storageKey) {
-    ctx.addIssue({ code: 'custom', path: ['storageKey'], message: 'storageKey is required for sourceType "local"' });
+  if (data.sourceType === 'external' && !data.url) {
+    ctx.addIssue({ code: 'custom', path: ['url'], message: 'url is required for sourceType "external"' });
   }
 };
 
@@ -37,7 +28,6 @@ const galleryImageShape = {
   sourceType: z.enum(GALLERY_IMAGE_SOURCE_TYPES).optional(),
   url: z.string().min(1).optional(),
   assetId: z.string().min(1).optional(),
-  storageKey: z.string().min(1).optional(),
 };
 
 export const createGalleryImageSchema = z

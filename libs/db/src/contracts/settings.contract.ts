@@ -1,5 +1,12 @@
-export const SETTING_TYPES = ['string', 'boolean', 'number', 'date', 'stringList', 'json', 'color'] as const;
+export const SETTING_TYPES = ['string', 'boolean', 'number', 'date', 'stringList', 'json', 'color', 'image'] as const;
 export type SettingType = (typeof SETTING_TYPES)[number];
+
+// An empty url means "no image saved" - consumers fall back to their own bundled default. assetId
+// is set for R2 uploads so the previous object can be released when the image is replaced.
+export interface SettingImageValue {
+  url: string;
+  assetId?: string;
+}
 
 interface SettingBase {
   id: string;
@@ -17,7 +24,8 @@ export type SettingEntity =
   | (SettingBase & { type: 'date'; value: string })
   | (SettingBase & { type: 'stringList'; value: string[] })
   | (SettingBase & { type: 'json'; value: Record<string, unknown> })
-  | (SettingBase & { type: 'color'; value: string });
+  | (SettingBase & { type: 'color'; value: string })
+  | (SettingBase & { type: 'image'; value: SettingImageValue });
 
 export type UpsertSettingInput =
   | { key: string; type: 'string'; value: string }
@@ -26,7 +34,8 @@ export type UpsertSettingInput =
   | { key: string; type: 'date'; value: string }
   | { key: string; type: 'stringList'; value: string[] }
   | { key: string; type: 'json'; value: Record<string, unknown> }
-  | { key: string; type: 'color'; value: string };
+  | { key: string; type: 'color'; value: string }
+  | { key: string; type: 'image'; value: SettingImageValue };
 
 export interface SettingsRepository {
   findAll: () => Promise<SettingEntity[]>;

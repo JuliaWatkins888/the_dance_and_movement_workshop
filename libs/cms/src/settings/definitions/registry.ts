@@ -1,3 +1,5 @@
+import type { SettingImageValue } from '@inithium/api-client';
+
 export interface SettingDefinitionBase {
   key: string;
   label: string;
@@ -15,7 +17,9 @@ export type SettingDefinition =
   | (SettingDefinitionBase & { type: 'date'; default: string })
   | (SettingDefinitionBase & { type: 'stringList'; default: string[] })
   | (SettingDefinitionBase & { type: 'json'; default: Record<string, unknown> })
-  | (SettingDefinitionBase & { type: 'color'; default: string });
+  | (SettingDefinitionBase & { type: 'color'; default: string })
+  // Always defaults to { url: '' } - the consumer (Navbar logo, home hero) owns its bundled fallback.
+  | (SettingDefinitionBase & { type: 'image'; default: SettingImageValue });
 
 // Every plugin that wants to push a new setting (a future blog plugin's "allow comments"
 // toggle, etc.) drops its own uniquely-named *.setting.ts file here, default-exporting a

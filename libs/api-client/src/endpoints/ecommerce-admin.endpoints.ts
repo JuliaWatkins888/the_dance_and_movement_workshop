@@ -60,7 +60,6 @@ export interface PersonDto {
 export interface AdminProductDto extends ProductDto {
   imageSourceType?: ProductImageSourceType;
   imageAssetId?: string;
-  imageStorageKey?: string;
   taxCode?: string;
 }
 
@@ -82,7 +81,6 @@ export interface ProductWriteInput {
   imageUrl?: string;
   imageSourceType?: ProductImageSourceType;
   imageAssetId?: string;
-  imageStorageKey?: string;
   basePriceCents: number;
   taxCode?: string;
   requiresShipping: boolean;
@@ -248,14 +246,6 @@ export const ecommerceAdminApi = baseApi.injectEndpoints({
       query: (id) => ({ url: `/api/products/${id}`, method: 'DELETE' }),
       invalidatesTags: ['Product', 'Cart'],
     }),
-    uploadProductImageLocal: builder.mutation<{ url: string; storageKey: string }, { file: File }>({
-      query: ({ file }) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        return { url: '/api/products/upload', method: 'POST', body: formData };
-      },
-      transformResponse: unwrap<{ url: string; storageKey: string }>,
-    }),
 
     listDiscounts: builder.query<PaginatedList<DiscountDto>, { page: number; pageSize: number; search?: string }>({
       query: ({ page, pageSize, search }) => withQuery('/api/discounts', { page, pageSize, search }),
@@ -360,7 +350,6 @@ export const {
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
-  useUploadProductImageLocalMutation,
   useListDiscountsQuery,
   useListDiscountSourceTypesQuery,
   useCreateDiscountMutation,

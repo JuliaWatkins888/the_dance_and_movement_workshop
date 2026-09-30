@@ -70,12 +70,14 @@ export {
   useIsProfileEnabled,
   useIsDarkModeFeatureEnabled,
   useCustomBrandColors,
+  usePublicImageSetting,
   SETTING_TYPES,
 } from './endpoints/settings.endpoints';
 export type {
   SettingType,
   SettingEntity,
   UpsertSettingInput,
+  SettingImageValue,
   CustomBrandColorSettings,
 } from './endpoints/settings.endpoints';
 
@@ -94,7 +96,6 @@ export {
   galleryApi,
   useListPublishedGalleryImagesQuery,
   useListGalleryImagesAdminQuery,
-  useUploadGalleryImageLocalMutation,
   useCreateGalleryImageMutation,
   useUpdateGalleryImageMutation,
   useDeleteGalleryImageMutation,
@@ -106,7 +107,6 @@ export type {
   ListGalleryImagesResult,
   GalleryImageWriteInput,
   UpdateGalleryImageInput,
-  UploadGalleryImageLocalResult,
 } from './endpoints/gallery.endpoints';
 
 // inithium:block:gallery:exports:end
@@ -138,7 +138,6 @@ export {
   useListPublicStaffQuery,
   useListStaffAdminQuery,
   useListStaffUserCandidatesQuery,
-  useUploadStaffPhotoLocalMutation,
   useCreateStaffMemberMutation,
   useUpdateStaffMemberMutation,
   useDeleteStaffMemberMutation,
@@ -151,7 +150,6 @@ export type {
   ListStaffResult,
   StaffWriteInput,
   UpdateStaffInput,
-  UploadStaffPhotoLocalResult,
 } from './endpoints/staff.endpoints';
 
 // inithium:block:staff:exports:end
@@ -240,7 +238,6 @@ export {
   useCreateProgramMutation,
   useUpdateProgramMutation,
   useDeleteProgramMutation,
-  useUploadClassImageMutation,
   useCreateCourseMutation,
   useUpdateCourseMutation,
   useDeleteCourseMutation,
@@ -389,7 +386,6 @@ export {
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
-  useUploadProductImageLocalMutation,
   useListDiscountsQuery,
   useListDiscountSourceTypesQuery,
   useCreateDiscountMutation,
@@ -435,4 +431,9 @@ export { downloadOrdersCsv } from './ecommerce/downloadOrdersCsv';
 export type { DownloadOrdersCsvParams } from './ecommerce/downloadOrdersCsv';
 
 // inithium:block:ecommerce:exports:end
+// inithium:block:storage:exports:start
+export { storageApi, useUploadAssetMutation, useDeleteAssetMutation } from './endpoints/storage.endpoints';
+export type { UploadAssetResult, UploadAssetInput, UploadPurpose } from './endpoints/storage.endpoints';
+
+// inithium:block:storage:exports:end
 // inithium:anchor:exports

@@ -26,7 +26,6 @@ const mapToProductEntity = (doc: ProductDocument): ProductEntity => {
     imageUrl: plain.imageUrl,
     imageSourceType: plain.imageSourceType,
     imageAssetId: plain.imageAssetId,
-    imageStorageKey: plain.imageStorageKey,
     basePriceCents: plain.basePriceCents,
     taxCode: plain.taxCode,
     requiresShipping: plain.requiresShipping,

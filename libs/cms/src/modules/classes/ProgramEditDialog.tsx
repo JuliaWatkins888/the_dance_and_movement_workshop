@@ -1,12 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Banner, BannerEditDialog, Box, Button, Input, Switch, Text, Textarea, generateSeededBannerConfig, useElementSize } from '@inithium/ui';
 import type { BannerTrianglifyConfig } from '@inithium/ui';
 import { readApiError, useCreateProgramMutation, useUpdateProgramMutation } from '@inithium/api-client';
 import type { ProgramBannerDto, ProgramDto } from '@inithium/api-client';
+import { useSessionUploads } from '../../media/useSessionUploads';
 import { FormError } from '../ecommerce/shared';
 import { parseOptionalNumber, slugify } from './classAdmin.shared';
 import { ProgramImageField } from './ProgramImageField';
-import type { ProgramImageValue } from './ProgramImageField';
+import type { ProgramImageFieldHandle, ProgramImageValue } from './ProgramImageField';
 
 const PREVIEW_HEIGHT = 140;
 
@@ -42,8 +43,10 @@ export const ProgramEditDialog = ({ program, onDone }: ProgramEditDialogProps) =
   const [image, setImage] = useState<ProgramImageValue>({
     ...(program?.imageUrl ? { imageUrl: program.imageUrl } : {}),
     ...(program?.imageSourceType ? { imageSourceType: program.imageSourceType } : {}),
-    ...(program?.imageStorageKey ? { imageStorageKey: program.imageStorageKey } : {}),
+    ...(program?.imageAssetId ? { imageAssetId: program.imageAssetId } : {}),
   });
+  const imageFieldRef = useRef<ProgramImageFieldHandle>(null);
+  const sessionUploads = useSessionUploads();
   // An existing program without a saved mesh keeps its id-derived default (matching the public
   // site); a new one has no id yet, so it gets a concrete mesh up front that's saved with it.
   const [banner, setBanner] = useState<ProgramBannerDto | undefined>(program ? program.banner : randomBanner);
@@ -72,6 +75,8 @@ export const ProgramEditDialog = ({ program, onDone }: ProgramEditDialogProps) =
     }
 
     try {
+      const finalImage = (await imageFieldRef.current?.finalize()) ?? image;
+      if (finalImage.imageAssetId && finalImage.imageAssetId !== program?.imageAssetId) sessionUploads.track(finalImage.imageAssetId);
       if (program) {
         await updateProgram({
           id: program.id,
@@ -80,9 +85,9 @@ export const ProgramEditDialog = ({ program, onDone }: ProgramEditDialogProps) =
           description: description.trim() || null,
           minAgeYears: minAgeYears ?? null,
           maxAgeYears: maxAgeYears ?? null,
-          imageUrl: image.imageUrl ?? null,
-          imageSourceType: image.imageSourceType ?? null,
-          imageStorageKey: image.imageStorageKey ?? null,
+          imageUrl: finalImage.imageUrl ?? null,
+          imageSourceType: finalImage.imageSourceType ?? null,
+          imageAssetId: finalImage.imageAssetId ?? null,
           ...(banner ? { banner } : {}),
           isPublished,
         }).unwrap();
@@ -93,11 +98,12 @@ export const ProgramEditDialog = ({ program, onDone }: ProgramEditDialogProps) =
           ...(description.trim() ? { description: description.trim() } : {}),
           ...(minAgeYears !== undefined ? { minAgeYears } : {}),
           ...(maxAgeYears !== undefined ? { maxAgeYears } : {}),
-          ...image,
+          ...finalImage,
           ...(banner ? { banner } : {}),
           isPublished,
         }).unwrap();
       }
+      sessionUploads.discardUnsaved(finalImage.imageAssetId);
       onDone();
     } catch (saveError) {
       setError(readApiError(saveError, 'Could not save this program.').message);
@@ -165,7 +171,7 @@ export const ProgramEditDialog = ({ program, onDone }: ProgramEditDialogProps) =
         </div>
       </Box>
 
-      <ProgramImageField value={image} onChange={setImage} />
+      <ProgramImageField ref={imageFieldRef} value={image} onChange={setImage} />
 
       <Box flex={{ direction: 'col', gap: 8 }}>
         <Text as="span" textColor={{ color: 'surface', intensity: 900 }} className="text-sm font-medium">
@@ -187,7 +193,14 @@ export const ProgramEditDialog = ({ program, onDone }: ProgramEditDialogProps) =
       <Switch label="Published (visible on the public Classes page)" checked={isPublished} onCheckedChange={setIsPublished} />
       <FormError message={error} />
       <Box flex={{ direction: 'row', gap: 8, justify: 'end' }}>
-        <Button variant={{ kind: 'ghost', color: 'surface' }} onClick={onDone} disabled={isSaving}>
+        <Button
+          variant={{ kind: 'ghost', color: 'surface' }}
+          onClick={() => {
+            sessionUploads.discardUnsaved();
+            onDone();
+          }}
+          disabled={isSaving}
+        >
           Cancel
         </Button>
         <Button variant={{ kind: 'filled', color: 'primary' }} onClick={handleSubmit} disabled={isSaving}>

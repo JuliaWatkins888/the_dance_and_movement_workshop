@@ -40,6 +40,9 @@ import { ShippingMethodRepository } from './shipping-method.contract';
 import { PaymentCustomerRepository } from './payment-customer.contract';
 import { PaymentEventRepository } from './payment-event.contract';
 // inithium:block:ecommerce:imports:end
+// inithium:block:storage:imports:start
+import { AssetRepository } from './asset.contract';
+// inithium:block:storage:imports:end
 // inithium:anchor:imports
 
 export interface DbConfig {
@@ -94,5 +97,8 @@ export interface DbProvider {
   getPaymentCustomerRepository: () => PaymentCustomerRepository;
   getPaymentEventRepository: () => PaymentEventRepository;
 // inithium:block:ecommerce:members:end
+// inithium:block:storage:members:start
+  getAssetRepository: () => AssetRepository;
+// inithium:block:storage:members:end
   // inithium:anchor:members
 }

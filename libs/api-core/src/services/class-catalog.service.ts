@@ -82,7 +82,7 @@ export type CatalogCourseDto = Omit<CourseEntity, 'isPublished' | 'createdAt' | 
 
 export type PublicProgramDto = Omit<
   ProgramEntity,
-  'isPublished' | 'createdAt' | 'updatedAt' | 'order' | 'imageSourceType' | 'imageStorageKey'
+  'isPublished' | 'createdAt' | 'updatedAt' | 'order' | 'imageSourceType' | 'imageAssetId'
 >;
 
 export type CatalogProgramDto = PublicProgramDto & {
@@ -96,7 +96,7 @@ const toPublicProgram = (program: ProgramEntity): PublicProgramDto => {
     updatedAt: _updatedAt,
     order: _order,
     imageSourceType: _imageSourceType,
-    imageStorageKey: _imageStorageKey,
+    imageAssetId: _imageAssetId,
     ...publicProgram
   } = program;
   return publicProgram;

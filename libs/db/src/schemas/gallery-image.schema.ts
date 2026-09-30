@@ -9,7 +9,6 @@ export interface GalleryImageDocument extends Document {
   sourceType: GalleryImageSourceType;
   url: string;
   assetId?: string;
-  storageKey?: string;
   isPublished: boolean;
   uploadedBy: string;
   createdAt: Date;
@@ -25,7 +24,6 @@ const galleryImageSchema = new Schema<GalleryImageDocument>(
     sourceType: { type: String, enum: GALLERY_IMAGE_SOURCE_TYPES, required: true },
     url: { type: String, required: true },
     assetId: { type: String, required: false },
-    storageKey: { type: String, required: false },
     isPublished: { type: Boolean, required: true, default: false, index: true },
     uploadedBy: { type: String, required: true, index: true },
   },

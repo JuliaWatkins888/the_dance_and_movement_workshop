@@ -8,7 +8,6 @@ export interface StaffDocument extends Document {
   photoUrl?: string;
   photoSourceType?: StaffPhotoSourceType;
   photoAssetId?: string;
-  photoStorageKey?: string;
   order: number;
   createdAt: Date;
   updatedAt: Date;
@@ -24,7 +23,6 @@ const staffSchema = new Schema<StaffDocument>(
     photoUrl: { type: String, required: false },
     photoSourceType: { type: String, enum: STAFF_PHOTO_SOURCE_TYPES, required: false },
     photoAssetId: { type: String, required: false },
-    photoStorageKey: { type: String, required: false },
     order: { type: Number, required: true, default: 0 },
   },
   { timestamps: true }

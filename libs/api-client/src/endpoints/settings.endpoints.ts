@@ -5,8 +5,14 @@ import { baseApi } from '../baseApi';
 // from @inithium/db is `import type` only (see page.endpoints.ts), since @inithium/db's barrel
 // also re-exports the Mongo provider and its mongoose-dependent code. SETTING_TYPES is a runtime
 // value the UI needs (to drive its type-dispatch), so it's redefined here rather than imported.
-export const SETTING_TYPES = ['string', 'boolean', 'number', 'date', 'stringList', 'json', 'color'] as const;
+export const SETTING_TYPES = ['string', 'boolean', 'number', 'date', 'stringList', 'json', 'color', 'image'] as const;
 export type SettingType = (typeof SETTING_TYPES)[number];
+
+// Empty url = nothing saved yet; consumers fall back to their own bundled default.
+export interface SettingImageValue {
+  url: string;
+  assetId?: string;
+}
 
 interface SettingBase {
   id: string;
@@ -21,7 +27,8 @@ export type SettingEntity =
   | (SettingBase & { type: 'date'; value: string })
   | (SettingBase & { type: 'stringList'; value: string[] })
   | (SettingBase & { type: 'json'; value: Record<string, unknown> })
-  | (SettingBase & { type: 'color'; value: string });
+  | (SettingBase & { type: 'color'; value: string })
+  | (SettingBase & { type: 'image'; value: SettingImageValue });
 
 export type UpsertSettingInput =
   | { key: string; type: 'string'; value: string }
@@ -30,7 +37,8 @@ export type UpsertSettingInput =
   | { key: string; type: 'date'; value: string }
   | { key: string; type: 'stringList'; value: string[] }
   | { key: string; type: 'json'; value: Record<string, unknown> }
-  | { key: string; type: 'color'; value: string };
+  | { key: string; type: 'color'; value: string }
+  | { key: string; type: 'image'; value: SettingImageValue };
 
 export const settingsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -171,3 +179,10 @@ export const useContactCaptchaSiteKey = (): string => {
 
 // inithium:block:contact:exports:end
 // inithium:anchor:exports
+
+// Shared by every image setting consumer (Navbar logo, favicon, home hero) - returns the saved R2
+// url, or `fallback` (the bundled asset) until an admin uploads one.
+export const usePublicImageSetting = (key: string, fallback: string): string => {
+  const { data } = useGetPublicSettingQuery(key);
+  return data?.type === 'image' && data.value.url ? data.value.url : fallback;
+};

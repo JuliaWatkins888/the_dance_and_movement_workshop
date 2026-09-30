@@ -1,7 +1,8 @@
 import type { ClearableUpdate } from './commerce.contract';
 import type { UserProfileBannerConfig } from './user.contract';
 
-export type ProgramImageSourceType = 'local' | 'external';
+export const PROGRAM_IMAGE_SOURCE_TYPES = ['cloud', 'external'] as const;
+export type ProgramImageSourceType = (typeof PROGRAM_IMAGE_SOURCE_TYPES)[number];
 
 // The generated trianglify mesh shown wherever the program has no image. Unset means the
 // frontend derives a stable default from the program's id.
@@ -23,7 +24,8 @@ export interface ProgramEntity {
   // Shown on the program's grid card and as its page banner; takes precedence over `banner`.
   imageUrl?: string;
   imageSourceType?: ProgramImageSourceType;
-  imageStorageKey?: string;
+  // cloud only - the AssetEntity id, so the R2 object can be released when the image changes.
+  imageAssetId?: string;
   banner?: ProgramBannerConfig;
   order: number;
   isPublished: boolean;

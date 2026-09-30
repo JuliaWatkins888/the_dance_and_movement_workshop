@@ -48,6 +48,9 @@ import { CreateSchoolYearInput, UpdateSchoolYearInput } from './contracts/school
 // inithium:block:children:imports:start
 import { CreateChildInput, FindManyChildrenOptions, UpdateChildInput } from './contracts/child.contract';
 // inithium:block:children:imports:end
+// inithium:block:storage:imports:start
+import { CreateAssetInput, ListAssetsForUserOptions } from './contracts/asset.contract';
+// inithium:block:storage:imports:end
 // inithium:anchor:imports
 import { activeProvider as defaultProvider } from './providers/active-provider';
 
@@ -268,6 +271,15 @@ export const getPaymentCustomerRepository = () => activeProvider.getPaymentCusto
 export const getPaymentEventRepository = () => activeProvider.getPaymentEventRepository();
 
 // inithium:block:ecommerce:repositories:end
+// inithium:block:storage:repositories:start
+export const getAssetRepository = () => activeProvider.getAssetRepository();
+export const createAsset = (input: CreateAssetInput) => getAssetRepository().create(input);
+export const getAssetById = (id: string) => getAssetRepository().findById(id);
+export const deleteAsset = (id: string) => getAssetRepository().delete(id);
+export const listAssetsForUser = (userId: string, options?: ListAssetsForUserOptions) =>
+  getAssetRepository().listForUser(userId, options);
+
+// inithium:block:storage:repositories:end
 // inithium:anchor:repositories
 
 export type { DbProvider, DbConfig } from './contracts/db-provider.contract';
@@ -311,7 +323,7 @@ export type {
 } from './contracts/page.contract';
 export type { NotificationEntity, CreateNotificationInput, NotificationRepository } from './contracts/notification.contract';
 export { SETTING_TYPES } from './contracts/settings.contract';
-export type { SettingType, SettingEntity, UpsertSettingInput, SettingsRepository } from './contracts/settings.contract';
+export type { SettingType, SettingEntity, SettingImageValue, UpsertSettingInput, SettingsRepository } from './contracts/settings.contract';
 // inithium:block:gallery:type-exports:start
 export { GALLERY_IMAGE_SOURCE_TYPES } from './contracts/gallery-image.contract';
 export type {
@@ -395,6 +407,7 @@ export type {
   ProgramBannerConfig,
   ProgramImageSourceType,
 } from './contracts/program.contract';
+export { PROGRAM_IMAGE_SOURCE_TYPES } from './contracts/program.contract';
 export { COURSE_LEVELS } from './contracts/course.contract';
 export type {
   CourseEntity,
@@ -557,6 +570,9 @@ export type {
 } from './contracts/payment-customer.contract';
 export type { PaymentEventEntity, PaymentEventRepository } from './contracts/payment-event.contract';
 // inithium:block:ecommerce:type-exports:end
+// inithium:block:storage:type-exports:start
+export type { AssetEntity, CreateAssetInput, AssetRepository, ListAssetsForUserOptions } from './contracts/asset.contract';
+// inithium:block:storage:type-exports:end
 // inithium:anchor:type-exports
 export { ensureSeededPages } from './page-seeds/ensureSeededPages';
 export { pruneOrphanedPluginPages } from './page-seeds/pruneOrphanedPluginPages';

@@ -1,13 +1,18 @@
-import { useRef, useState } from 'react';
-import type { ChangeEvent } from 'react';
-import { Box, Button, Input, Tabs, TabsContent, TabsList, TabsTrigger, Text } from '@inithium/ui';
-import { useUploadClassImageMutation } from '@inithium/api-client';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { Box, Button, DEFAULT_BANNER_HEIGHT, DEFAULT_MESH_WIDTH, MediaField } from '@inithium/ui';
+import type { MediaFieldHandle, UploadedAsset } from '@inithium/ui';
+import { useUploadAssetMutation } from '@inithium/api-client';
 import type { ProgramImageSourceType } from '@inithium/api-client';
 
 export interface ProgramImageValue {
   readonly imageUrl?: string;
   readonly imageSourceType?: ProgramImageSourceType;
-  readonly imageStorageKey?: string;
+  readonly imageAssetId?: string;
+}
+
+export interface ProgramImageFieldHandle {
+  // The image to save - uploading a file still sitting in the crop step first.
+  readonly finalize: () => Promise<ProgramImageValue>;
 }
 
 export interface ProgramImageFieldProps {
@@ -15,68 +20,64 @@ export interface ProgramImageFieldProps {
   readonly onChange: (value: ProgramImageValue) => void;
 }
 
-// An external URL, or a file uploaded to the API's own uploads folder - the same two sources the
-// plain ProductImageField offers.
-export const ProgramImageField = ({ value, onChange }: ProgramImageFieldProps) => {
-  const [activeTab, setActiveTab] = useState(value.imageSourceType === 'local' ? 'upload' : 'url');
-  const [uploadLocal, { isLoading: isUploading }] = useUploadClassImageMutation();
-  const [uploadError, setUploadError] = useState<string | undefined>(undefined);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+// Cropped to the same ratio as the live program banner (ProgramBanner / Banner's reference mesh
+// size), so the saved image matches how it's displayed on the program page.
+const PROGRAM_IMAGE_ASPECT_RATIO = DEFAULT_MESH_WIDTH / DEFAULT_BANNER_HEIGHT;
 
-  const handleFileSelected = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
-    setUploadError(undefined);
-    try {
-      const result = await uploadLocal({ file }).unwrap();
-      onChange({ imageUrl: result.url, imageSourceType: 'local', imageStorageKey: result.storageKey });
-    } catch {
-      setUploadError('Upload failed. Please try again.');
+// An R2 upload (cropped) or an external URL. Removing the image falls back to the program's
+// generated placeholder banner.
+export const ProgramImageField = forwardRef<ProgramImageFieldHandle, ProgramImageFieldProps>(({ value, onChange }, ref) => {
+  const [uploadAsset] = useUploadAssetMutation();
+  const mediaFieldRef = useRef<MediaFieldHandle>(null);
+  // Remounts MediaField on Remove so a half-finished crop doesn't survive the removal.
+  const [fieldKey, setFieldKey] = useState(0);
+
+  const handleAssetChange = (asset: UploadedAsset | null) => {
+    if (asset) {
+      onChange({ imageUrl: asset.url, imageSourceType: 'cloud', imageAssetId: asset.assetId });
     }
   };
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      finalize: async () => {
+        const uploaded = await mediaFieldRef.current?.resolvePendingUpload();
+        return uploaded ? { imageUrl: uploaded.url, imageSourceType: 'cloud', imageAssetId: uploaded.assetId } : value;
+      },
+    }),
+    [value],
+  );
+
   return (
     <Box flex={{ direction: 'col', gap: 8 }}>
-      <Text as="span" textColor={{ color: 'surface', intensity: 900 }} className="text-sm font-medium">
-        Image
-      </Text>
-      <Box borderColor={{ color: 'surface', intensity: 300 }} className="rounded-md border" padding={{ base: 12 }}>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="url">URL</TabsTrigger>
-            <TabsTrigger value="upload">Upload</TabsTrigger>
-          </TabsList>
-          <TabsContent value="url">
-            <Input
-              placeholder="https://example.com/program.jpg"
-              value={value.imageSourceType === 'local' ? '' : value.imageUrl ?? ''}
-              onChange={(event) => {
-                const url = event.target.value.trim();
-                onChange(url ? { imageUrl: url, imageSourceType: 'external' } : {});
-              }}
-            />
-          </TabsContent>
-          <TabsContent value="upload">
-            <Box flex={{ direction: 'row', align: 'center', gap: 8 }}>
-              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelected} />
-              <Button variant={{ kind: 'filled', color: 'primary' }} onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-                Choose File
-              </Button>
-              {isUploading ? (
-                <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
-                  Uploading…
-                </Text>
-              ) : null}
-            </Box>
-            {uploadError ? (
-              <Text as="p" textColor={{ color: 'red', intensity: 600 }} className="mt-2 text-xs">
-                {uploadError}
-              </Text>
-            ) : null}
-          </TabsContent>
-        </Tabs>
-      </Box>
+      <MediaField
+        key={fieldKey}
+        ref={mediaFieldRef}
+        label="Image"
+        value={value.imageUrl ?? ''}
+        onValueChange={(url) => onChange({ imageUrl: url, imageSourceType: 'external' })}
+        onAssetChange={handleAssetChange}
+        onUpload={async (file) => await uploadAsset({ file, purpose: 'program' }).unwrap()}
+        aspectRatio={PROGRAM_IMAGE_ASPECT_RATIO}
+        defaultMode={value.imageSourceType === 'external' ? 'url' : 'upload'}
+      />
+      {value.imageUrl ? (
+        <Box flex={{ direction: 'row', justify: 'end' }}>
+          <Button
+            variant={{ kind: 'link', color: 'accent' }}
+            textColor={{ color: 'surface', intensity: 700 }}
+            className="text-xs"
+            onClick={() => {
+              onChange({});
+              setFieldKey((key) => key + 1);
+            }}
+          >
+            Remove image
+          </Button>
+        </Box>
+      ) : null}
     </Box>
   );
-};
+});
+ProgramImageField.displayName = 'ProgramImageField';

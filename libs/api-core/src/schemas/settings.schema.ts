@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const SETTING_TYPES = ['string', 'boolean', 'number', 'date', 'stringList', 'json', 'color'] as const;
+const SETTING_TYPES = ['string', 'boolean', 'number', 'date', 'stringList', 'json', 'color', 'image'] as const;
 
 // Same 3/6-digit hex shape ColorPicker validates client-side (libs/ui/src/contracts/color.contract.ts's
 // HEX_COLOR_PATTERN) - duplicated here rather than imported since libs/api-core has no dependency on
@@ -19,6 +19,12 @@ const settingValueSchemas: Record<(typeof SETTING_TYPES)[number], z.ZodTypeAny> 
   stringList: z.array(z.string()),
   json: z.record(z.string(), z.unknown()),
   color: z.string().regex(HEX_COLOR_PATTERN),
+  // Empty url resets to the consumer's bundled default. A non-empty url without an assetId is
+  // rejected - image settings only accept R2 uploads, and the route derives url from the asset.
+  image: z
+    .object({ url: z.string(), assetId: z.string().min(1).optional() })
+    .strict()
+    .refine((value) => value.url === '' || Boolean(value.assetId)),
 };
 
 export const upsertSettingSchema = z

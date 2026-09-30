@@ -1,13 +1,14 @@
 import { useRef, useState } from 'react';
-import type { ChangeEvent } from 'react';
-import { Box, Button, Input, Tabs, TabsContent, TabsList, TabsTrigger, Text, Textarea } from '@inithium/ui';
+import { Box, Button, Input, MediaField, Text, Textarea } from '@inithium/ui';
+import type { MediaFieldHandle, UploadedAsset } from '@inithium/ui';
 import {
   useCreateStaffMemberMutation,
   useUpdateStaffMemberMutation,
-  useUploadStaffPhotoLocalMutation,
+  useUploadAssetMutation,
 } from '@inithium/api-client';
 import type { StaffMemberDto, StaffUserCandidate } from '@inithium/api-client';
 import type { StaffPhotoSourceType } from '@inithium/db';
+import { useSessionUploads } from '../../media/useSessionUploads';
 import { LinkedUserField } from './UserPicker';
 
 export interface StaffEditDialogProps {
@@ -16,91 +17,15 @@ export interface StaffEditDialogProps {
   readonly onDone: () => void;
 }
 
-// Deliberately NOT @inithium/ui's MediaField here - MediaField only exists in this workspace once
-// the storage plugin is installed (it's shipped BY that plugin, not a core libs/ui component -
-// see MediaField.tsx's own comment), so a plain, storage-less workspace can't import it at all.
-// This reimplements just the URL/Upload tab shell MediaField uses (same Tabs/Input/Button
-// primitives) without a crop step - StaffEditDialog.storage.tsx is the version that swaps this
-// for MediaField (with cropping, since a staff photo is a fixed-aspect portrait card unlike a
-// gallery image) once storage is installed.
-const PhotoSourceField = ({
-  photoUrl,
-  onUrlCommit,
-  onLocalUploaded,
-}: {
-  readonly photoUrl: string;
-  readonly onUrlCommit: (url: string) => void;
-  readonly onLocalUploaded: (result: { url: string; storageKey: string }) => void;
-}) => {
-  const [activeTab, setActiveTab] = useState('url');
-  const [uploadLocal, { isLoading: isUploading }] = useUploadStaffPhotoLocalMutation();
-  const [uploadError, setUploadError] = useState<string | undefined>(undefined);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileSelected = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
-
-    setUploadError(undefined);
-    try {
-      const result = await uploadLocal({ file }).unwrap();
-      onLocalUploaded(result);
-    } catch {
-      setUploadError('Upload failed. Please try again.');
-    }
-  };
-
-  return (
-    <Box flex={{ direction: 'col', gap: 8 }}>
-      <Text as="span" textColor={{ color: 'surface', intensity: 900 }} className="text-sm font-medium">
-        Photo
-      </Text>
-      <Box flex={{ direction: 'row', gap: 12, align: 'start' }}>
-        <Box borderColor={{ color: 'surface', intensity: 300 }} className="flex-1 rounded-md border" padding={{ base: 12 }}>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="url">URL</TabsTrigger>
-              <TabsTrigger value="upload">Upload</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="url">
-              <Input
-                placeholder="https://example.com/photo.jpg"
-                value={photoUrl}
-                onChange={(event) => onUrlCommit(event.target.value)}
-              />
-            </TabsContent>
-
-            <TabsContent value="upload">
-              <Box flex={{ direction: 'row', align: 'center', gap: 8 }}>
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelected} />
-                <Button variant={{ kind: 'filled', color: 'primary' }} onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-                  Choose File
-                </Button>
-                {isUploading ? (
-                  <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
-                    Uploading…
-                  </Text>
-                ) : null}
-              </Box>
-              {uploadError ? (
-                <Text as="p" textColor={{ color: 'red', intensity: 600 }} className="mt-2 text-xs">
-                  {uploadError}
-                </Text>
-              ) : null}
-            </TabsContent>
-          </Tabs>
-        </Box>
-        {photoUrl ? <img src={photoUrl} alt="" className="h-20 w-20 shrink-0 rounded object-cover" /> : null}
-      </Box>
-    </Box>
-  );
-};
+// A staff photo is a fixed-shape portrait card image (see StaffPage.tsx's aspect-[3/4] cards),
+// unlike gallery's masonry grid - a forced crop is exactly right here, which is why this uses
+// @inithium/ui's MediaField rather than GalleryImageEditDialog's uncropped upload.
+const STAFF_PHOTO_ASPECT_RATIO = 3 / 4;
 
 export const StaffEditDialog = ({ mode, initialStaff, onDone }: StaffEditDialogProps) => {
   const [createStaffMember, { isLoading: isCreating }] = useCreateStaffMemberMutation();
   const [updateStaffMember, { isLoading: isUpdating }] = useUpdateStaffMemberMutation();
+  const [uploadAsset] = useUploadAssetMutation();
   const isLoading = isCreating || isUpdating;
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
 
@@ -111,19 +36,25 @@ export const StaffEditDialog = ({ mode, initialStaff, onDone }: StaffEditDialogP
   const [order, setOrder] = useState(String(initialStaff?.order ?? 0));
 
   const [photoUrl, setPhotoUrl] = useState(initialStaff?.photoUrl ?? '');
+  // Only reassigned by handlePhotoAssetChange below (itself only invoked when MediaField reports
+  // a genuine URL-commit or a completed upload) - never recomputed from photoUrl at submit time,
+  // so an untouched photo field on an edit keeps whatever sourceType/assetId it
+  // already had instead of being silently reclassified as 'external'.
   const [photoSourceType, setPhotoSourceType] = useState<StaffPhotoSourceType | undefined>(initialStaff?.photoSourceType);
-  const [photoStorageKey, setPhotoStorageKey] = useState(initialStaff?.photoStorageKey);
+  const [photoAssetId, setPhotoAssetId] = useState(initialStaff?.photoAssetId);
+  const mediaFieldRef = useRef<MediaFieldHandle>(null);
+  const sessionUploads = useSessionUploads();
 
-  const handlePhotoUrlCommit = (url: string) => {
-    setPhotoUrl(url);
-    setPhotoSourceType(url ? 'external' : undefined);
-    setPhotoStorageKey(undefined);
-  };
-
-  const handlePhotoLocalUploaded = (result: { url: string; storageKey: string }) => {
-    setPhotoUrl(result.url);
-    setPhotoSourceType('local');
-    setPhotoStorageKey(result.storageKey);
+  const handlePhotoAssetChange = (asset: UploadedAsset | null) => {
+    if (asset) {
+      setPhotoSourceType('cloud');
+      setPhotoAssetId(asset.assetId);
+    } else {
+      // A URL was committed via MediaField's own URL tab - a deliberate switch to an
+      // externally-hosted image.
+      setPhotoSourceType('external');
+      setPhotoAssetId(undefined);
+    }
   };
 
   const handleSubmit = async () => {
@@ -134,22 +65,33 @@ export const StaffEditDialog = ({ mode, initialStaff, onDone }: StaffEditDialogP
       return;
     }
 
-    const parsedOrder = Number(order);
-    const commonFields = {
-      title,
-      bio: bio || undefined,
-      order: Number.isFinite(parsedOrder) ? parsedOrder : 0,
-      photoUrl: photoUrl || undefined,
-      photoSourceType,
-      photoStorageKey,
-    };
-
     try {
+      // Resolves a still-pending crop (a file was selected/dragged into position but never
+      // separately "confirmed") into a real R2 upload right here. Returns null when there's
+      // nothing pending, in which case whatever photoUrl/photoSourceType is already in state is
+      // final. Throws on upload failure, which the catch below reports.
+      const uploaded = await mediaFieldRef.current?.resolvePendingUpload();
+      if (uploaded) sessionUploads.track(uploaded.assetId);
+      const finalPhotoUrl = uploaded?.url ?? photoUrl;
+      const finalPhotoSourceType = uploaded ? 'cloud' : photoSourceType;
+      const finalPhotoAssetId = uploaded ? uploaded.assetId : photoAssetId;
+
+      const parsedOrder = Number(order);
+      const commonFields = {
+        title,
+        bio: bio || undefined,
+        order: Number.isFinite(parsedOrder) ? parsedOrder : 0,
+        photoUrl: finalPhotoUrl || undefined,
+        photoSourceType: finalPhotoUrl ? finalPhotoSourceType : undefined,
+        photoAssetId: finalPhotoSourceType === 'cloud' ? finalPhotoAssetId : undefined,
+      };
+
       if (mode === 'create' && selectedUser) {
         await createStaffMember({ userId: selectedUser.id, ...commonFields }).unwrap();
       } else if (initialStaff) {
         await updateStaffMember({ id: initialStaff.id, userId: selectedUser?.id, ...commonFields }).unwrap();
       }
+      sessionUploads.discardUnsaved(commonFields.photoAssetId);
       onDone();
     } catch {
       setSubmitError('Could not save this staff member. Check the fields and try again.');
@@ -183,12 +125,16 @@ export const StaffEditDialog = ({ mode, initialStaff, onDone }: StaffEditDialogP
         rows={3}
       />
 
-      <PhotoSourceField photoUrl={photoUrl} onUrlCommit={handlePhotoUrlCommit} onLocalUploaded={handlePhotoLocalUploaded} />
-      {photoSourceType === 'local' ? (
-        <Text as="p" textColor={{ color: 'amber', intensity: 700 }} className="text-xs">
-          Stored locally on this server. Commit and push apps/api/uploads/staff to make this permanent in production.
-        </Text>
-      ) : null}
+      <MediaField
+        ref={mediaFieldRef}
+        label="Photo"
+        value={photoUrl}
+        onValueChange={setPhotoUrl}
+        onAssetChange={handlePhotoAssetChange}
+        onUpload={async (file) => await uploadAsset({ file, purpose: 'staff' }).unwrap()}
+        defaultMode={initialStaff?.photoSourceType === 'external' ? 'url' : 'upload'}
+        aspectRatio={STAFF_PHOTO_ASPECT_RATIO}
+      />
 
       {submitError ? (
         <Text as="p" textColor={{ color: 'red', intensity: 600 }} className="text-sm">
@@ -197,7 +143,14 @@ export const StaffEditDialog = ({ mode, initialStaff, onDone }: StaffEditDialogP
       ) : null}
 
       <Box flex={{ direction: 'row', gap: 8, justify: 'end' }}>
-        <Button variant={{ kind: 'ghost', color: 'surface' }} onClick={onDone} disabled={isLoading}>
+        <Button
+          variant={{ kind: 'ghost', color: 'surface' }}
+          onClick={() => {
+            sessionUploads.discardUnsaved();
+            onDone();
+          }}
+          disabled={isLoading}
+        >
           Cancel
         </Button>
         <Button variant={{ kind: 'filled', color: 'primary' }} onClick={handleSubmit} disabled={isLoading}>

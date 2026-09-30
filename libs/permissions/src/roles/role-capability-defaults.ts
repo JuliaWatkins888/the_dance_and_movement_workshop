@@ -53,6 +53,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:children:editor:start
   'children:manage',
 // inithium:block:children:editor:end
+// inithium:block:storage:editor:start
+  'storage:manageAssets',
+// inithium:block:storage:editor:end
     // inithium:anchor:editor
   ],
   // users:managePermissions is deliberately absent even from admin - granting the ability to
@@ -94,6 +97,9 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
   'ecommerce:manage-shipping',
   'ecommerce:record-sales',
 // inithium:block:ecommerce:admin:end
+// inithium:block:storage:admin:start
+  'storage:manageAssets',
+// inithium:block:storage:admin:end
     // inithium:anchor:admin
   ],
 };

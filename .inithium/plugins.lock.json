@@ -176,7 +176,7 @@
           "target": "libs/api-core/src/routes/gallery.route.ts",
           "source": "src/api-core/routes/gallery.route.storage.ts",
           "requires": "storage",
-          "status": "deferred",
+          "status": "applied",
           "strategy": "overwrite"
         },
         {
@@ -246,7 +246,7 @@
           "target": "libs/cms/src/modules/gallery/GalleryImageEditDialog.tsx",
           "source": "src/cms/modules/gallery/GalleryImageEditDialog.storage.tsx",
           "requires": "storage",
-          "status": "deferred",
+          "status": "applied",
           "strategy": "overwrite"
         },
         {
@@ -589,7 +589,7 @@
           "target": "libs/api-core/src/routes/staff.route.ts",
           "source": "src/api-core/routes/staff.route.storage.ts",
           "requires": "storage",
-          "status": "deferred",
+          "status": "applied",
           "strategy": "overwrite"
         },
         {
@@ -673,7 +673,7 @@
           "target": "libs/cms/src/modules/staff/StaffEditDialog.tsx",
           "source": "src/cms/modules/staff/StaffEditDialog.storage.tsx",
           "requires": "storage",
-          "status": "deferred",
+          "status": "applied",
           "strategy": "overwrite"
         }
       ]
@@ -1380,7 +1380,7 @@
           "target": "libs/api-core/src/routes/ecommerce/products.route.ts",
           "source": "src/api-core/routes/ecommerce/products.route.storage.ts",
           "requires": "storage",
-          "status": "deferred",
+          "status": "applied",
           "strategy": "overwrite"
         },
         {
@@ -1583,7 +1583,7 @@
           "target": "libs/cms/src/modules/products/ProductImageField.tsx",
           "source": "src/cms/modules/products/ProductImageField.storage.tsx",
           "requires": "storage",
-          "status": "deferred",
+          "status": "applied",
           "strategy": "overwrite"
         },
         {
@@ -1645,6 +1645,220 @@
         {
           "target": "libs/cms/src/dashboard/widgets/sales-over-time.widget.tsx",
           "source": "src/cms/dashboard/widgets/sales-over-time.widget.tsx",
+          "requires": "cms",
+          "status": "applied",
+          "strategy": "overwrite"
+        }
+      ]
+    },
+    "storage": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-30T17:14:20.627Z",
+      "dependencies": [],
+      "npmDependencies": {
+        "@aws-sdk/client-s3": "^3.700.0",
+        "@aws-sdk/s3-request-presigner": "^3.700.0",
+        "multer": "^2.0.0",
+        "@types/multer": "^1.4.12"
+      },
+      "injections": [
+        {
+          "target": "libs/permissions/src/roles/role-capability-defaults.ts",
+          "source": "src/permissions/roles/role-capability-defaults.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/storage/package.json",
+          "source": "src/storage/package.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/storage/project.json",
+          "source": "src/storage/project.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/storage/tsconfig.json",
+          "source": "src/storage/tsconfig.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/storage/tsconfig.lib.json",
+          "source": "src/storage/tsconfig.lib.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/storage/src/contracts/storage-provider.contract.ts",
+          "source": "src/storage/contracts/storage-provider.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/storage/src/providers/s3/s3.provider.ts",
+          "source": "src/storage/providers/s3/s3.provider.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/storage/src/index.ts",
+          "source": "src/storage/index.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/asset.contract.ts",
+          "source": "src/db/contracts/asset.contract.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/schemas/asset.schema.ts",
+          "source": "src/db/schemas/asset.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/asset.repository.ts",
+          "source": "src/db/providers/mongo/asset.repository.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/db/src/contracts/db-provider.contract.ts",
+          "source": "src/db/contracts/db-provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/providers/mongo/mongo.provider.ts",
+          "source": "src/db/providers/mongo/mongo.provider.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/db/src/index.ts",
+          "source": "src/db/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-core/src/schemas/storage.schema.ts",
+          "source": "src/api-core/schemas/storage.schema.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/routes/storage.route.ts",
+          "source": "src/api-core/routes/storage.route.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-core/src/index.ts",
+          "source": "src/api-core/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-client/src/endpoints/storage.endpoints.ts",
+          "source": "src/api-client/endpoints/storage.endpoints.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/api-client/src/index.ts",
+          "source": "src/api-client/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/api-client/src/baseApi.ts",
+          "source": "src/api-client/baseApi.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/ui/src/composites/MediaField.tsx",
+          "source": "src/ui/composites/MediaField.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ui/src/composites/AvatarEditDialog.tsx",
+          "source": "src/ui/composites/AvatarEditDialog.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ui/src/composites/BannerEditDialog.tsx",
+          "source": "src/ui/composites/BannerEditDialog.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/ui/src/composites/index.ts",
+          "source": "src/ui/composites/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "libs/ui/src/index.ts",
+          "source": "src/ui/index.fragment.ts",
+          "requires": null,
+          "status": "applied",
+          "strategy": "merge"
+        },
+        {
+          "target": "tsconfig.base.json",
+          "source": "src/tsconfig-paths.fragment.json",
+          "requires": null,
+          "status": "applied",
+          "strategy": "tsconfig-paths-merge",
+          "jsonPaths": {
+            "@inithium/storage": [
+              "./libs/storage/src/index.ts"
+            ]
+          }
+        },
+        {
+          "target": "apps/web/src/pages/profile/tabs/assets.tab.tsx",
+          "source": "src/pages/profile/tabs/assets.tab.tsx",
+          "requires": null,
+          "status": "applied",
+          "strategy": "overwrite"
+        },
+        {
+          "target": "libs/cms/src/permissions/definitions/storage-manage-assets.capability.ts",
+          "source": "src/cms/permissions/definitions/storage-manage-assets.capability.ts",
           "requires": "cms",
           "status": "applied",
           "strategy": "overwrite"

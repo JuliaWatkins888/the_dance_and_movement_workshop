@@ -14,7 +14,6 @@ export interface StaffMemberDto {
   photoUrl?: string;
   photoSourceType?: StaffPhotoSourceType;
   photoAssetId?: string;
-  photoStorageKey?: string;
   order: number;
   createdAt: string;
   updatedAt: string;
@@ -60,16 +59,11 @@ export interface StaffWriteInput {
   photoUrl?: string;
   photoSourceType?: StaffPhotoSourceType;
   photoAssetId?: string;
-  photoStorageKey?: string;
   order?: number;
 }
 
-export type UpdateStaffInput = Partial<StaffWriteInput> & { id: string };
-
-export interface UploadStaffPhotoLocalResult {
-  url: string;
-  storageKey: string;
-}
+// null clears the photo fields (removing a photo).
+export type UpdateStaffInput = { [K in keyof StaffWriteInput]?: StaffWriteInput[K] | null } & { id: string };
 
 const buildListResult = (response: ApiResponse<StaffMemberDto[]>): ListStaffResult => ({
   items: response.data,
@@ -104,16 +98,6 @@ export const staffApi = baseApi.injectEndpoints({
       transformResponse: (response: ApiResponse<StaffUserCandidate[]>) => response.data,
       providesTags: ['Staff'],
     }),
-    // fetchBaseQuery passes a FormData body through untouched (no JSON.stringify, the browser
-    // sets the multipart boundary), matching gallery.endpoints.ts's own uploadGalleryImageLocal.
-    uploadStaffPhotoLocal: builder.mutation<UploadStaffPhotoLocalResult, { file: File }>({
-      query: ({ file }) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        return { url: '/api/staff/upload', method: 'POST', body: formData };
-      },
-      transformResponse: (response: ApiResponse<UploadStaffPhotoLocalResult>) => response.data,
-    }),
     createStaffMember: builder.mutation<StaffMemberDto, StaffWriteInput>({
       query: (input) => ({ url: '/api/staff', method: 'POST', body: input }),
       transformResponse: (response: ApiResponse<StaffMemberDto>) => response.data,
@@ -135,7 +119,6 @@ export const {
   useListPublicStaffQuery,
   useListStaffAdminQuery,
   useListStaffUserCandidatesQuery,
-  useUploadStaffPhotoLocalMutation,
   useCreateStaffMemberMutation,
   useUpdateStaffMemberMutation,
   useDeleteStaffMemberMutation,

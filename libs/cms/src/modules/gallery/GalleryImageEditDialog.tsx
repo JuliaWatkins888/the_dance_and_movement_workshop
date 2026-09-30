@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react';
-import type { ChangeEvent } from 'react';
+import { useState } from 'react';
 import { Box, Button, Input, Switch, Tabs, TabsContent, TabsList, TabsTrigger, Text, Textarea } from '@inithium/ui';
-import { useCreateGalleryImageMutation, useUpdateGalleryImageMutation, useUploadGalleryImageLocalMutation } from '@inithium/api-client';
-import type { GalleryImageDto } from '@inithium/api-client';
+import { useCreateGalleryImageMutation, useUpdateGalleryImageMutation } from '@inithium/api-client';
+import type { GalleryImageDto, UploadAssetResult } from '@inithium/api-client';
 import type { GalleryImageSourceType } from '@inithium/db';
+import { CloudImageUploadButton } from '../../media/CloudImageUploadButton';
+import { useSessionUploads } from '../../media/useSessionUploads';
 
 export interface GalleryImageEditDialogProps {
   readonly mode: 'create' | 'edit';
@@ -12,42 +13,24 @@ export interface GalleryImageEditDialogProps {
 }
 
 // Deliberately NOT @inithium/ui's MediaField here - MediaField's Upload tab always forces a
-// fixed-aspect-ratio crop step before it uploads (see ImageCropStep in MediaField.tsx), which is
-// exactly wrong for a gallery: the masonry grid's whole visual point is showing each image at its
-// own natural proportions, so force-cropping every upload to one shape here would silently turn
-// the masonry grid into a uniform one. This reimplements just the URL/Upload tab shell MediaField
-// uses (same Tabs/Input/Button primitives, same visual container) without the crop step.
+// fixed-aspect-ratio crop step before it uploads, which is exactly wrong for a gallery: the masonry
+// grid's whole visual point is showing each image at its own natural proportions.
 //
-// Every tab commits directly to the shared imageUrl/sourceType state as its own action - there is
-// no separate "confirm"/"use this" button beyond the outer dialog's own Save. Typing/pasting a
-// URL, or picking a file to upload, IS the selection; only "Save" persists the record.
+// Every tab commits directly to the shared imageUrl/sourceType state as its own action - typing a
+// URL, or picking a file (uploaded to R2 immediately), IS the selection; only "Save" persists the
+// record.
 const ImageSourceField = ({
   imageUrl,
+  sourceType,
   onUrlCommit,
-  onLocalUploaded,
+  onCloudUploaded,
 }: {
   readonly imageUrl: string;
+  readonly sourceType?: GalleryImageSourceType;
   readonly onUrlCommit: (url: string) => void;
-  readonly onLocalUploaded: (result: { url: string; storageKey: string }) => void;
+  readonly onCloudUploaded: (result: UploadAssetResult) => void;
 }) => {
-  const [activeTab, setActiveTab] = useState('url');
-  const [uploadLocal, { isLoading: isUploading }] = useUploadGalleryImageLocalMutation();
-  const [uploadError, setUploadError] = useState<string | undefined>(undefined);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileSelected = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
-
-    setUploadError(undefined);
-    try {
-      const result = await uploadLocal({ file }).unwrap();
-      onLocalUploaded(result);
-    } catch {
-      setUploadError('Upload failed. Please try again.');
-    }
-  };
+  const [activeTab, setActiveTab] = useState(sourceType === 'external' ? 'url' : 'upload');
 
   return (
     <Box flex={{ direction: 'col', gap: 8 }}>
@@ -58,35 +41,20 @@ const ImageSourceField = ({
         <Box borderColor={{ color: 'surface', intensity: 300 }} className="flex-1 rounded-md border" padding={{ base: 12 }}>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
-              <TabsTrigger value="url">URL</TabsTrigger>
               <TabsTrigger value="upload">Upload</TabsTrigger>
+              <TabsTrigger value="url">URL</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="upload">
+              <CloudImageUploadButton purpose="gallery" onUploaded={onCloudUploaded} />
+            </TabsContent>
 
             <TabsContent value="url">
               <Input
                 placeholder="https://example.com/image.jpg"
-                value={imageUrl}
+                value={sourceType === 'external' ? imageUrl : ''}
                 onChange={(event) => onUrlCommit(event.target.value)}
               />
-            </TabsContent>
-
-            <TabsContent value="upload">
-              <Box flex={{ direction: 'row', align: 'center', gap: 8 }}>
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelected} />
-                <Button variant={{ kind: 'filled', color: 'primary' }} onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-                  Choose File
-                </Button>
-                {isUploading ? (
-                  <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
-                    Uploading…
-                  </Text>
-                ) : null}
-              </Box>
-              {uploadError ? (
-                <Text as="p" textColor={{ color: 'red', intensity: 600 }} className="mt-2 text-xs">
-                  {uploadError}
-                </Text>
-              ) : null}
             </TabsContent>
           </Tabs>
         </Box>
@@ -111,20 +79,24 @@ export const GalleryImageEditDialog = ({ mode, initialImage, onDone }: GalleryIm
   const [imageUrl, setImageUrl] = useState(initialImage?.url ?? '');
   const [sourceType, setSourceType] = useState<GalleryImageSourceType | undefined>(initialImage?.sourceType);
   const [assetId, setAssetId] = useState(initialImage?.assetId);
-  const [storageKey, setStorageKey] = useState(initialImage?.storageKey);
+  const sessionUploads = useSessionUploads();
 
   const handleUrlCommit = (url: string) => {
     setImageUrl(url);
     setSourceType('external');
     setAssetId(undefined);
-    setStorageKey(undefined);
   };
 
-  const handleLocalUploaded = (result: { url: string; storageKey: string }) => {
+  const handleCloudUploaded = (result: UploadAssetResult) => {
+    sessionUploads.track(result.assetId);
     setImageUrl(result.url);
-    setSourceType('local');
-    setStorageKey(result.storageKey);
-    setAssetId(undefined);
+    setSourceType('cloud');
+    setAssetId(result.assetId);
+  };
+
+  const handleCancel = () => {
+    sessionUploads.discardUnsaved();
+    onDone();
   };
 
   const handleSubmit = async () => {
@@ -153,8 +125,7 @@ export const GalleryImageEditDialog = ({ mode, initialImage, onDone }: GalleryIm
       isPublished,
       sourceType,
       url: imageUrl,
-      assetId,
-      storageKey,
+      assetId: sourceType === 'cloud' ? assetId : undefined,
     };
 
     try {
@@ -163,6 +134,7 @@ export const GalleryImageEditDialog = ({ mode, initialImage, onDone }: GalleryIm
       } else if (initialImage) {
         await updateGalleryImage({ id: initialImage.id, ...payload }).unwrap();
       }
+      sessionUploads.discardUnsaved(payload.assetId);
       onDone();
     } catch {
       setSubmitError('Could not save this image. Check the fields and try again.');
@@ -200,13 +172,12 @@ export const GalleryImageEditDialog = ({ mode, initialImage, onDone }: GalleryIm
         </Box>
       </Box>
 
-      <ImageSourceField imageUrl={imageUrl} onUrlCommit={handleUrlCommit} onLocalUploaded={handleLocalUploaded} />
-      {sourceType === 'local' ? (
-        <Text as="p" textColor={{ color: 'amber', intensity: 700 }} className="text-xs">
-          Stored locally on this server. Commit and push apps/api/uploads/gallery to make this permanent in production.
-        </Text>
-      ) : null}
-
+      <ImageSourceField
+        imageUrl={imageUrl}
+        sourceType={sourceType}
+        onUrlCommit={handleUrlCommit}
+        onCloudUploaded={handleCloudUploaded}
+      />
       <Switch label="Published" checked={isPublished} onCheckedChange={setIsPublished} />
 
       {submitError ? (
@@ -216,7 +187,7 @@ export const GalleryImageEditDialog = ({ mode, initialImage, onDone }: GalleryIm
       ) : null}
 
       <Box flex={{ direction: 'row', gap: 8, justify: 'end' }}>
-        <Button variant={{ kind: 'ghost', color: 'surface' }} onClick={onDone} disabled={isLoading}>
+        <Button variant={{ kind: 'ghost', color: 'surface' }} onClick={handleCancel} disabled={isLoading}>
           Cancel
         </Button>
         <Button variant={{ kind: 'filled', color: 'primary' }} onClick={handleSubmit} disabled={isLoading}>

@@ -88,6 +88,10 @@
 		{
 			"key": "registrationId",
 			"value": ""
+		},
+		{
+			"key": "assetId",
+			"value": ""
 		}
 	],
 	"item": [
@@ -1390,51 +1394,6 @@
 					}
 				},
 				{
-					"name": "Upload Program Image",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"// Default user lacks classes:manage capability.",
-									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{accessToken}}"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "file",
-									"type": "file",
-									"src": []
-								}
-							]
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/classes/upload",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"classes",
-								"upload"
-							]
-						}
-					}
-				},
-				{
 					"name": "Create Program",
 					"event": [
 						{
@@ -2404,6 +2363,98 @@
 								"mine",
 								"{{registrationId}}",
 								"cancel"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Storage",
+			"item": [
+				{
+					"name": "Upload Asset",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// purpose must be one of gallery | staff | program | product | setting, each gated by the",
+									"// capability owning that image field. The default user holds none of them.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "purpose",
+									"value": "gallery",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/upload",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"upload"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Asset",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Discards an unattached upload. Only its uploader or a storage:manageAssets holder may delete it.",
+									"pm.test('Status code is 204, 403 or 404', () => pm.expect(pm.response.code).to.be.oneOf([204, 403, 404]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/assets/{{assetId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"assets",
+								"{{assetId}}"
 							]
 						}
 					}

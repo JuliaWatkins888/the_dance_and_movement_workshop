@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Box, Button, IconButton, Input, ListRow, Switch, Text, Textarea, HEX_COLOR_PATTERN } from '@inithium/ui';
 import { useUpsertSettingMutation } from '@inithium/api-client';
-import type { SettingEntity, UpsertSettingInput } from '@inithium/api-client';
+import type { SettingEntity, SettingImageValue, UpsertSettingInput } from '@inithium/api-client';
+import { CloudImageUploadButton } from '../../media/CloudImageUploadButton';
 import type { SettingDefinition } from '../../settings/definitions/registry';
 
 export interface SettingRowProps {
@@ -134,6 +135,36 @@ export const SettingRow = ({ definition, stored }: SettingRowProps) => {
           </Box>
         );
       }
+      case 'image': {
+        // Saved as soon as an upload finishes (like the boolean switch) - there's no draft state
+        // for an image, and saving immediately means an upload never lingers unattached in R2.
+        const image = draft as SettingImageValue;
+        const saveImage = (value: SettingImageValue) => {
+          setDraft(value);
+          save(value);
+        };
+        return (
+          <Box flex={{ direction: 'row', gap: 12, align: 'center' }} className="flex-wrap">
+            {image.url ? (
+              <img
+                src={image.url}
+                alt=""
+                className="h-16 max-w-48 rounded border border-surface-300 bg-surface-100 object-contain p-1"
+              />
+            ) : (
+              <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
+                Using the default image.
+              </Text>
+            )}
+            <CloudImageUploadButton purpose="setting" disabled={isLoading} onUploaded={({ url, assetId }) => saveImage({ url, assetId })} />
+            {image.url ? (
+              <Button variant={{ kind: 'ghost', color: 'surface' }} disabled={isLoading} onClick={() => saveImage({ url: '' })}>
+                Reset to Default
+              </Button>
+            ) : null}
+          </Box>
+        );
+      }
       case 'json':
         return (
           <Textarea
@@ -148,7 +179,7 @@ export const SettingRow = ({ definition, stored }: SettingRowProps) => {
     }
   };
 
-  const needsExplicitSave = definition.type !== 'boolean';
+  const needsExplicitSave = definition.type !== 'boolean' && definition.type !== 'image';
   const isColorInvalid = definition.type === 'color' && !HEX_COLOR_PATTERN.test((draft as string).trim());
 
   return (

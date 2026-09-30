@@ -1,9 +1,5 @@
-import { randomUUID } from 'node:crypto';
-import fs from 'node:fs';
-import path from 'node:path';
-import express, { Router } from 'express';
-import type { NextFunction, Request, Response, Router as RouterType } from 'express';
-import multer from 'multer';
+import { Router } from 'express';
+import type { Request, Response, Router as RouterType } from 'express';
 import { asyncHandler, ConflictError, createSuccessResponse, NotFoundError, ValidationError } from '@inithium/api-utils';
 import { requireAuth } from '@inithium/auth';
 import { requirePermission } from '@inithium/permissions';
@@ -30,7 +26,7 @@ import {
   updateProgram,
   updateSchoolYear,
 } from '@inithium/db';
-import type { ProgramEntity, SchoolYearEntity } from '@inithium/db';
+import type { SchoolYearEntity } from '@inithium/db';
 import type { ZodType } from 'zod';
 import {
   createClassSectionSchema,
@@ -50,59 +46,11 @@ import {
   loadInstructorDirectory,
   toAdminSectionDto,
 } from '../services/class-catalog.service';
+import { releaseCloudAsset, releaseReplacedCloudAsset, resolveCloudAssetUrl } from '../services/cloud-image.service';
 
 const router: RouterType = Router();
 
 const MANAGE = requirePermission('classes:manage');
-
-// Program images, stored the same way as staff photos and gallery uploads (see staff.route.ts's
-// STAFF_UPLOAD_DIR for why this lives in the source tree and must be committed to survive a
-// redeploy).
-const CLASSES_UPLOAD_DIR = path.resolve(process.cwd(), 'apps/api/uploads/classes');
-fs.mkdirSync(CLASSES_UPLOAD_DIR, { recursive: true });
-
-const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
-// No image/svg+xml - an uploaded SVG can carry <script>.
-const EXTENSION_BY_MIME_TYPE: Record<string, string> = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-  'image/gif': 'gif',
-};
-
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (_req, _file, callback) => callback(null, CLASSES_UPLOAD_DIR),
-    filename: (_req, file, callback) => callback(null, `${randomUUID()}.${EXTENSION_BY_MIME_TYPE[file.mimetype] ?? 'bin'}`),
-  }),
-  limits: { fileSize: MAX_FILE_SIZE_BYTES },
-  fileFilter: (_req, file, callback) => {
-    if (!(file.mimetype in EXTENSION_BY_MIME_TYPE)) {
-      callback(new Error(`Unsupported file type: ${file.mimetype}`));
-      return;
-    }
-    callback(null, true);
-  },
-});
-
-// Adapts multer's errors into a ValidationError the shared errorHandler understands.
-const handleUpload = (req: Request, res: Response, next: NextFunction): void => {
-  upload.single('file')(req, res, (err: unknown) => {
-    if (err instanceof multer.MulterError) {
-      next(ValidationError(err.code === 'LIMIT_FILE_SIZE' ? 'File too large. Max size is 5MB.' : err.message));
-      return;
-    }
-    next(err ? ValidationError(err instanceof Error ? err.message : 'Invalid file upload') : undefined);
-  });
-};
-
-const resolvePublicOrigin = (): string => process.env['API_PUBLIC_URL'] || `http://localhost:${process.env['PORT'] || 3000}`;
-
-// path.basename guards against a storage key ever carrying directory segments.
-const removeLocalImage = (program: ProgramEntity): void => {
-  if (program.imageSourceType !== 'local' || !program.imageStorageKey) return;
-  fs.rm(path.join(CLASSES_UPLOAD_DIR, path.basename(program.imageStorageKey)), { force: true }, () => undefined);
-};
 
 const normalizeParam = (raw: string | string[]): string => (Array.isArray(raw) ? raw[0] : raw);
 
@@ -225,24 +173,6 @@ router.get(
 // ---- Programs --------------------------------------------------------------------------------
 
 router.post(
-  '/api/classes/upload',
-  requireAuth,
-  MANAGE,
-  handleUpload,
-  asyncHandler(async (req: Request, res: Response) => {
-    if (!req.file) throw ValidationError('No file was uploaded');
-    res.status(201).json(
-      createSuccessResponse({
-        url: `${resolvePublicOrigin()}/api/classes/uploads/${req.file.filename}`,
-        storageKey: req.file.filename,
-      }),
-    );
-  }),
-);
-
-router.use('/api/classes/uploads', express.static(CLASSES_UPLOAD_DIR));
-
-router.post(
   '/api/classes/programs',
   requireAuth,
   MANAGE,
@@ -250,7 +180,12 @@ router.post(
     const body = parseBody(createProgramSchema, req.body);
     await assertProgramSlugAvailable(body.slug);
     const order = body.order ?? (await listPrograms()).length;
-    const program = await createProgram({ ...body, order, isPublished: body.isPublished ?? true });
+    const program = await createProgram({
+      ...body,
+      ...(body.imageSourceType === 'cloud' && body.imageAssetId ? { imageUrl: await resolveCloudAssetUrl(body.imageAssetId) } : {}),
+      order,
+      isPublished: body.isPublished ?? true,
+    });
     res.status(201).json(createSuccessResponse(program));
   }),
 );
@@ -264,9 +199,18 @@ router.put(
     const body = parseBody(updateProgramSchema, req.body);
     if (body.slug) await assertProgramSlugAvailable(body.slug, id);
     const previous = await getProgramById(id);
-    const program = await updateProgram(id, body);
-    if (!previous || !program) throw NotFoundError('Program not found');
-    if (previous.imageStorageKey !== program.imageStorageKey) removeLocalImage(previous);
+    if (!previous) throw NotFoundError('Program not found');
+    // imageSourceType present (a value or null) means the image was changed or removed.
+    const { imageAssetId, ...rest } = body;
+    const isImageChange = rest.imageSourceType !== undefined;
+    const nextAssetId = isImageChange ? (rest.imageSourceType === 'cloud' ? imageAssetId : null) : previous.imageAssetId;
+    const program = await updateProgram(id, {
+      ...rest,
+      ...(isImageChange ? { imageAssetId: nextAssetId ?? null } : {}),
+      ...(isImageChange && nextAssetId ? { imageUrl: await resolveCloudAssetUrl(nextAssetId) } : {}),
+    });
+    if (!program) throw NotFoundError('Program not found');
+    await releaseReplacedCloudAsset(previous.imageAssetId, nextAssetId);
     res.status(200).json(createSuccessResponse(program));
   }),
 );
@@ -281,8 +225,9 @@ router.delete(
       throw ConflictError('Move or delete this program’s courses before deleting it');
     }
     const program = await getProgramById(id);
-    if (!program || !(await deleteProgram(id))) throw NotFoundError('Program not found');
-    removeLocalImage(program);
+    if (!program) throw NotFoundError('Program not found');
+    await releaseCloudAsset(program.imageAssetId);
+    await deleteProgram(id);
     res.status(204).send();
   }),
 );
