@@ -29,7 +29,15 @@ export interface TabsListProps {
 }
 
 export const TabsList = ({ children, className }: TabsListProps) => (
-  <TabsPrimitive.List className={mergeClassNames('flex items-center gap-1 border-b border-surface-300', className)}>
+  // Scrolls sideways rather than wrapping/overflowing when the triggers outgrow a narrow screen.
+  // The baseline is an inset shadow, not border-b: a scroll container clips at its padding box,
+  // which would cut off the old -mb-px trick that let the active trigger's underline cover it.
+  <TabsPrimitive.List
+    className={mergeClassNames(
+      'flex items-center gap-1 overflow-x-auto shadow-[inset_0_-1px_0_var(--color-surface-300)] [scrollbar-width:none]',
+      className,
+    )}
+  >
     {children}
   </TabsPrimitive.List>
 );
@@ -46,10 +54,10 @@ export const TabsTrigger = ({ value, disabled, children, className }: TabsTrigge
     value={value}
     disabled={disabled}
     className={mergeClassNames(
-      '-mb-px border-b-2 border-transparent px-3 py-2 text-sm font-medium text-surface-600 transition-colors',
+      'shrink-0 whitespace-nowrap border-b-2 border-transparent px-3 py-2 text-sm font-medium text-surface-600 transition-colors',
       'hover:text-surface-900',
       'data-[state=active]:border-primary-500 data-[state=active]:text-surface-900',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500',
       'disabled:cursor-not-allowed disabled:opacity-50',
       className,
     )}

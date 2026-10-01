@@ -8,7 +8,7 @@ const AccountInfoSection = ({ profile, isOwnProfile }: ProfileSectionProps) => (
     <Text as="h2" className="text-xl font-semibold">
       {[profile.firstName, profile.lastName].filter(Boolean).join(' ')}
     </Text>
-    {isOwnProfile && profile.email ? <Text className="text-sm text-surface-600">{profile.email}</Text> : null}
+    {isOwnProfile && profile.email ? <Text className="text-sm text-surface-600 [overflow-wrap:anywhere]">{profile.email}</Text> : null}
     <Text className="text-sm text-surface-600">Joined {new Date(profile.createdAt).toLocaleDateString()}</Text>
   </Box>
 );

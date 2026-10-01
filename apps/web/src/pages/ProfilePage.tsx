@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   Avatar,
@@ -10,6 +10,8 @@ import {
   DEFAULT_BANNER_HEIGHT,
   Icon,
   Loader,
+  Select,
+  SelectItem,
   Tabs,
   TabsContent,
   TabsList,
@@ -30,7 +32,6 @@ import { profileSections } from './profile/sections/registry';
 import { profileTabs } from './profile/tabs/registry';
 
 const AVATAR_SIZE = 128;
-const COLUMN_INSET = 32;
 
 // @inithium/db's UserProfileBannerConfig stores color stops as a plain string[] (libs/db must
 // stay ignorant of @inithium/ui's non-empty-tuple BannerTrianglifyConfig type - see
@@ -61,6 +62,9 @@ export const ProfilePage = () => {
   // page's banner spans the full page width, which varies a lot across viewports, so it measures
   // its own wrapper and feeds the real width back in to keep the mesh undistorted everywhere.
   const { ref: bannerSizeRef, size: bannerSize } = useElementSize();
+  // Controlled (rather than Tabs' own defaultValue) so the mobile Select and the desktop tab
+  // strip below stay in sync. Unset until the user picks one, falling back to initialTabId.
+  const [selectedTabId, setSelectedTabId] = useState<string | undefined>(undefined);
 
   // Falls back to a deterministic mesh seeded off the profile's own id when nothing's been
   // customized yet - every profile has a stable, on-brand banner with zero DB writes until its
@@ -154,12 +158,12 @@ export const ProfilePage = () => {
         {/* Positioned so the banner's own bottom edge (top: DEFAULT_BANNER_HEIGHT) bisects the
             avatar exactly (translateY(-50%)) - "the bottom of the banner intersects the avatar
             at its direct middle" per spec. left offset matches the sidebar's own padding below
-            (COLUMN_INSET) so the avatar and the left column read as one aligned column. */}
+            (px-5 / lg:px-8) so the avatar and the left column read as one aligned column. */}
         <Box
           bgColor={{ color: 'surface', intensity: 100 }}
           borderColor={{ color: 'surface', intensity: 100 }}
-          className="absolute rounded-full border-4"
-          style={{ left: `${COLUMN_INSET}px`, top: `${DEFAULT_BANNER_HEIGHT}px`, transform: 'translateY(-50%)' }}
+          className="absolute left-5 rounded-full border-4 lg:left-8"
+          style={{ top: `${DEFAULT_BANNER_HEIGHT}px`, transform: 'translateY(-50%)' }}
         >
           <Avatar
             {...resolveAvatarConfigProps(profile.avatar, fullName)}
@@ -179,14 +183,15 @@ export const ProfilePage = () => {
         <Box
           bgColor={{ color: 'surface', intensity: 200 }}
           flex={{ direction: 'col', gap: 24 }}
-          padding={{ base: COLUMN_INSET, top: 64 }}
-          className="w-full lg:w-1/4 lg:shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)]"
+          className="w-full px-5 pb-6 pt-20 lg:w-1/4 lg:p-8 lg:pt-16 lg:shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)]"
         >
           {profileSections.map((section) => (
             <section.Component key={section.id} profile={profile} isOwnProfile={isOwnProfile} />
           ))}
         </Box>
-        <Box flex={{ direction: 'col' }} padding={{ base: COLUMN_INSET, top: 64 }} className="w-full lg:w-3/4">
+        {/* The 64px top inset only matters on lg, where it lines the tab strip up with the
+            sidebar's content below the avatar - stacked, it would just be dead space. */}
+        <Box flex={{ direction: 'col' }} className="w-full min-w-0 px-5 pb-8 pt-6 lg:w-3/4 lg:p-8 lg:pt-16">
           {visibleTabs.length > 0 ? (
             // flex-1 on both Tabs (a flex item of this column) and the active TabsContent (a
             // flex item of Tabs' own flex-col) is what actually delivers "min height of the
@@ -195,8 +200,19 @@ export const ProfilePage = () => {
             // panel grows to fill whatever's left after the tab strip's own height, pushing the
             // page's own min-height out to the viewport's bottom edge - and past it, undisturbed,
             // the moment a tab's actual content is taller than that.
-            <Tabs defaultValue={initialTabId} className="flex flex-1 flex-col">
-              <TabsList>
+            <Tabs value={selectedTabId ?? initialTabId} onValueChange={setSelectedTabId} className="flex flex-1 flex-col">
+              {/* The tab strip outgrows a phone's width, so below md it swaps for a dropdown -
+                  CSS-only, matching how every other breakpoint concern here is handled. */}
+              <Box className="md:hidden">
+                <Select value={selectedTabId ?? initialTabId} onValueChange={setSelectedTabId}>
+                  {visibleTabs.map((tab) => (
+                    <SelectItem key={tab.id} value={tab.id}>
+                      {tab.label}
+                    </SelectItem>
+                  ))}
+                </Select>
+              </Box>
+              <TabsList className="hidden md:flex">
                 {visibleTabs.map((tab) => (
                   <TabsTrigger key={tab.id} value={tab.id}>
                     {tab.label}

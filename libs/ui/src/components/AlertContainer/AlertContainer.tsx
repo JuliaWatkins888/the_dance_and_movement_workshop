@@ -78,8 +78,12 @@ export const AlertContainer = () => {
           key={position}
           label={POSITION_LABELS[position]}
           className={mergeClassNames(
-            'fixed z-[100] flex max-h-screen w-full max-w-sm list-none flex-col gap-2 p-4 outline-none',
+            'fixed z-[100] flex max-h-dvh w-full list-none flex-col gap-2 p-4 outline-none',
             POSITION_VIEWPORT_CLASSES[position],
+            // Below sm a corner-anchored column can't fit beside anything anyway, so it spans
+            // the screen edge to edge instead of hugging one side.
+            'left-0 right-0 items-stretch sm:max-w-sm',
+            position.endsWith('right') ? 'sm:left-auto sm:items-end' : 'sm:right-auto sm:items-start',
           )}
         >
           {records

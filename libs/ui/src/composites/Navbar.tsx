@@ -342,19 +342,18 @@ export const Navbar = ({
         flex={{ direction: 'row', justify: 'between', align: 'center' }}
         bgColor={{ color: 'surface', intensity: 100 }}
         borderColor={{ color: 'surface', intensity: 300 }}
-        padding={{ left: 24, right: 24 }}
-        className={mergeClassNames('h-full w-full border-b', className)}
+        className={mergeClassNames('h-full w-full border-b px-4 md:px-6', className)}
       >
         <Link to="/" className="flex shrink-0 items-center gap-2">
           {logo ? <img src={logo.src} alt={logo.alt ?? ''} className="h-14 w-auto" /> : null}
           {title ? (
-            <Text textColor={{color: 'surface', intensity: 950}} as="span" className="text-lg font-semibold font-primary">
+            <Text textColor={{color: 'surface', intensity: 950}} as="span" className="hidden text-lg font-semibold font-primary md:inline">
               <AmpersandText text={title} />
             </Text>
           ) : null}
         </Link>
 
-        <Box flex={{ direction: 'row', align: 'center', gap: 24 }}>
+        <Box flex={{ direction: 'row', align: 'center', gap: 24 }} className="gap-3 md:gap-6">
           <Box className="hidden lg:flex" flex={{ direction: 'row', align: 'center', gap: 16 }}>
             {toNavEntries(primaryNavPages).map((entry) =>
               entry.kind === 'link' ? (
