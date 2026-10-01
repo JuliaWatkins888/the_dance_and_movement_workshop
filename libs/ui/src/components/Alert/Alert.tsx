@@ -47,7 +47,7 @@ export const Alert = ({
   }, [duration]);
 
   const classes = mergeClassNames(
-    'flex w-full max-w-sm items-start gap-3 rounded-md border p-4 shadow-md',
+    'flex w-full items-start gap-3 rounded-md border p-4 shadow-md sm:max-w-sm',
     resolveAlertSeverityClasses(severity),
     resolveAnimationClasses(resolveAlertAnimation(position, animation), trigger),
     className,

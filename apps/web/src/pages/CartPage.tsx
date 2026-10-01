@@ -260,7 +260,7 @@ export const CartPage = () => {
   const notes = renewalNotes(cart);
 
   return (
-    <Box flex={{ direction: 'col', gap: 24 }} padding={{ base: 32 }}>
+    <Box flex={{ direction: 'col', gap: 24 }} className="p-4 md:p-8">
       <Box flex={{ direction: 'row', justify: 'between', align: 'center', gap: 16 }}>
         {header}
         <Button variant={{ kind: 'ghost', color: 'surface' }} textColor={{ color: 'surface', intensity: 800 }} disabled={isClearing} onClick={confirmClear}>
@@ -282,7 +282,9 @@ export const CartPage = () => {
           bgColor={{ color: 'surface', intensity: 200 }}
           padding={{ base: 24 }}
           flex={{ direction: 'col', gap: 20 }}
-          className="h-fit rounded-lg lg:sticky lg:top-6"
+          // order-first: on the stacked single-column layout the total and Checkout button lead,
+          // instead of sitting below every line item.
+          className="order-first h-fit rounded-lg lg:order-none lg:sticky lg:top-6"
         >
           <Text as="h2" textColor={{ color: 'surface', intensity: 950 }} className="text-lg font-semibold">
             Order summary

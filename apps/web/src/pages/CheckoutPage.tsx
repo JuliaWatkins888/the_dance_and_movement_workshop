@@ -58,7 +58,8 @@ const CheckoutSummary = ({
       bgColor={{ color: 'surface', intensity: 200 }}
       padding={{ base: 24 }}
       flex={{ direction: 'col', gap: 16 }}
-      className="h-fit rounded-lg lg:sticky lg:top-6"
+      // order-first: stacked on mobile, the totals lead and the form follows.
+      className="order-first h-fit rounded-lg lg:order-none lg:sticky lg:top-6"
     >
       <Box flex={{ direction: 'row', justify: 'between', align: 'center' }}>
         <Text as="h2" textColor={{ color: 'surface', intensity: 950 }} className="text-lg font-semibold">
@@ -294,7 +295,7 @@ export const CheckoutPage = () => {
   const canPlaceOrder = Boolean(quote) && !isPlacing && (!needsPayment || Boolean(payment));
 
   return (
-    <Box flex={{ direction: 'col', gap: 24 }} padding={{ base: 32 }}>
+    <Box flex={{ direction: 'col', gap: 24 }} className="p-4 md:p-8">
       <Text as="h1" textColor={{ color: 'surface', intensity: 950 }} className="text-3xl font-bold">
         Checkout
       </Text>

@@ -117,7 +117,10 @@ export function App() {
     // pages have real contrast to fade or slide against — without this, a page fading toward
     // transparent (or sliding out) reveals nothing but a plain white gap instead of a visible
     // transition.
-    <Box bgColor={{ color: 'surface', intensity: 950 }} className="min-h-screen w-full">
+    // overflow-x-clip: any page content wider than a phone screen would otherwise widen mobile
+    // Chrome's layout viewport, dragging fixed right-anchored UI (alerts) off the visible screen.
+    // clip (not hidden) so it doesn't become a scroll container and break position: sticky.
+    <Box bgColor={{ color: 'surface', intensity: 950 }} className="min-h-screen w-full overflow-x-clip">
       {hasBootstrapped ? (
         <>
           <Navbar
