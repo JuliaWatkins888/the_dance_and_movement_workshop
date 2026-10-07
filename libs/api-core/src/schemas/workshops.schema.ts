@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { httpUrlSchema } from './url.schema';
 import { COURSE_LEVELS } from '@inithium/db';
 
 // 24-hour "HH:mm" and "YYYY-MM-DD" - native <input type="time"> / <input type="date"> values.
@@ -11,7 +12,7 @@ const slugString = z
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use lowercase letters, numbers, and single dashes');
 
 const ageYears = z.number().min(0).max(120);
-const imageUrl = z.string().trim().url().max(2000);
+const imageUrl = httpUrlSchema;
 const imageSourceType = z.enum(['cloud', 'external']);
 const hexColor = z.string().regex(/^#[0-9a-f]{3,8}$/i, 'Expected a hex color');
 

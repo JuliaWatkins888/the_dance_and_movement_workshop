@@ -1,3 +1,11 @@
 packages:
   - 'apps/*'
   - 'libs/*'
+
+# Security floors for transitive dependencies flagged by `pnpm audit` - drop an entry once every
+# parent package depends on a fixed version itself.
+overrides:
+  proxy-addr: '>=2.0.8'
+  qs: '>=6.16.0'
+  ip-address: '>=10.7.3'
+  source-map-js: '>=1.2.2'

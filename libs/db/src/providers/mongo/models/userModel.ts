@@ -13,12 +13,13 @@ export interface UserDocument extends Document {
   avatar: AvatarConfig;
   profileBanner?: UserProfileBannerConfig;
   darkMode: boolean;
+  tokenVersion: number;
   createdAt: Date;
 }
 
 const userSchema = new Schema<UserDocument>(
   {
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: false },
     passwordHash: { type: String, required: true },
@@ -29,6 +30,7 @@ const userSchema = new Schema<UserDocument>(
     // keys are opaque, plugin-owned strings core has no fixed list of.
     capabilityOverrides: { type: Schema.Types.Mixed, required: true, default: {} },
     darkMode: { type: Boolean, required: true, default: false },
+    tokenVersion: { type: Number, required: true, default: 0 },
     avatar: {
       variant: { type: String, required: true, enum: AVATAR_VARIANTS, default: DEFAULT_AVATAR_CONFIG.variant },
       style: {

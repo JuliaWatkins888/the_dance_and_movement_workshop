@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { httpUrlSchema } from './url.schema';
 import { EVENT_BULK_DISCOUNT_KINDS } from '@inithium/db';
 
 // 24-hour "HH:mm" and "YYYY-MM-DD" - native <input type="time"> / <input type="date"> values.
@@ -45,7 +46,7 @@ export const eventWriteSchema = z
     venueAddress: z.string().trim().min(1).max(300).optional(),
     ticketTypes: z.array(ticketTypeSchema).min(1, 'Add at least one ticket type').max(10),
     bulkDiscount: bulkDiscountSchema.optional(),
-    imageUrl: z.string().trim().url().max(2000).optional(),
+    imageUrl: httpUrlSchema.optional(),
     imageSourceType: z.enum(['cloud', 'external']).optional(),
     imageAssetId: z.string().min(1).optional(),
     banner: z

@@ -1,12 +1,23 @@
-import { countAllUsers, listUsers, transferOwnership } from '../index';
+import { countAllUsers, getUserRepository, listUsers, transferOwnership } from '../index';
+
+// OWNER_BOOTSTRAP_EMAIL names the one account allowed to claim ownership automatically. Without
+// it, "first user to register becomes owner" would hand the whole site to whoever reaches the
+// signup page first on a fresh deployment.
+export const ownerBootstrapEmail = (): string | undefined => {
+  const value = process.env['OWNER_BOOTSTRAP_EMAIL']?.trim().toLowerCase();
+  return value ? value : undefined;
+};
+
+export const isOwnerBootstrapEmail = (email: string): boolean => {
+  const configured = ownerBootstrapEmail();
+  return configured !== undefined && configured === email.trim().toLowerCase();
+};
 
 // Called once at API startup (apps/api/src/main.ts, right after ensureSeededPages) - same
-// idempotent, run-on-every-boot precedent. Ensures exactly one user carries isOwner: true:
-// - Already exactly one -> no-op (the common case after the very first boot, since
-//   /auth/register already promotes the very first user ever to register).
-// - None (a workspace upgrading into this refactor with pre-existing users, or a fresh DB seeded
-//   outside /auth/register) -> promote the earliest-created 'admin'-role user if one exists,
-//   else the earliest-created user overall.
+// idempotent, run-on-every-boot precedent. Ensures at most one user carries isOwner: true:
+// - Already exactly one -> no-op (the common case).
+// - None -> promote the OWNER_BOOTSTRAP_EMAIL account if it exists, else the earliest-created
+//   'admin'-role user. Never an ordinary self-registered account.
 // - More than one (shouldn't happen given transferOwnership's atomicity, but defensive against
 //   hand-edited data) -> keep the earliest, demote the rest.
 export const ensureOwnerBootstrap = async (): Promise<void> => {
@@ -27,8 +38,14 @@ export const ensureOwnerBootstrap = async (): Promise<void> => {
     return;
   }
 
+  const configuredEmail = ownerBootstrapEmail();
+  const configuredUser = configuredEmail ? await getUserRepository().findByEmail(configuredEmail) : null;
   const sortedByCreatedAt = [...allUsers].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-  const newOwner = sortedByCreatedAt.find((user) => user.role === 'admin') ?? sortedByCreatedAt[0];
+  const newOwner = configuredUser ?? sortedByCreatedAt.find((user) => user.role === 'admin');
+  if (!newOwner) {
+    console.warn('ensureOwnerBootstrap: no owner exists - set OWNER_BOOTSTRAP_EMAIL to an existing account and restart');
+    return;
+  }
   await transferOwnership(newOwner.id);
   console.log(`ensureOwnerBootstrap: promoted ${newOwner.email} to owner`);
 };

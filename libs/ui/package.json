@@ -22,7 +22,7 @@
     "@tiptap/starter-kit": "^3.31.3",
     "animate.css": "^4.1.1",
     "react": "^19.0.0",
-    "react-router-dom": "6.30.3",
+    "react-router-dom": "6.30.6",
     "tailwind-merge": "^3.0.0",
     "@fullcalendar/core": "~6.1.21",
     "@fullcalendar/daygrid": "~6.1.21",

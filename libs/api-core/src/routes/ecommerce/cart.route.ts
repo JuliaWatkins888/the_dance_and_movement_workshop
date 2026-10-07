@@ -13,6 +13,7 @@ import {
 } from '@inithium/ecommerce';
 import { addCartLineSchema, applyDiscountCodeSchema, updateCartLineSchema } from '../../schemas/ecommerce.schema';
 import { currentUserId, normalizeParam, parseBody } from './ecommerceHttp';
+import { discountCodeRateLimiter } from '../../middleware/rateLimiters';
 
 const router: RouterType = Router();
 
@@ -63,6 +64,7 @@ router.delete(
 // attaches it, or answers 400 with the reason it doesn't apply.
 router.put(
   '/api/cart/discount',
+  discountCodeRateLimiter,
   asyncHandler(async (req: Request, res: Response) => {
     const { code } = parseBody(applyDiscountCodeSchema, req.body);
     res.status(200).json(createSuccessResponse(await applyCartDiscountCode(currentUserId(req), code)));

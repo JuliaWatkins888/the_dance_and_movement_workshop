@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import './types/express';
 import { getUserRepository } from '@inithium/db';
+import type { AuthTokenPayload } from '@inithium/auth';
 import { hasCapability } from './resolveEffectiveCapabilities';
 
 // Response style deliberately matches @inithium/auth's requireRole (plain res.status(...).json)
@@ -56,5 +57,15 @@ export const requireOwner = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
+// Registered with @inithium/auth's setSessionValidator by the API host. Rejects tokens for deleted
+// accounts or ones issued before the account's last revokeSessions, and refreshes the payload's
+// role/email so nothing downstream acts on claims that changed since the token was signed.
+export const resolveSession = async (payload: AuthTokenPayload): Promise<AuthTokenPayload | null> => {
+  const user = await getUserRepository().findById(payload.sub);
+  if (!user || (payload.ver ?? 0) !== user.tokenVersion) return null;
+  return { sub: user.id, email: user.email, role: user.role, ver: user.tokenVersion };
+};
+
 export { resolveEffectiveCapabilities, hasCapability } from './resolveEffectiveCapabilities';
+export { canManageUser, canAssignRole } from './delegation';
 export { ROLE_CAPABILITY_DEFAULTS } from './roles/role-capability-defaults';

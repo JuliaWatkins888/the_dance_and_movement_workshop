@@ -1,6 +1,7 @@
 import dns from 'node:dns';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import {
   connectDatabase,
   ensureOwnerBootstrap,
@@ -10,7 +11,8 @@ import {
   ensureSeededSettings,
   pruneOrphanedPluginPages,
 } from '@inithium/db';
-import { getAuthProvider } from '@inithium/auth';
+import { getAuthProvider, setSessionValidator } from '@inithium/auth';
+import { resolveSession } from '@inithium/permissions';
 import { registerCoreRoutes } from '@inithium/api-core';
 import { errorHandler } from '@inithium/api-utils';
 import { attachRealtimeGateway, connectRealtime } from '@inithium/realtime';
@@ -27,13 +29,35 @@ import { createPaymentWebhookRouter } from '@inithium/ecommerce';
 // every SRV query fails with ECONNREFUSED even though the OS's own DNS tools (which fall back
 // differently) resolve fine - see connectDatabase's own error if this ever regresses. Pointing
 // Node's resolver at public DNS directly sidesteps that broken local config without touching the
-// OS network settings at all.
-dns.setServers(['8.8.8.8', '1.1.1.1']);
+// OS network settings at all. Development only - a production host's own resolver may be the only
+// one that can see private/internal names.
+const isProduction = process.env['NODE_ENV'] === 'production';
+if (!isProduction) {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+}
+
+// Comma-separated list of browser origins allowed to call this API and open realtime sockets.
+// Required in production - a missing value must fail loudly rather than fall back to localhost.
+const webOrigins = (process.env['WEB_ORIGIN'] ?? '')
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+if (webOrigins.length === 0) {
+  if (isProduction) throw new Error('WEB_ORIGIN must be set in production (e.g. https://www.example.com)');
+  webOrigins.push('http://localhost:5173');
+}
 
 const app = express();
-// apps/web (Vite) runs on a different origin in dev - without this, the browser silently
-// blocks every request the SPA makes to this API.
-app.use(cors({ origin: process.env['WEB_ORIGIN'] || 'http://localhost:5173' }));
+// Number of reverse proxies in front of this server (Render's load balancer = 1). Makes req.ip the
+// real visitor address so rate limits are per visitor; never `true`, which trusts a
+// client-supplied X-Forwarded-For.
+app.set('trust proxy', Number.parseInt(process.env['TRUST_PROXY'] ?? '0', 10) || 0);
+// A JSON-only API: helmet's defaults (HSTS, nosniff, frame denial, a deny-all CSP, no
+// X-Powered-By) cost nothing here. The SPA's own CSP is emitted by apps/web's build.
+app.use(helmet());
+// apps/web (Vite) runs on a different origin - without this, the browser silently blocks every
+// request the SPA makes to this API.
+app.use(cors({ origin: webOrigins }));
 // Routes that must see the untouched request body (e.g. a payment provider's signed webhook,
 // verified against the exact bytes sent) mount here, ahead of the global JSON parser below.
 // inithium:block:ecommerce:pre-body-parser:start
@@ -75,6 +99,7 @@ const startServer = async () => {
     await ensureSeededClassCatalog();
 
     getAuthProvider().assertConfigured?.();
+    setSessionValidator(resolveSession);
     registerCoreRoutes(app);
     app.use(errorHandler);
 
@@ -82,7 +107,7 @@ const startServer = async () => {
     const server = app.listen(port, () => {
       console.log(`🚀 API listening at http://localhost:${port}`);
     });
-    attachRealtimeGateway(server);
+    attachRealtimeGateway(server, { allowedOrigins: webOrigins });
   } catch (error) {
     console.error('❌ Startup failed:', error);
     process.exit(1);

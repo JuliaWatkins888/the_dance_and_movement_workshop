@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { AVATAR_SHAPES, AVATAR_VARIANTS } from '@inithium/db';
+import { accountEmailSchema, newPasswordSchema } from './auth.schema';
 
 // Mirrors page.schema.ts's pageColorSchema - libs/api-core validates against the same loose
 // {color, intensity?, opacity?} shape @inithium/db's AvatarColor/UserProfileBannerConfig color
@@ -48,26 +49,29 @@ const profileBannerConfigSchema = z
 // by its own two dedicated endpoints below, not this general-purpose update). avatar/profileBanner
 // are whole-object replacements (the editor dialogs always send a complete config), not
 // per-field patches.
+// currentPassword is required by the route only when `email` actually changes - the sign-in
+// identifier is the one profile field a stolen session must not be able to rewrite on its own.
 export const updateMyProfileSchema = z
   .object({
-    email: z.email(),
-    firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().min(1).optional(),
+    email: accountEmailSchema,
+    firstName: z.string().trim().min(1, 'First name is required').max(100),
+    lastName: z.string().trim().min(1).max(100).optional(),
     avatar: avatarConfigSchema,
     profileBanner: profileBannerConfigSchema,
+    currentPassword: z.string().min(1).max(1024),
   })
   .partial();
 export type UpdateMyProfileRequestBody = z.infer<typeof updateMyProfileSchema>;
 
 export const verifyPasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
+  currentPassword: z.string().min(1, 'Current password is required').max(1024),
 });
 export type VerifyPasswordRequestBody = z.infer<typeof verifyPasswordSchema>;
 
 // Same min-length rule as registration's password field (auth.schema.ts) - a changed password
 // is held to the same bar as a newly-registered one.
 export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
-  newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+  currentPassword: z.string().min(1, 'Current password is required').max(1024),
+  newPassword: newPasswordSchema,
 });
 export type ChangePasswordRequestBody = z.infer<typeof changePasswordSchema>;

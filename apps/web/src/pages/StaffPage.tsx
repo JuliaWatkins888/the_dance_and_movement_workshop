@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Avatar, Box, Loader, Pagination, Text } from '@inithium/ui';
 import { useListPublicStaffQuery } from '@inithium/api-client';
-import type { StaffMemberDto } from '@inithium/api-client';
+import type { PublicStaffMemberDto } from '@inithium/api-client';
 
 const PAGE_SIZE = 12;
 
-const fullNameOf = (member: StaffMemberDto): string =>
+const fullNameOf = (member: PublicStaffMemberDto): string =>
   member.lastName ? `${member.firstName} ${member.lastName}` : member.firstName;
 
 interface StaffCardProps {
-  readonly member: StaffMemberDto;
+  readonly member: PublicStaffMemberDto;
 }
 
 // Full-bleed portrait card: the photo (or an initials fallback) fills the whole card, with

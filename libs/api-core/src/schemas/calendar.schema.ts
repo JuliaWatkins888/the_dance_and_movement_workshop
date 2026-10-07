@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { httpUrlSchema } from './url.schema';
 
 // 24-hour "HH:mm" and "YYYY-MM-DD" - native <input type="time"> / <input type="date"> values.
 const timeString = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Expected 24-hour HH:mm');
@@ -37,7 +38,7 @@ export const calendarEntryWriteSchema = z
     isAtStudio: z.boolean(),
     venueName: z.string().trim().min(1).max(120).optional(),
     venueAddress: z.string().trim().min(1).max(300).optional(),
-    linkUrl: z.string().trim().url().max(2000).optional(),
+    linkUrl: httpUrlSchema.optional(),
     isPublished: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {

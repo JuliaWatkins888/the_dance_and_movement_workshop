@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { httpUrlSchema } from './url.schema';
 import { GALLERY_IMAGE_SOURCE_TYPES } from '@inithium/db';
 
 // Cross-field: a cloud image must carry its assetId (the route derives the public url from it),
@@ -26,12 +27,12 @@ const galleryImageShape = {
   metadata: z.record(z.string(), z.unknown()).optional(),
   isPublished: z.boolean().optional(),
   sourceType: z.enum(GALLERY_IMAGE_SOURCE_TYPES).optional(),
-  url: z.string().min(1).optional(),
+  url: httpUrlSchema.optional(),
   assetId: z.string().min(1).optional(),
 };
 
 export const createGalleryImageSchema = z
-  .object({ ...galleryImageShape, sourceType: z.enum(GALLERY_IMAGE_SOURCE_TYPES), url: z.string().min(1) })
+  .object({ ...galleryImageShape, sourceType: z.enum(GALLERY_IMAGE_SOURCE_TYPES), url: httpUrlSchema })
   .superRefine(requireSourceFields);
 export type CreateGalleryImageRequestBody = z.infer<typeof createGalleryImageSchema>;
 

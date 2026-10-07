@@ -11,6 +11,8 @@ const sanitizePolicyContent = (html: string): string =>
     allowedTags: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'blockquote', 'a'],
     allowedAttributes: { a: ['href', 'target', 'rel'] },
     allowedSchemes: ['http', 'https', 'mailto'],
+    // A target="_blank" link without noopener lets the opened page navigate this one (tabnabbing).
+    transformTags: { a: sanitizeHtml.simpleTransform('a', { rel: 'noopener noreferrer' }) },
   });
 
 const contentSchema = z

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { alert, Box, Button, Input, PasswordInput, Text, useNavigateWithTransition } from '@inithium/ui';
-import { useRegisterMutation } from '@inithium/api-client';
+import { isRateLimitedError, RATE_LIMITED_MESSAGE, useRegisterMutation } from '@inithium/api-client';
 import { authStore } from '../app/authStore';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,8 +59,8 @@ export const SignupPage = () => {
       const result = await register({ email, password, firstName, lastName: lastName || undefined }).unwrap();
       authStore.setToken(result.accessToken);
       navigate('/');
-    } catch {
-      setFieldErrors({ email: 'Could not create an account with those details.' });
+    } catch (error) {
+      setFieldErrors({ email: isRateLimitedError(error) ? RATE_LIMITED_MESSAGE : 'Could not create an account with those details.' });
       showSubmissionErrorAlert();
     }
   };

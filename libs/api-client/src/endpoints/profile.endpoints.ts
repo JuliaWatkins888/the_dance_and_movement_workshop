@@ -24,6 +24,8 @@ export interface UpdateMyProfileInput {
   // not per-field patches - matches updateMyProfileSchema's own shape on the API side.
   avatar?: AvatarConfig;
   profileBanner?: UserProfileBannerConfig;
+  // Required by the API only when `email` changes.
+  currentPassword?: string;
 }
 
 export interface ChangePasswordInput {
@@ -56,8 +58,11 @@ export const profileApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: ApiResponse<{ valid: boolean }>) => response.data.valid,
     }),
-    changePassword: builder.mutation<void, ChangePasswordInput>({
+    // Changing the password signs out every other session server-side; the response carries a
+    // fresh token for this one, which the caller must store in place of the old (now revoked) one.
+    changePassword: builder.mutation<string, ChangePasswordInput>({
       query: (input) => ({ url: '/api/profile/me/password', method: 'POST', body: input }),
+      transformResponse: (response: ApiResponse<{ success: boolean; accessToken: string }>) => response.data.accessToken,
     }),
     // No request body - the server flips the currently-stored value itself (see
     // profile.route.ts), so there's no client-supplied target value that could drift out of

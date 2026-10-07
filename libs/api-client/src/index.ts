@@ -11,6 +11,7 @@ export { usePageParams } from './usePageParams';
 export { authApi, useGetMeQuery, useLoginMutation, useRegisterMutation } from './endpoints/auth.endpoints';
 export type { AuthUser, LoginCredentials, RegisterInput, AuthResponse } from './endpoints/auth.endpoints';
 export { ACCESS_TOKEN_STORAGE_KEY, getStoredAccessToken, setStoredAccessToken } from './tokenStorage';
+export { isRateLimitedError, RATE_LIMITED_MESSAGE } from './rateLimit';
 
 export { presenceApi, useGetUserPresenceQuery } from './endpoints/presence.endpoints';
 export { usePresence } from './realtime/usePresence';
@@ -144,6 +145,8 @@ export {
 } from './endpoints/staff.endpoints';
 export type {
   StaffMemberDto,
+  PublicStaffMemberDto,
+  ListPublicStaffResult,
   StaffUserCandidate,
   ListPublicStaffParams,
   ListStaffAdminParams,

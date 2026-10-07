@@ -1,15 +1,22 @@
 import type { Request, Response, NextFunction } from 'express';
 import './types/express';
-import { AuthProvider, AuthTokenPayload } from './contracts/auth-provider.contract';
+import { AuthProvider, AuthTokenPayload, SessionValidator } from './contracts/auth-provider.contract';
 import { activeProvider as defaultProvider } from './providers/active-provider';
 
 let activeProvider: AuthProvider = defaultProvider;
+let sessionValidator: SessionValidator | null = null;
 
 export const setAuthProvider = (provider: AuthProvider): void => {
   activeProvider = provider;
 };
 
 export const getAuthProvider = (): AuthProvider => activeProvider;
+
+// Wired once by the API host - this package stays free of any database dependency, so the
+// "is this session still valid" lookup is injected rather than imported.
+export const setSessionValidator = (validator: SessionValidator): void => {
+  sessionValidator = validator;
+};
 
 export const hashPassword = (plain: string): Promise<string> => activeProvider.hashPassword(plain);
 
@@ -22,17 +29,40 @@ export const signAccessToken = (payload: AuthTokenPayload): string =>
 export const verifyAccessToken = (token: string): AuthTokenPayload =>
   activeProvider.verifyAccessToken(token);
 
-export const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
+// Signature + expiry, then the injected session check. Null for any token that shouldn't be
+// honored; never throws, so every caller (HTTP middleware, the WebSocket upgrade) treats a
+// bad token the same way.
+export const authenticateAccessToken = async (token: string): Promise<AuthTokenPayload | null> => {
+  let payload: AuthTokenPayload;
+  try {
+    payload = verifyAccessToken(token);
+  } catch {
+    return null;
+  }
+  return sessionValidator ? sessionValidator(payload) : payload;
+};
+
+const bearerToken = (req: Request): string | null => {
   const header = req.headers.authorization;
-  if (!header?.startsWith('Bearer ')) {
+  return header?.startsWith('Bearer ') ? header.slice('Bearer '.length) : null;
+};
+
+export const requireAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const token = bearerToken(req);
+  if (!token) {
     res.status(401).json({ error: 'Missing or invalid Authorization header' });
     return;
   }
   try {
-    req.user = verifyAccessToken(header.slice('Bearer '.length));
+    const payload = await authenticateAccessToken(token);
+    if (!payload) {
+      res.status(401).json({ error: 'Invalid or expired token' });
+      return;
+    }
+    req.user = payload;
     next();
-  } catch {
-    res.status(401).json({ error: 'Invalid or expired token' });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -50,17 +80,19 @@ export const requireRole =
     next();
   };
 
-export const optionalAuth = (req: Request, _res: Response, next: NextFunction): void => {
-  const header = req.headers.authorization;
-  if (header?.startsWith('Bearer ')) {
-    try {
-      req.user = verifyAccessToken(header.slice('Bearer '.length));
-    } catch {
-      // Invalid/expired token on an optional-auth route — treat the caller as anonymous.
+// Invalid, expired, or revoked token on an optional-auth route - the caller is treated as anonymous.
+export const optionalAuth = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+  const token = bearerToken(req);
+  try {
+    if (token) {
+      const payload = await authenticateAccessToken(token);
+      if (payload) req.user = payload;
     }
+    next();
+  } catch (error) {
+    next(error);
   }
-  next();
 };
 
-export type { AuthProvider, AuthTokenPayload } from './contracts/auth-provider.contract';
+export type { AuthProvider, AuthTokenPayload, SessionValidator } from './contracts/auth-provider.contract';
 export { jwtProvider } from './providers/jwt/jwt.provider';
