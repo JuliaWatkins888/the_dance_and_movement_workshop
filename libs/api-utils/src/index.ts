@@ -23,3 +23,5 @@ export { asyncHandler } from './middleware/asyncHandler';
 export { errorHandler } from './middleware/errorHandler';
 
 export { logError } from './logging/logError';
+
+export { escapeCsvField, toCsvRow } from './csv/csv';

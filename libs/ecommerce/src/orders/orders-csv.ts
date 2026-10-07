@@ -1,7 +1,5 @@
+import { toCsvRow } from '@inithium/api-utils';
 import type { OrderEntity, UserEntity } from '@inithium/db';
-
-const escapeCsvField = (value: string): string => (/[",\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value);
-const toCsvRow = (fields: string[]): string => fields.map(escapeCsvField).join(',');
 
 // Minor units -> a plain decimal amount ("1234.50") in the currency's own fraction digits, with no
 // symbol or grouping, so spreadsheets and accounting imports read it as a number.

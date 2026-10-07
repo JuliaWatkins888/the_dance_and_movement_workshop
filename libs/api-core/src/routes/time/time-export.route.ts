@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { Request, Response, Router as RouterType } from 'express';
-import { asyncHandler, ForbiddenError, NotFoundError, ValidationError } from '@inithium/api-utils';
+import { asyncHandler, ForbiddenError, NotFoundError, toCsvRow, ValidationError } from '@inithium/api-utils';
 import { requireAuth } from '@inithium/auth';
 import { requirePermission } from '@inithium/permissions';
 import { getUserRepository, listTimeEntriesForUsersInRange, listTimeEntryTypes, listUsers } from '@inithium/db';
@@ -9,9 +9,6 @@ import { canActOnEmployee, isEmployee } from './timeAccess';
 
 const router: RouterType = Router();
 const EMPLOYEE_FETCH_LIMIT = 200;
-
-const escapeCsvField = (value: string): string => (/[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value);
-const toCsvRow = (fields: string[]): string => fields.map(escapeCsvField).join(',');
 
 // Hand-rolled rather than a CSV library - the format is simple enough (escape commas/quotes/
 // newlines, join with CRLF) not to justify a new dependency for it. Plain fetch-and-download on

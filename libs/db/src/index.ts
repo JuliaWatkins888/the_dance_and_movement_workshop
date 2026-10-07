@@ -88,6 +88,7 @@ export const deleteUser = (id: string) => getUserRepository().delete(id);
 export const getUserRegistrationsByDay = () => getUserRepository().countRegistrationsByDay();
 export const countAllUsers = () => getUserRepository().countAll();
 export const transferOwnership = (newOwnerId: string) => getUserRepository().transferOwnership(newOwnerId);
+export const revokeUserSessions = (id: string) => getUserRepository().revokeSessions(id);
 
 export const getPageRepository = () => activeProvider.getPageRepository();
 export const findPageByRoutePattern = (routePattern: string) =>
@@ -673,7 +674,7 @@ export type { FederalHoliday } from './utils/us-federal-holidays';
 export { ensureSeededPages } from './page-seeds/ensureSeededPages';
 export { pruneOrphanedPluginPages } from './page-seeds/pruneOrphanedPluginPages';
 export { ensureSeededSettings } from './settings-seeds/ensureSeededSettings';
-export { ensureOwnerBootstrap } from './bootstrap/ensureOwnerBootstrap';
+export { ensureOwnerBootstrap, isOwnerBootstrapEmail } from './bootstrap/ensureOwnerBootstrap';
 export { ensureSeededPolicies } from './policy-seeds/ensureSeededPolicies';
 export { ensureSeededClassCatalog } from './class-seeds/ensureSeededClassCatalog';
 export { mongoProvider } from './providers/mongo/mongo.provider';

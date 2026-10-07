@@ -1,16 +1,24 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import { AuthProvider, AuthTokenPayload } from '../../contracts/auth-provider.contract';
+import { AuthProvider } from '../../contracts/auth-provider.contract';
 
 const SALT_ROUNDS = 10;
+const ALGORITHM = 'HS256';
 
 const envSchema = z.object({
-  JWT_SECRET: z.string().min(1, 'JWT_SECRET environment variable must be set'),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters (e.g. `openssl rand -base64 48`)'),
   JWT_EXPIRES_IN: z
     .string()
     .regex(/^\d+(ms|s|m|h|d|w|y)?$/, 'JWT_EXPIRES_IN must look like "3600", "1h", "7d", etc.')
     .default('1h'),
+});
+
+const tokenPayloadSchema = z.object({
+  sub: z.string().min(1),
+  email: z.string(),
+  role: z.string(),
+  ver: z.number().int().nonnegative().optional(),
 });
 
 const getEnv = () =>
@@ -26,12 +34,14 @@ export const jwtProvider: AuthProvider = {
   signAccessToken: (payload) => {
     const env = getEnv();
     return jwt.sign(payload, env.JWT_SECRET, {
+      algorithm: ALGORITHM,
       expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
     });
   },
   verifyAccessToken: (token) => {
     const env = getEnv();
-    return jwt.verify(token, env.JWT_SECRET) as unknown as AuthTokenPayload;
+    const decoded = jwt.verify(token, env.JWT_SECRET, { algorithms: [ALGORITHM] });
+    return tokenPayloadSchema.parse(decoded);
   },
   assertConfigured: () => {
     getEnv();

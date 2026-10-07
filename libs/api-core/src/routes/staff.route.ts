@@ -50,6 +50,13 @@ const toStaffDto = async (staff: StaffEntity) => {
   };
 };
 
+// The unauthenticated /staff listing - drops internal ids (the linked account's userId, the
+// photo's storage asset) that only the CMS needs.
+const toPublicStaffDto = async (staff: StaffEntity) => {
+  const { userId: _userId, photoAssetId: _photoAssetId, ...publicFields } = await toStaffDto(staff);
+  return publicFields;
+};
+
 const toCandidateDto = (user: UserEntity) => ({
   id: user.id,
   firstName: user.firstName,
@@ -65,7 +72,7 @@ router.get(
     const pageSize = Math.min(100, Math.max(1, Number(req.query['pageSize']) || 12));
 
     const result = await listStaff({ page, pageSize });
-    const items = await Promise.all(result.items.map(toStaffDto));
+    const items = await Promise.all(result.items.map(toPublicStaffDto));
 
     res.status(200).json(
       createSuccessResponse(items, {

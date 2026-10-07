@@ -1,3 +1,4 @@
+import { isValidObjectId } from 'mongoose';
 import type { Model, QueryFilter } from 'mongoose';
 import {
   CreateUserInput,
@@ -28,16 +29,21 @@ const mapToUserEntity = (doc: UserDocument): UserEntity => ({
   avatar: doc.avatar,
   profileBanner: doc.profileBanner,
   darkMode: doc.darkMode,
+  tokenVersion: doc.tokenVersion ?? 0,
   createdAt: doc.createdAt,
 });
 
+// Case-insensitive so accounts saved before emails were normalized to lowercase still match.
+const CASE_INSENSITIVE = { locale: 'en', strength: 2 } as const;
+
 export const createMongoUserRepository = (model: Model<UserDocument>): UserRepository => ({
   findById: async (id: string): Promise<UserEntity | null> => {
+    if (!isValidObjectId(id)) return null;
     const user = await model.findById(id).exec();
     return user ? mapToUserEntity(user) : null;
   },
   findByEmail: async (email: string): Promise<UserEntity | null> => {
-    const user = await model.findOne({ email }).exec();
+    const user = await model.findOne({ email: email.trim() }).collation(CASE_INSENSITIVE).exec();
     return user ? mapToUserEntity(user) : null;
   },
   findMany: async (options: FindManyUsersOptions): Promise<PaginatedResult<UserEntity>> => {
@@ -72,6 +78,7 @@ export const createMongoUserRepository = (model: Model<UserDocument>): UserRepos
     return mapToUserEntity(user);
   },
   update: async (id: string, input: UpdateUserInput): Promise<UserEntity | null> => {
+    if (!isValidObjectId(id)) return null;
     const updateDoc: Record<string, unknown> = {};
     if (input.email !== undefined) updateDoc['email'] = input.email;
     if (input.firstName !== undefined) updateDoc['firstName'] = input.firstName;
@@ -87,6 +94,7 @@ export const createMongoUserRepository = (model: Model<UserDocument>): UserRepos
     return user ? mapToUserEntity(user) : null;
   },
   delete: async (id: string): Promise<boolean> => {
+    if (!isValidObjectId(id)) return false;
     const result = await model.findByIdAndDelete(id).exec();
     return result !== null;
   },
@@ -108,5 +116,10 @@ export const createMongoUserRepository = (model: Model<UserDocument>): UserRepos
     const user = await model.findByIdAndUpdate(newOwnerId, { $set: { isOwner: true } }, { new: true }).exec();
     if (!user) throw new Error(`transferOwnership: user ${newOwnerId} not found`);
     return mapToUserEntity(user);
+  },
+  revokeSessions: async (id: string): Promise<UserEntity | null> => {
+    if (!isValidObjectId(id)) return null;
+    const user = await model.findByIdAndUpdate(id, { $inc: { tokenVersion: 1 } }, { new: true }).exec();
+    return user ? mapToUserEntity(user) : null;
   },
 });

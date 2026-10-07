@@ -1,5 +1,6 @@
 import { ChangePasswordDialog, dialog } from '@inithium/ui';
 import { useChangePasswordMutation, useVerifyCurrentPasswordMutation } from '@inithium/api-client';
+import { authStore } from '../../app/authStore';
 
 // Single shared trigger for the "Change Password" flow, used both by the Navbar's
 // disabled-profile drawer shortcut (app.tsx) and the profile page's own account-settings
@@ -20,7 +21,7 @@ export const useOpenChangePasswordDialog = (): (() => void) => {
             }
           }}
           onSubmit={async (input) => {
-            await changePassword(input).unwrap();
+            authStore.setToken(await changePassword(input).unwrap());
           }}
           onClose={close}
         />

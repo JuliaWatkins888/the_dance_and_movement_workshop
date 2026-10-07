@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Box, Button, Input, Text } from '@inithium/ui';
-import { useAppName, useLoginMutation } from '@inithium/api-client';
+import { isRateLimitedError, RATE_LIMITED_MESSAGE, useAppName, useLoginMutation } from '@inithium/api-client';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -51,8 +51,8 @@ export const TimeLoginPage = ({ onLoginSuccess }: TimeLoginPageProps) => {
     try {
       const result = await login({ email, password }).unwrap();
       onLoginSuccess(result.accessToken);
-    } catch {
-      setSubmitError('Invalid email or password.');
+    } catch (error) {
+      setSubmitError(isRateLimitedError(error) ? RATE_LIMITED_MESSAGE : 'Invalid email or password.');
     }
   };
 

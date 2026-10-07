@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { useGetMeQuery, usePresence } from '@inithium/api-client';
 import type { AuthUser, PresenceStatus } from '@inithium/api-client';
 import { authStore } from './authStore';
@@ -22,11 +22,18 @@ export interface UseCurrentUserResult {
 
 export const useCurrentUser = (): UseCurrentUserResult => {
   const token = useAuthToken();
-  const { data: user, isLoading } = useGetMeQuery(undefined, { skip: !token });
+  const { data: user, isLoading, error } = useGetMeQuery(undefined, { skip: !token });
   // Own live presence, not a friend's or stranger's - reuses the exact same usePresence hook a
   // future friends list would call per-friend, just pointed at "me" so the Navbar's own avatar
   // shows the same status other users would eventually see for this account.
   const status = usePresence(token ? user?.id : undefined);
+
+  // A 401 here means the stored token was revoked (password changed elsewhere, role changed,
+  // account deleted) or has expired - drop it so the app shows a clean signed-out state.
+  const isRejected = (error as { status?: unknown } | undefined)?.status === 401;
+  useEffect(() => {
+    if (token && isRejected) authStore.setToken(null);
+  }, [token, isRejected]);
 
   return {
     currentUser: token && user ? { ...user, status } : null,

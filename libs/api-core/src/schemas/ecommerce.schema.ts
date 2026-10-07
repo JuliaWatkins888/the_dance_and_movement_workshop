@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { httpUrlSchema } from './url.schema';
 import {
   BILLING_INTERVALS,
   DISCOUNT_BILLING_TARGETS,
@@ -53,7 +54,7 @@ const productShape = {
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase letters, numbers, and single hyphens'),
   description: z.string().max(10000).optional(),
   categories: z.array(z.string().min(1).max(100)).default([]),
-  imageUrl: z.string().min(1).optional(),
+  imageUrl: httpUrlSchema.optional(),
   imageSourceType: z.enum(PRODUCT_IMAGE_SOURCE_TYPES).optional(),
   imageAssetId: z.string().min(1).optional(),
   basePriceCents: cents,
@@ -222,15 +223,18 @@ export const updateShippingMethodSchema = z
 
 // ---- Cart & checkout ----
 
+// Same ceiling the CMS's manual orders use - bounds pricing math and stock reservations.
+const MAX_LINE_QUANTITY = 99;
+
 export const addCartLineSchema = z.object({
   sourceType: z.string().min(1).max(50),
   sourceId: z.string().min(1).max(100),
   variantId: z.string().min(1).max(100).optional(),
   options: lineOptions.optional(),
-  quantity: z.number().int().min(1).default(1),
+  quantity: z.number().int().min(1).max(MAX_LINE_QUANTITY).default(1),
 });
 
-export const updateCartLineSchema = z.object({ quantity: z.number().int().min(1) });
+export const updateCartLineSchema = z.object({ quantity: z.number().int().min(1).max(MAX_LINE_QUANTITY) });
 
 export const applyDiscountCodeSchema = z.object({ code: z.string().trim().min(1).max(40) });
 

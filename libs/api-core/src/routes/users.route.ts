@@ -4,11 +4,13 @@ import {
   asyncHandler,
   createSuccessResponse,
   ConflictError,
+  ForbiddenError,
   NotFoundError,
+  UnauthorizedError,
   ValidationError,
 } from '@inithium/api-utils';
 import { requireAuth, hashPassword } from '@inithium/auth';
-import { requirePermission, requireOwner } from '@inithium/permissions';
+import { canAssignRole, canManageUser, requirePermission, requireOwner } from '@inithium/permissions';
 import {
   listUsers,
   createUser,
@@ -16,6 +18,7 @@ import {
   deleteUser,
   getUserRepository,
   getUserRegistrationsByDay,
+  revokeUserSessions,
   transferOwnership,
 } from '@inithium/db';
 import type { UserEntity, UserSearchField } from '@inithium/db';
@@ -28,6 +31,23 @@ const isSearchField = (value: unknown): value is UserSearchField =>
   typeof value === 'string' && (SEARCH_FIELDS as readonly string[]).includes(value);
 
 const normalizeId = (raw: string | string[]): string => (Array.isArray(raw) ? raw[0] : raw);
+
+// requirePermission has already loaded the acting user onto the request.
+const actingUser = (req: Request): UserEntity => {
+  if (!req.permissionUser) throw UnauthorizedError();
+  return req.permissionUser;
+};
+
+// Loads the target and enforces @inithium/permissions' canManageUser - a users:manage delegate
+// can't edit, reset, or delete an account holding capabilities they don't have themselves.
+const loadManageableTarget = async (req: Request, id: string): Promise<UserEntity> => {
+  const target = await getUserRepository().findById(id);
+  if (!target) throw NotFoundError('User not found');
+  if (!canManageUser(actingUser(req), target)) {
+    throw ForbiddenError('You cannot manage an account with more permissions than your own');
+  }
+  return target;
+};
 
 // Every response strips passwordHash, matching auth.route.ts's existing convention of never
 // returning the hash on any user-facing endpoint. capabilityOverrides is the raw per-user
@@ -97,6 +117,10 @@ router.post(
       throw ValidationError('Invalid request body', parsed.error.flatten());
     }
 
+    if (!canAssignRole(actingUser(req), parsed.data.role ?? 'user')) {
+      throw ForbiddenError('You cannot create an account with more permissions than your own');
+    }
+
     const existing = await getUserRepository().findByEmail(parsed.data.email);
     if (existing) {
       throw ConflictError('A user with this email already exists');
@@ -134,10 +158,14 @@ router.patch(
       throw ValidationError('You cannot change your own role');
     }
 
+    const target = await loadManageableTarget(req, id);
+
     if (parsed.data.role !== undefined) {
-      const target = await getUserRepository().findById(id);
-      if (target?.isOwner) {
+      if (target.isOwner) {
         throw ValidationError("You cannot change the owner's role");
+      }
+      if (!canAssignRole(actingUser(req), parsed.data.role, target.capabilityOverrides)) {
+        throw ForbiddenError('You cannot assign a role with more permissions than your own');
       }
     }
 
@@ -159,6 +187,12 @@ router.patch(
 
     if (!user) {
       throw NotFoundError('User not found');
+    }
+
+    // A reset password or changed role must take effect now, not when the old token expires.
+    const roleChanged = parsed.data.role !== undefined && parsed.data.role !== target.role;
+    if (passwordHash || roleChanged) {
+      await revokeUserSessions(id);
     }
 
     res.status(200).json(createSuccessResponse(toPublicUser(user)));
@@ -233,8 +267,8 @@ router.delete(
       throw ValidationError('You cannot delete your own account');
     }
 
-    const target = await getUserRepository().findById(id);
-    if (target?.isOwner) {
+    const target = await loadManageableTarget(req, id);
+    if (target.isOwner) {
       throw ValidationError('You cannot delete the owner account');
     }
 

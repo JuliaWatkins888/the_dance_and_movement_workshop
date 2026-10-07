@@ -183,68 +183,6 @@
 							"body": "{\n  \"success\": true,\n  \"data\": {\n    \"status\": \"ok\"\n  }\n}"
 						}
 					]
-				},
-				{
-					"name": "API Test Error",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test('Status code is 400', () => pm.response.to.have.status(400));",
-									"pm.test('Response has success: false and VALIDATION_ERROR code', () => {",
-									"  const json = pm.response.json();",
-									"  pm.expect(json.success).to.eql(false);",
-									"  pm.expect(json.error.code).to.eql('VALIDATION_ERROR');",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/test-error",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"test-error"
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "Validation Error",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/test-error",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"test-error"
-									]
-								}
-							},
-							"status": "Bad Request",
-							"code": 400,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"This is a simulated validation error for testing the global error handler\",\n    \"details\": {\n      \"field\": \"example\"\n    }\n  }\n}"
-						}
-					]
 				}
 			]
 		},
@@ -964,7 +902,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"firstName\": \"{{firstName}}\",\n  \"lastName\": \"{{lastName}}\",\n  \"email\": \"{{email}}\",\n  \"avatar\": {\n    \"variant\": \"initials\",\n    \"style\": { \"bgColor\": { \"color\": \"primary\", \"intensity\": 500 }, \"shape\": \"circle\" }\n  },\n  \"profileBanner\": {\n    \"cellSize\": 40,\n    \"variance\": 0.5,\n    \"xColors\": [\"#006a8e\", \"#f5a42d\"],\n    \"yColors\": [\"#397e7f\"]\n  }\n}",
+							"raw": "{\n  \"firstName\": \"{{firstName}}\",\n  \"lastName\": \"{{lastName}}\",\n  \"email\": \"{{email}}\",\n  \"avatar\": {\n    \"variant\": \"initials\",\n    \"style\": {\n      \"bgColor\": {\n        \"color\": \"primary\",\n        \"intensity\": 500\n      },\n      \"shape\": \"circle\"\n    }\n  },\n  \"profileBanner\": {\n    \"cellSize\": 40,\n    \"variance\": 0.5,\n    \"xColors\": [\n      \"#006a8e\",\n      \"#f5a42d\"\n    ],\n    \"yColors\": [\n      \"#397e7f\"\n    ]\n  },\n  \"currentPassword\": \"{{password}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -981,7 +919,8 @@
 								"profile",
 								"me"
 							]
-						}
+						},
+						"description": "currentPassword is required only when email changes (401 if missing or wrong)."
 					}
 				},
 				{
@@ -1083,11 +1022,10 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
-									"",
-									"if (pm.response.code === 200) {",
-									"  pm.collectionVariables.set('password', 'NewPassword123!');",
-									"}"
+									"pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+									"const data = pm.response.json().data;",
+									"pm.test('Returns a fresh access token', function () { pm.expect(data.accessToken).to.be.a('string'); });",
+									"if (data && data.accessToken) { pm.collectionVariables.set('accessToken', data.accessToken); }"
 								]
 							}
 						}
@@ -1124,7 +1062,8 @@
 								"me",
 								"password"
 							]
-						}
+						},
+						"description": "Revokes every existing session for the account and returns a fresh token in data.accessToken; the test script stores it."
 					}
 				}
 			]

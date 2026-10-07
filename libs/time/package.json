@@ -6,6 +6,6 @@
   "types": "./src/index.d.ts",
   "dependencies": {
     "react": "^19.0.0",
-    "react-router-dom": "6.30.3"
+    "react-router-dom": "6.30.6"
   }
 }

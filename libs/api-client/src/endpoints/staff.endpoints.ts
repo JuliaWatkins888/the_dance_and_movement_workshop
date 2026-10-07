@@ -44,6 +44,17 @@ export interface ListStaffAdminParams {
   searchField?: StaffSearchField;
 }
 
+// What the unauthenticated /api/staff listing returns - no internal account or asset ids.
+export type PublicStaffMemberDto = Omit<StaffMemberDto, 'userId' | 'photoAssetId'>;
+
+export interface ListPublicStaffResult {
+  items: PublicStaffMemberDto[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
 export interface ListStaffResult {
   items: StaffMemberDto[];
   page: number;
@@ -65,7 +76,7 @@ export interface StaffWriteInput {
 // null clears the photo fields (removing a photo).
 export type UpdateStaffInput = { [K in keyof StaffWriteInput]?: StaffWriteInput[K] | null } & { id: string };
 
-const buildListResult = (response: ApiResponse<StaffMemberDto[]>): ListStaffResult => ({
+const buildListResult = <T>(response: ApiResponse<T[]>) => ({
   items: response.data,
   page: (response.meta?.['page'] as number) ?? 1,
   pageSize: (response.meta?.['pageSize'] as number) ?? response.data.length,
@@ -75,9 +86,9 @@ const buildListResult = (response: ApiResponse<StaffMemberDto[]>): ListStaffResu
 
 export const staffApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    listPublicStaff: builder.query<ListStaffResult, ListPublicStaffParams>({
+    listPublicStaff: builder.query<ListPublicStaffResult, ListPublicStaffParams>({
       query: ({ page, pageSize }) => `/api/staff?${new URLSearchParams({ page: String(page), pageSize: String(pageSize) })}`,
-      transformResponse: buildListResult,
+      transformResponse: (response: ApiResponse<PublicStaffMemberDto[]>) => buildListResult(response),
       providesTags: ['Staff'],
     }),
     listStaffAdmin: builder.query<ListStaffResult, ListStaffAdminParams>({
@@ -87,7 +98,7 @@ export const staffApi = baseApi.injectEndpoints({
         if (searchField) params.set('searchField', searchField);
         return `/api/staff/admin?${params.toString()}`;
       },
-      transformResponse: buildListResult,
+      transformResponse: (response: ApiResponse<StaffMemberDto[]>): ListStaffResult => buildListResult(response),
       providesTags: ['Staff'],
     }),
     listStaffUserCandidates: builder.query<StaffUserCandidate[], { search?: string }>({

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { alert, Box, Button, Input, PasswordInput, Text, useNavigateWithTransition } from '@inithium/ui';
-import { useLoginMutation } from '@inithium/api-client';
+import { isRateLimitedError, RATE_LIMITED_MESSAGE, useLoginMutation } from '@inithium/api-client';
 import { authStore } from '../app/authStore';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,8 +59,8 @@ export const LoginPage = () => {
       const result = await login({ email, password }).unwrap();
       authStore.setToken(result.accessToken);
       navigate(resolveRedirect(location.search));
-    } catch {
-      setFieldErrors({ password: 'Invalid email or password.' });
+    } catch (error) {
+      setFieldErrors({ password: isRateLimitedError(error) ? RATE_LIMITED_MESSAGE : 'Invalid email or password.' });
       showSubmissionErrorAlert();
     }
   };

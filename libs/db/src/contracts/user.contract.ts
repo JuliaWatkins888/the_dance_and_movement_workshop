@@ -88,6 +88,9 @@ export interface UserEntity {
   avatar: AvatarConfig;
   profileBanner?: UserProfileBannerConfig;
   darkMode: boolean;
+  // Embedded in every access token as `ver`; incrementing it (revokeSessions) invalidates every
+  // token issued before. Never settable through UpdateUserInput.
+  tokenVersion: number;
   createdAt: Date;
 }
 
@@ -143,4 +146,7 @@ export interface UserRepository {
   // new-owner entity. Ownership transfer never goes through the generic update() - keeping it a
   // dedicated method means it can never be smuggled through a normal user-edit form.
   transferOwnership: (newOwnerId: string) => Promise<UserEntity>;
+  // Bumps tokenVersion so every access token issued so far stops being accepted. Returns the
+  // updated entity (null if the user no longer exists) so the caller can sign a fresh token.
+  revokeSessions: (id: string) => Promise<UserEntity | null>;
 }

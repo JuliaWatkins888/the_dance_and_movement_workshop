@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { httpUrlSchema } from './url.schema';
 import { COURSE_LEVELS, DAYS_OF_WEEK } from '@inithium/db';
 
 // 24-hour "HH:mm" - matches a native <input type="time"> value directly, see class-section.contract.ts.
@@ -40,7 +41,7 @@ const programBanner = z.object({
   xColors: z.array(hexColor).min(1).max(8),
   yColors: z.array(hexColor).min(1).max(8),
 });
-const imageUrl = z.string().trim().url().max(2000);
+const imageUrl = httpUrlSchema;
 const imageSourceType = z.enum(['cloud', 'external']);
 const imageAssetId = z.string().min(1);
 // A cloud image carries its assetId - the route derives imageUrl from the Asset row.

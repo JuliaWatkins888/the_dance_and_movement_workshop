@@ -10,9 +10,11 @@ import {
   ValidationError,
 } from '@inithium/api-utils';
 import { requireAuth, optionalAuth, hashPassword, comparePassword } from '@inithium/auth';
-import { getSetting, getUserRepository, updateUser } from '@inithium/db';
+import { getSetting, getUserRepository, revokeUserSessions, updateUser } from '@inithium/db';
 import type { UserEntity } from '@inithium/db';
 import { changePasswordSchema, updateMyProfileSchema, verifyPasswordSchema } from '../schemas/profile.schema';
+import { passwordRateLimiter } from '../middleware/rateLimiters';
+import { signTokenFor } from '../services/access-token.service';
 
 const router: RouterType = Router();
 
@@ -73,6 +75,7 @@ router.get(
 router.patch(
   '/api/profile/me',
   requireAuth,
+  passwordRateLimiter,
   asyncHandler(async (req: Request, res: Response) => {
     if (!(await isProfileEnabled())) {
       throw NotFoundError(PROFILE_NOT_FOUND_MESSAGE);
@@ -84,8 +87,16 @@ router.patch(
     }
 
     const id = req.user!.sub;
+    const current = await getUserRepository().findById(id);
+    if (!current) {
+      throw NotFoundError('User not found');
+    }
 
-    if (parsed.data.email) {
+    if (parsed.data.email && parsed.data.email !== current.email.toLowerCase()) {
+      const { currentPassword } = parsed.data;
+      if (!currentPassword || !(await comparePassword(currentPassword, current.passwordHash))) {
+        throw UnauthorizedError('Enter your current password to change your email');
+      }
       const existing = await getUserRepository().findByEmail(parsed.data.email);
       if (existing && existing.id !== id) {
         throw ConflictError('A user with this email already exists');
@@ -139,6 +150,7 @@ router.post(
 router.post(
   '/api/profile/me/password/verify',
   requireAuth,
+  passwordRateLimiter,
   asyncHandler(async (req: Request, res: Response) => {
     const parsed = verifyPasswordSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -158,9 +170,12 @@ router.post(
   }),
 );
 
+// Signs every other device out (revokeUserSessions) and returns a fresh token so this one stays
+// signed in.
 router.post(
   '/api/profile/me/password',
   requireAuth,
+  passwordRateLimiter,
   asyncHandler(async (req: Request, res: Response) => {
     const parsed = changePasswordSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -180,8 +195,12 @@ router.post(
 
     const passwordHash = await hashPassword(parsed.data.newPassword);
     await updateUser(user.id, { passwordHash });
+    const revoked = await revokeUserSessions(user.id);
+    if (!revoked) {
+      throw NotFoundError('User not found');
+    }
 
-    res.status(200).json(createSuccessResponse({ success: true }));
+    res.status(200).json(createSuccessResponse({ success: true, accessToken: signTokenFor(revoked) }));
   }),
 );
 

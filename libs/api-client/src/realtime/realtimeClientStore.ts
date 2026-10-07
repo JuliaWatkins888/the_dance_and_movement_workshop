@@ -23,12 +23,16 @@ const channelListeners = new Map<string, Set<ChannelListener>>();
 
 const emitStatus = () => statusListeners.forEach((listener) => listener());
 
-const resolveSocketUrl = (token: string): string => {
+// Must match @inithium/realtime's AUTH_SUBPROTOCOL - duplicated rather than imported because that
+// package's runtime entry pulls in the Node `ws` server. The token rides in the subprotocol
+// header instead of the URL so it never ends up in proxy or access logs.
+const AUTH_SUBPROTOCOL = 'inithium.bearer';
+
+const resolveSocketUrl = (): string => {
   const baseUrl = import.meta.env?.['VITE_API_URL'] ?? 'http://localhost:3000';
   const url = new URL(baseUrl);
   url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
   url.pathname = '/realtime';
-  url.searchParams.set('token', token);
   return url.toString();
 };
 
@@ -85,7 +89,7 @@ const open = (): void => {
   status = 'connecting';
   emitStatus();
 
-  const ws = new WebSocket(resolveSocketUrl(currentToken));
+  const ws = new WebSocket(resolveSocketUrl(), [AUTH_SUBPROTOCOL, currentToken]);
   socket = ws;
 
   ws.onopen = () => {

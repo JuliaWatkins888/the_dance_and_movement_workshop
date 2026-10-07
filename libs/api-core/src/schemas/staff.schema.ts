@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { httpUrlSchema } from './url.schema';
 import { STAFF_PHOTO_SOURCE_TYPES } from '@inithium/db';
 
 // Cross-field: a cloud photo must carry its assetId (the route derives photoUrl from it), an
@@ -20,7 +21,7 @@ const staffShape = {
   userId: z.string().min(1, 'A linked user is required'),
   title: z.string().min(1, 'Title is required'),
   bio: z.string().max(2000).optional(),
-  photoUrl: z.string().min(1).optional(),
+  photoUrl: httpUrlSchema.optional(),
   photoSourceType: z.enum(STAFF_PHOTO_SOURCE_TYPES).optional(),
   photoAssetId: z.string().min(1).optional(),
   order: z.number().int().optional(),

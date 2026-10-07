@@ -9,6 +9,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 interface FieldErrors {
   firstName?: string;
   email?: string;
+  currentPassword?: string;
 }
 
 // Core's own tab, added through the exact same registry every plugin tab uses. visibility:
@@ -22,14 +23,19 @@ const AccountSettingsTab = ({ profile }: ProfileTabProps) => {
   const [firstName, setFirstName] = useState(profile.firstName);
   const [lastName, setLastName] = useState(profile.lastName ?? '');
   const [email, setEmail] = useState(profile.email ?? '');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
   const [savedAt, setSavedAt] = useState<number | undefined>(undefined);
+
+  // The API requires the current password to change the sign-in email.
+  const isEmailChanging = email.trim().toLowerCase() !== (profile.email ?? '').toLowerCase();
 
   const validate = (): FieldErrors => {
     const errors: FieldErrors = {};
     if (!firstName.trim()) errors.firstName = 'First name is required.';
     if (!EMAIL_REGEX.test(email)) errors.email = 'Please enter a valid email.';
+    if (isEmailChanging && !currentPassword) errors.currentPassword = 'Enter your current password to change your email.';
     return errors;
   };
 
@@ -43,10 +49,23 @@ const AccountSettingsTab = ({ profile }: ProfileTabProps) => {
     setSubmitError(undefined);
 
     try {
-      await updateMyProfile({ firstName, lastName: lastName || undefined, email }).unwrap();
+      await updateMyProfile({
+        firstName,
+        lastName: lastName || undefined,
+        email,
+        ...(isEmailChanging ? { currentPassword } : {}),
+      }).unwrap();
+      setCurrentPassword('');
       setSavedAt(Date.now());
-    } catch {
-      setSubmitError('Could not save your changes. Check the fields and try again.');
+    } catch (error) {
+      const status = (error as { status?: unknown })?.status;
+      setSubmitError(
+        status === 401
+          ? 'Your current password is incorrect.'
+          : status === 429
+            ? 'Too many attempts. Please wait a few minutes and try again.'
+            : 'Could not save your changes. Check the fields and try again.',
+      );
     }
   };
 
@@ -70,6 +89,18 @@ const AccountSettingsTab = ({ profile }: ProfileTabProps) => {
         error={Boolean(fieldErrors.email)}
         helperText={fieldErrors.email}
       />
+      {isEmailChanging ? (
+        <Input
+          label="Current Password"
+          type="password"
+          required
+          autoComplete="current-password"
+          value={currentPassword}
+          onChange={(event) => setCurrentPassword(event.target.value)}
+          error={Boolean(fieldErrors.currentPassword)}
+          helperText={fieldErrors.currentPassword ?? 'Required to change your email.'}
+        />
+      ) : null}
       {submitError ? (
         <Text as="p" className="text-sm text-red-600">
           {submitError}
