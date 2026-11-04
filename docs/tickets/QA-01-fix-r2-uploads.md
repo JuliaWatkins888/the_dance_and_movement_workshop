@@ -39,10 +39,10 @@
 
 ## Implementation steps
 
-- [ ] Get the exact error: read the API logs for a failed `POST /api/storage/upload` on the
+- [x] Get the exact error: read the API logs for a failed `POST /api/storage/upload` on the
       deployed environment (or have the developer reproduce locally with the production R2
       credentials) and record the root cause in this ticket under "Findings".
-- [ ] Fix the root cause (env, token scope, public URL, or SDK checksum config in
+- [x] Fix the root cause (env, token scope, public URL, or SDK checksum config in
       `s3.provider.ts`).
 - [x] Wrap provider failures in `uploadObject` so the API logs the underlying S3/R2 error code
       server-side but returns a clean `AppError` (e.g. "Image storage is unavailable, please try
@@ -62,7 +62,13 @@
 
 ## Findings
 
-**Confirmed from the code (2026-11-04):**
+**Root cause (confirmed 2026-11-04): cause #1, missing env.** The deployed API had no
+`STORAGE_*` variables. They had been added to the Render **web** service instead of the **API**
+service (`…-sx1n`). The new error handling showed `503 SERVICE_UNAVAILABLE` with
+`reason: InvalidStorageConfig`. After the variables were moved to the API service, a gallery
+upload succeeded.
+
+**Also fixed from the code:**
 
 - The installed `@aws-sdk/client-s3` is **3.1143.0**. Since 3.729, the SDK sends CRC32 checksums
   on every `PutObject` by default, so cause #4 applies to this codebase. Fixed in `s3.provider.ts`:
@@ -70,7 +76,7 @@
 - Env values are now trimmed (a trailing space or newline pasted into the host dashboard caused
   `SignatureDoesNotMatch`). `STORAGE_ENDPOINT` and `STORAGE_PUBLIC_BASE_URL` must now be full URLs.
 
-**Still to confirm on the deployed API (developer):** deploy this branch, then check:
+**Diagnosing a future failure:** check:
 
 1. The boot log. It should show `🪣 Storage: bucket "…" via <account>.r2.cloudflarestorage.com, public URL …`
    with no `⚠️ Storage` lines. A `⚠️` line names the env problem (cause #1 or #3).
