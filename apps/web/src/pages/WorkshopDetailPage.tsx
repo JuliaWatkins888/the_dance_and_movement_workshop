@@ -16,6 +16,7 @@ import { LEVEL_LABELS, formatAgeRange, formatCents, formatTime12h, formatTimeRan
 import { ProgramBanner } from './classes/ProgramBanner';
 import { AttendeeChoices, ChoiceCard, DetailBlock, attendeeKeyOf } from './classes/registrationChoices';
 import { useRouteSlug } from './classes/useRouteSlug';
+import { AddStudentAction } from './students/AddStudentAction';
 import {
   formatDateSpan,
   formatDayCount,
@@ -91,7 +92,11 @@ export const WorkshopDetailPage = () => {
   const [addCartLine, { isLoading: isAdding }] = useAddCartLineMutation();
 
   const isOpen = workshop?.status === 'open';
-  const { data: attendees = [], isFetching: isLoadingAttendees } = useListEligibleWorkshopAttendeesQuery(workshop?.id ?? '', {
+  const {
+    data: attendees = [],
+    isFetching: isLoadingAttendees,
+    refetch: refetchAttendees,
+  } = useListEligibleWorkshopAttendeesQuery(workshop?.id ?? '', {
     skip: !currentUser || !workshop || !isOpen,
   });
   const selectedAttendee = attendees.find((attendee) => attendeeKeyOf(attendee) === selectedAttendeeKey);
@@ -160,7 +165,7 @@ export const WorkshopDetailPage = () => {
         quantity: 1,
       }).unwrap();
       alert.success(`${workshop.title} for ${selectedAttendee.name} added to your cart.`, { position: ALERT_POSITION });
-      setSelectedDayIds([]);
+      navigate('/cart');
     } catch (error) {
       alert.danger(readApiError(error, 'Could not add this workshop to your cart.').message, { position: ALERT_POSITION });
     }
@@ -210,14 +215,9 @@ export const WorkshopDetailPage = () => {
     }
     if (attendees.length === 0) {
       return (
-        <Box flex={{ direction: 'col', align: 'start', gap: 6 }}>
-          <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
-            None of your dancers are in this workshop’s age range ({formatAgeRange(workshop.minAgeYears, workshop.maxAgeYears)}).
-          </Text>
-          <Link to={`/profile/${currentUser.id}?tab=students`} className="text-sm font-medium text-primary-600 hover:underline">
-            Add a student
-          </Link>
-        </Box>
+        <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+          None of your dancers are in this workshop’s age range ({formatAgeRange(workshop.minAgeYears, workshop.maxAgeYears)}).
+        </Text>
       );
     }
     return <AttendeeChoices attendees={attendees} selectedKey={selectedAttendeeKey} onSelect={setSelectedAttendeeKey} />;
@@ -298,7 +298,12 @@ export const WorkshopDetailPage = () => {
 
         <Divider />
 
-        <DetailBlock title="2. Who’s dancing?">{renderAttendees()}</DetailBlock>
+        <DetailBlock title="2. Who’s dancing?">
+          {renderAttendees()}
+          {currentUser ? (
+            <AddStudentAction courseKind="workshop" refreshAttendees={refetchAttendees} onEligible={setSelectedAttendeeKey} />
+          ) : null}
+        </DetailBlock>
 
         <Divider />
 

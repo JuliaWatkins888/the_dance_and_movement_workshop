@@ -10,16 +10,17 @@ interface FieldErrors {
 }
 
 export interface ChildFormDialogProps {
-  readonly mode: 'create' | 'edit';
-  readonly initialChild?: ChildDto;
-  readonly onDone: () => void;
+  // Present when editing; creates a new student otherwise.
+  readonly initialChild?: ChildDto | undefined;
+  readonly onSaved: (student: ChildDto) => void;
+  readonly onCancel: () => void;
 }
 
 // Self-service create/edit for a parent's own child - shares its shape with UserFormDialog
 // (plain useState fields + hand-rolled validate()) but never sends parentUserId: the API always
 // scopes a non-manager's create/update to the caller's own account (see children.route.ts), so
 // there's no parent picker here the way the CMS's ChildEditDialog needs one.
-export const ChildFormDialog = ({ mode, initialChild, onDone }: ChildFormDialogProps) => {
+export const ChildFormDialog = ({ initialChild, onSaved, onCancel }: ChildFormDialogProps) => {
   const [createChild, { isLoading: isCreating }] = useCreateChildMutation();
   const [updateChild, { isLoading: isUpdating }] = useUpdateChildMutation();
   const isSubmitting = isCreating || isUpdating;
@@ -60,12 +61,10 @@ export const ChildFormDialog = ({ mode, initialChild, onDone }: ChildFormDialogP
     };
 
     try {
-      if (mode === 'create') {
-        await createChild(commonFields).unwrap();
-      } else if (initialChild) {
-        await updateChild({ id: initialChild.id, ...commonFields }).unwrap();
-      }
-      onDone();
+      const saved = initialChild
+        ? await updateChild({ id: initialChild.id, ...commonFields }).unwrap()
+        : await createChild(commonFields).unwrap();
+      onSaved(saved);
     } catch {
       setSubmitError('Could not save this student. Check the fields and try again.');
     }
@@ -114,11 +113,11 @@ export const ChildFormDialog = ({ mode, initialChild, onDone }: ChildFormDialogP
       ) : null}
 
       <Box flex={{ direction: 'row', gap: 8, justify: 'end' }}>
-        <Button variant={{ kind: 'ghost', color: 'surface' }} onClick={onDone} disabled={isSubmitting}>
+        <Button variant={{ kind: 'ghost', color: 'surface' }} onClick={onCancel} disabled={isSubmitting}>
           Cancel
         </Button>
         <Button variant={{ kind: 'filled', color: 'primary' }} onClick={handleSubmit} disabled={isSubmitting}>
-          {isSubmitting ? 'Saving…' : mode === 'create' ? 'Add Student' : 'Save Changes'}
+          {isSubmitting ? 'Saving…' : initialChild ? 'Save Changes' : 'Add Student'}
         </Button>
       </Box>
     </Box>

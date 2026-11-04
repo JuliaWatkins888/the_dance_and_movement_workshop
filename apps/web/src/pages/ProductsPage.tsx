@@ -28,19 +28,27 @@ const useProductDialog = (currency: string | undefined) => {
 
   useEffect(() => {
     if (!slug || !currency) return;
+    let urlMovedOn = false;
     const dialogId = dialog.show(({ close }) => <ProductDetail slug={slug} currency={currency} close={close} />, {
       width: 'min(64rem, 92vw)',
-      onClose: () =>
+      // Fires after the exit animation. This setSearchParams resolves against the path it was
+      // created on, so if the user has since left (e.g. redirected to the cart) it would pull
+      // them back to this page.
+      onClose: () => {
+        if (urlMovedOn) return;
         setSearchParams(
           (current) => {
-            // Only clear our own slug - a different product may have been opened meanwhile.
-            if (current.get(PRODUCT_QUERY_PARAM) === slug) current.delete(PRODUCT_QUERY_PARAM);
+            current.delete(PRODUCT_QUERY_PARAM);
             return current;
           },
           { replace: true },
-        ),
+        );
+      },
     });
-    return () => dialog.close(dialogId);
+    return () => {
+      urlMovedOn = true;
+      dialog.close(dialogId);
+    };
   }, [slug, currency, setSearchParams]);
 
   return (product: ProductDto) =>

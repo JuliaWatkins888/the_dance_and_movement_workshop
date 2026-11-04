@@ -2,12 +2,8 @@ import { alert, Box, Button, IconButton, ListRow, Text, dialog } from '@inithium
 import { formatChildAge, readApiError, useDeleteChildMutation, useListMyChildrenQuery } from '@inithium/api-client';
 import type { ChildDto } from '@inithium/api-client';
 import type { ProfileTabDescriptor, ProfileTabProps } from './registry';
-import { ChildFormDialog } from './ChildFormDialog';
-import { CHILD_GENDER_LABELS } from './childGenders';
-
-const DIALOG_WIDTH = 480;
-
-const fullNameOf = (child: ChildDto): string => (child.lastName ? `${child.firstName} ${child.lastName}` : child.firstName);
+import { CHILD_GENDER_LABELS } from '../../students/childGenders';
+import { openStudentDialog, studentFullName as fullNameOf } from '../../students/openStudentDialog';
 
 // Only ever mounted for the profile's own owner (visibility: 'owned' below) - a child account is
 // private data about a minor, never shown to anyone viewing someone else's profile.
@@ -15,36 +11,9 @@ const ChildrenTab = (_props: ProfileTabProps) => {
   const { data: children, isLoading, refetch } = useListMyChildrenQuery();
   const [deleteChild] = useDeleteChildMutation();
 
-  const openCreateDialog = () => {
-    const id = dialog.show(
-      () => (
-        <ChildFormDialog
-          mode="create"
-          onDone={() => {
-            dialog.close(id);
-            refetch();
-          }}
-        />
-      ),
-      { title: 'Add Student', width: DIALOG_WIDTH },
-    );
-  };
+  const openCreateDialog = () => openStudentDialog({ onSaved: () => refetch() });
 
-  const openEditDialog = (child: ChildDto) => {
-    const id = dialog.show(
-      () => (
-        <ChildFormDialog
-          mode="edit"
-          initialChild={child}
-          onDone={() => {
-            dialog.close(id);
-            refetch();
-          }}
-        />
-      ),
-      { title: `Edit ${fullNameOf(child)}`, width: DIALOG_WIDTH },
-    );
-  };
+  const openEditDialog = (child: ChildDto) => openStudentDialog({ student: child, onSaved: () => refetch() });
 
   const handleDelete = async (child: ChildDto) => {
     const confirmed = await dialog.confirm({
