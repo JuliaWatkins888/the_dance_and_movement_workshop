@@ -46,7 +46,11 @@ export function App() {
   const route = location.pathname;
   const navigate = useNavigateWithTransition();
 
-  const { data: page, isLoading: isPageLoading } = useGetPageByRouteQuery({ route });
+  // `data` keeps the previous route's page while a new route resolves (no loader flash between
+  // pages), but also after the new route fails - isError is per-route, so a 404/403 must drop it
+  // or the old page stays on screen under the new URL and the click looks like it did nothing.
+  const { data: lastResolvedPage, isLoading: isPageLoading, isError: isPageError } = useGetPageByRouteQuery({ route });
+  const page = isPageError ? undefined : lastResolvedPage;
   // Home renders its own title above the intro paragraph (see HomePage) - showing the site name
   // a second time in the Navbar right above it would just repeat the same brand name twice on
   // the one page that already leads with it.
