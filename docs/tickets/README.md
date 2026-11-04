@@ -31,7 +31,7 @@ decisions already confirmed, the implementation steps, and the acceptance criter
 Tick a box only when the ticket's own status is `done`.
 
 - [ ] [QA-01](QA-01-fix-r2-uploads.md): Fix CMS uploads on R2 + clearer upload errors · **P0**
-- [ ] [QA-02](QA-02-continue-shopping.md): Fix "Continue shopping" after registration · **P0**
+- [x] [QA-02](QA-02-continue-shopping.md): Fix "Continue shopping" after registration · **P0**
 - [ ] [QA-03](QA-03-child-to-student.md): Rename "Child" → "Student" and remove the under-18 limit · **P1**
 - [ ] [QA-04](QA-04-inline-add-student.md): Add a student inline from the registration screen · **P1** · needs QA-03
 - [ ] [QA-05](QA-05-staff-page-visibility.md): Hide staff from the public Staff page (Melissa) · **P1**
