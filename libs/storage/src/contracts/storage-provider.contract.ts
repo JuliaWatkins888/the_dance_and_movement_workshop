@@ -11,6 +11,8 @@ export interface UploadObjectResult {
   publicUrl: string;
 }
 
+import type { StorageConfigSummary } from './storage-config.contract';
+
 export interface StorageProvider {
   name: string;
   uploadObject: (input: UploadObjectInput) => Promise<UploadObjectResult>;
@@ -20,4 +22,5 @@ export interface StorageProvider {
   // so a future private-gallery/ecommerce feature never needs a breaking StorageProvider change,
   // only a new route that calls this.
   getSignedUrl: (key: string, expiresInSeconds: number) => Promise<string>;
+  describeConfig: () => StorageConfigSummary;
 }

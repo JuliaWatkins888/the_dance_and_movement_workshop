@@ -1,13 +1,10 @@
 import { useRef, useState } from 'react';
 import { Box, Button, Input, MediaField, Text, Textarea } from '@inithium/ui';
 import type { MediaFieldHandle, UploadedAsset } from '@inithium/ui';
-import {
-  useCreateStaffMemberMutation,
-  useUpdateStaffMemberMutation,
-  useUploadAssetMutation,
-} from '@inithium/api-client';
+import { useCreateStaffMemberMutation, useUpdateStaffMemberMutation } from '@inithium/api-client';
 import type { StaffMemberDto, StaffUserCandidate } from '@inithium/api-client';
 import type { StaffPhotoSourceType } from '@inithium/db';
+import { UPLOAD_IMAGE_ACCEPT, useCloudImageUpload, validateCroppableImage } from '../../media/cloud-image-upload';
 import { useSessionUploads } from '../../media/useSessionUploads';
 import { LinkedUserField } from './UserPicker';
 
@@ -25,7 +22,7 @@ const STAFF_PHOTO_ASPECT_RATIO = 3 / 4;
 export const StaffEditDialog = ({ mode, initialStaff, onDone }: StaffEditDialogProps) => {
   const [createStaffMember, { isLoading: isCreating }] = useCreateStaffMemberMutation();
   const [updateStaffMember, { isLoading: isUpdating }] = useUpdateStaffMemberMutation();
-  const [uploadAsset] = useUploadAssetMutation();
+  const [uploadImage] = useCloudImageUpload('staff');
   const isLoading = isCreating || isUpdating;
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
 
@@ -131,7 +128,9 @@ export const StaffEditDialog = ({ mode, initialStaff, onDone }: StaffEditDialogP
         value={photoUrl}
         onValueChange={setPhotoUrl}
         onAssetChange={handlePhotoAssetChange}
-        onUpload={async (file) => await uploadAsset({ file, purpose: 'staff' }).unwrap()}
+        onUpload={uploadImage}
+        accept={UPLOAD_IMAGE_ACCEPT}
+        validateFile={validateCroppableImage}
         defaultMode={initialStaff?.photoSourceType === 'external' ? 'url' : 'upload'}
         aspectRatio={STAFF_PHOTO_ASPECT_RATIO}
       />

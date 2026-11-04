@@ -29,5 +29,8 @@ export const ValidationError = (message = 'Validation failed', details?: ApiErro
 export const ConflictError = (message = 'Conflict', details?: ApiErrorDetails): AppError =>
   new AppError(409, 'CONFLICT', message, details);
 
-export const InternalServerError = (message = 'Internal server error', details?: ApiErrorDetails): AppError =>
+export const ServiceUnavailableError = (message = 'Service unavailable', details?: ApiErrorDetails): AppError =>
+  new AppError(503, 'SERVICE_UNAVAILABLE', message, details);
+
+export const InternalServerError =(message = 'Internal server error', details?: ApiErrorDetails): AppError =>
   new AppError(500, 'INTERNAL_SERVER_ERROR', message, details);

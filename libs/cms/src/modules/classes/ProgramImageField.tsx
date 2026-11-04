@@ -1,8 +1,8 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { Box, Button, DEFAULT_BANNER_HEIGHT, DEFAULT_MESH_WIDTH, MediaField } from '@inithium/ui';
 import type { MediaFieldHandle, UploadedAsset } from '@inithium/ui';
-import { useUploadAssetMutation } from '@inithium/api-client';
 import type { ProgramImageSourceType, UploadPurpose } from '@inithium/api-client';
+import { UPLOAD_IMAGE_ACCEPT, useCloudImageUpload, validateCroppableImage } from '../../media/cloud-image-upload';
 
 export interface ProgramImageValue {
   readonly imageUrl?: string;
@@ -32,7 +32,7 @@ const BANNER_IMAGE_ASPECT_RATIO = DEFAULT_MESH_WIDTH / DEFAULT_BANNER_HEIGHT;
 // generated placeholder banner.
 export const ProgramImageField = forwardRef<ProgramImageFieldHandle, ProgramImageFieldProps>(({ value, onChange, ...options }, ref) => {
   const { purpose = 'program', aspectRatio = BANNER_IMAGE_ASPECT_RATIO, label = 'Image' } = options;
-  const [uploadAsset] = useUploadAssetMutation();
+  const [uploadImage] = useCloudImageUpload(purpose);
   const mediaFieldRef = useRef<MediaFieldHandle>(null);
   // Remounts MediaField on Remove so a half-finished crop doesn't survive the removal.
   const [fieldKey, setFieldKey] = useState(0);
@@ -63,7 +63,9 @@ export const ProgramImageField = forwardRef<ProgramImageFieldHandle, ProgramImag
         value={value.imageUrl ?? ''}
         onValueChange={(url) => onChange({ imageUrl: url, imageSourceType: 'external' })}
         onAssetChange={handleAssetChange}
-        onUpload={async (file) => await uploadAsset({ file, purpose }).unwrap()}
+        onUpload={uploadImage}
+        accept={UPLOAD_IMAGE_ACCEPT}
+        validateFile={validateCroppableImage}
         aspectRatio={aspectRatio}
         defaultMode={value.imageSourceType === 'external' ? 'url' : 'upload'}
       />

@@ -1,14 +1,14 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { MediaField } from '@inithium/ui';
 import type { MediaFieldHandle, UploadedAsset } from '@inithium/ui';
-import { useUploadAssetMutation } from '@inithium/api-client';
+import { UPLOAD_IMAGE_ACCEPT, useCloudImageUpload, validateCroppableImage } from '../../media/cloud-image-upload';
 import type { ProductImageFieldHandle, ProductImageFieldProps, ProductImageValue } from './productImage.contract';
 
 // Storefront cards and the product dialog both show product images square.
 const PRODUCT_IMAGE_ASPECT_RATIO = 1;
 
 export const ProductImageField = forwardRef<ProductImageFieldHandle, ProductImageFieldProps>(({ initial }, ref) => {
-  const [uploadAsset] = useUploadAssetMutation();
+  const [uploadImage] = useCloudImageUpload('product');
   const [imageUrl, setImageUrl] = useState(initial.imageUrl ?? '');
   // Only reassigned when MediaField reports a real URL commit or a finished upload - an untouched
   // image on an edit keeps its existing sourceType/assetId instead of being
@@ -43,7 +43,9 @@ export const ProductImageField = forwardRef<ProductImageFieldHandle, ProductImag
       value={imageUrl}
       onValueChange={setImageUrl}
       onAssetChange={handleAssetChange}
-      onUpload={async (file) => await uploadAsset({ file, purpose: 'product' }).unwrap()}
+      onUpload={uploadImage}
+      accept={UPLOAD_IMAGE_ACCEPT}
+      validateFile={validateCroppableImage}
       aspectRatio={PRODUCT_IMAGE_ASPECT_RATIO}
       defaultMode={initial.imageSourceType === 'external' ? 'url' : 'upload'}
     />

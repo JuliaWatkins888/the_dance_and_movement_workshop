@@ -16,6 +16,7 @@ export {
   ForbiddenError,
   ValidationError,
   ConflictError,
+  ServiceUnavailableError,
   InternalServerError,
 } from './errors/app-error';
 

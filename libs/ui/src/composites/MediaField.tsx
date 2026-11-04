@@ -50,6 +50,9 @@ export interface MediaFieldProps extends FieldProps {
   readonly onModeChange?: (mode: string) => void;
   readonly accept?: string;
   readonly maxSizeBytes?: number;
+  // Runs on file pick, before the crop step - `accept` alone can't be trusted since the picker's
+  // "All files" option bypasses it. Returns the message to show, or undefined when the file is OK.
+  readonly validateFile?: (file: File) => string | undefined;
   // width / height of the crop frame a selected file is dragged against before upload - callers
   // whose display container isn't square (Banner's wide strip vs Avatar's 1:1 circle) must pass
   // their own real ratio, or an uploaded image ends up centered against the wrong shape (see
@@ -268,6 +271,7 @@ export const MediaField = forwardRef<MediaFieldHandle, MediaFieldProps>(
       onModeChange,
       accept = DEFAULT_ACCEPT,
       maxSizeBytes,
+      validateFile,
       aspectRatio = DEFAULT_ASPECT_RATIO,
       name,
       className,
@@ -315,7 +319,9 @@ export const MediaField = forwardRef<MediaFieldHandle, MediaFieldProps>(
         return;
       }
 
-      setUploadError(undefined);
+      const invalid = validateFile?.(file);
+      setUploadError(invalid);
+      if (invalid) return;
       setCropFile(file);
     };
 
@@ -343,7 +349,8 @@ export const MediaField = forwardRef<MediaFieldHandle, MediaFieldProps>(
             setCropFile(null);
             return result;
           } catch (err) {
-            setUploadError('Upload failed. Please try again.');
+            // onUpload owners reject with a user-facing Error message (e.g. the server's reason).
+            setUploadError(err instanceof Error && err.message ? err.message : 'Upload failed. Please try again.');
             throw err;
           } finally {
             setIsUploading(false);
