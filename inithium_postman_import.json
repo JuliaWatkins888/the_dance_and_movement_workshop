@@ -3637,6 +3637,172 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Settings",
+			"item": [
+				{
+					"name": "Get Public Setting (Studio Hours)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// 404 until an admin saves this key; the site then shows its built-in default.",
+									"pm.test('Status code is 200 or 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/settings/public/studio.hours",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"settings",
+								"public",
+								"studio.hours"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Settings (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks settings:manage capability. With an admin token this returns 200, and 400 for a value that fails validation.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/settings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"settings"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Studio Hours (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks settings:manage capability. With an admin token this returns 200, and 400 for a value that fails validation.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"json\",\n  \"value\": {\n    \"days\": [\n      {\n        \"day\": \"Mon\",\n        \"text\": \"3:00 PM – 8:30 PM\"\n      },\n      {\n        \"day\": \"Tue\",\n        \"text\": \"3:00 PM – 8:30 PM\"\n      },\n      {\n        \"day\": \"Wed\",\n        \"text\": \"3:00 PM – 8:30 PM\"\n      },\n      {\n        \"day\": \"Thu\",\n        \"text\": \"3:00 PM – 8:30 PM\"\n      },\n      {\n        \"day\": \"Fri\",\n        \"text\": \"4:30 PM – 7:00 PM\"\n      },\n      {\n        \"day\": \"Sat\",\n        \"text\": \"11:00 AM – 3:00 PM\"\n      },\n      {\n        \"day\": \"Sun\",\n        \"text\": \"By Appointment Only\",\n        \"linkUrl\": \"/contact?subject=Private%20lesson\"\n      }\n    ]\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/settings/studio.hours",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"settings",
+								"studio.hours"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Studio Phone (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Default user lacks settings:manage capability. With an admin token this returns 200, and 400 for a value that fails validation.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"string\",\n  \"value\": \"(248) 495-4756\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/settings/studio.phone",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"settings",
+								"studio.phone"
+							]
+						}
+					}
+				}
+			]
 		}
 	]
 }

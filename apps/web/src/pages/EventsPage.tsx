@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Button, Icon, Input, Loader, Text } from '@inithium/ui';
-import { useListEventsQuery } from '@inithium/api-client';
-import type { PublicEventDto } from '@inithium/api-client';
+import { useListEventsQuery, useStudioInfo } from '@inithium/api-client';
+import type { PublicEventDto, StudioInfo } from '@inithium/api-client';
 import { ProgramBanner } from './classes/ProgramBanner';
 import {
   availabilityLabel,
@@ -16,9 +16,9 @@ import {
 
 const CARD_IMAGE_HEIGHT = 180;
 
-const EventCard = ({ event }: { event: PublicEventDto }) => {
+const EventCard = ({ event, studio }: { event: PublicEventDto; studio: StudioInfo }) => {
   const isPast = event.status === 'past';
-  const location = eventLocation(event);
+  const location = eventLocation(event, studio);
 
   return (
     <Link
@@ -72,24 +72,25 @@ const EventCard = ({ event }: { event: PublicEventDto }) => {
   );
 };
 
-const EventGrid = ({ events }: { events: PublicEventDto[] }) => (
+const EventGrid = ({ events, studio }: { events: PublicEventDto[]; studio: StudioInfo }) => (
   <Box className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
     {events.map((event) => (
-      <EventCard key={event.id} event={event} />
+      <EventCard key={event.id} event={event} studio={studio} />
     ))}
   </Box>
 );
 
 export const EventsPage = () => {
   const { data: events = [], isLoading } = useListEventsQuery();
+  const studio = useStudioInfo();
   const [search, setSearch] = useState('');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
 
   const hasFilters = Boolean(search.trim()) || Boolean(from) || Boolean(to);
   const filtered = useMemo(
-    () => filterEvents(events, { search, from: from || undefined, to: to || undefined }),
-    [events, search, from, to],
+    () => filterEvents(events, { search, from: from || undefined, to: to || undefined }, studio),
+    [events, search, from, to, studio],
   );
   const upcoming = filtered.filter((event) => event.status !== 'past');
   const past = filtered.filter((event) => event.status === 'past');
@@ -146,14 +147,14 @@ export const EventsPage = () => {
             </Box>
           ) : null}
 
-          {upcoming.length > 0 ? <EventGrid events={upcoming} /> : null}
+          {upcoming.length > 0 ? <EventGrid events={upcoming} studio={studio} /> : null}
 
           {past.length > 0 ? (
             <Box flex={{ direction: 'col', gap: 12 }}>
               <Text as="h2" textColor={{ color: 'surface', intensity: 700 }} className="text-sm font-semibold uppercase tracking-wide">
                 Past events
               </Text>
-              <EventGrid events={past} />
+              <EventGrid events={past} studio={studio} />
             </Box>
           ) : null}
         </>

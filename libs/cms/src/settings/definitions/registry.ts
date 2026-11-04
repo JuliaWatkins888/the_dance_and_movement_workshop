@@ -16,7 +16,9 @@ export type SettingDefinition =
   | (SettingDefinitionBase & { type: 'number'; default: number })
   | (SettingDefinitionBase & { type: 'date'; default: string })
   | (SettingDefinitionBase & { type: 'stringList'; default: string[] })
-  | (SettingDefinitionBase & { type: 'json'; default: Record<string, unknown> })
+  // `editor` swaps the raw JSON textarea for a purpose-built form. It's a name rather than a
+  // component so that definitions stay pure data; SettingRow maps it to the component.
+  | (SettingDefinitionBase & { type: 'json'; default: Record<string, unknown>; editor?: 'studioHours' })
   | (SettingDefinitionBase & { type: 'color'; default: string })
   // Always defaults to { url: '' } - the consumer (Navbar logo, home hero) owns its bundled fallback.
   | (SettingDefinitionBase & { type: 'image'; default: SettingImageValue });

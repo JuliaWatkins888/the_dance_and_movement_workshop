@@ -1,6 +1,7 @@
-import type { EventBulkDiscountDto, PublicEventDto } from '@inithium/api-client';
-import { STUDIO_ADDRESS, STUDIO_NAME } from '../../app/studioLocation';
+import type { EventBulkDiscountDto, PublicEventDto, StudioInfo } from '@inithium/api-client';
 import { formatCents, formatTime12h } from '../classes/classFormat';
+
+type StudioLocation = Pick<StudioInfo, 'name' | 'address'>;
 
 // Calendar dates are stored as UTC midnight - formatted in UTC so they never shift a day.
 const longDateFormatter = new Intl.DateTimeFormat('en-US', {
@@ -26,8 +27,9 @@ export const formatEventTimes = (event: Pick<PublicEventDto, 'startTime' | 'endT
 
 export const eventLocation = (
   event: Pick<PublicEventDto, 'isAtStudio' | 'venueName' | 'venueAddress'>,
+  studio: StudioLocation,
 ): { name: string; address: string } =>
-  event.isAtStudio ? { name: STUDIO_NAME, address: STUDIO_ADDRESS } : { name: event.venueName ?? '', address: event.venueAddress ?? '' };
+  event.isAtStudio ? { name: studio.name, address: studio.address } : { name: event.venueName ?? '', address: event.venueAddress ?? '' };
 
 export const formatTicketPrice = (cents: number): string => (cents === 0 ? 'Free' : formatCents(cents));
 
@@ -63,13 +65,13 @@ export interface EventFilters {
   readonly to?: string;
 }
 
-export const filterEvents = (events: PublicEventDto[], filters: EventFilters): PublicEventDto[] => {
+export const filterEvents = (events: PublicEventDto[], filters: EventFilters, studio: StudioLocation): PublicEventDto[] => {
   const query = filters.search.trim().toLowerCase();
   return events.filter((event) => {
     const date = event.date.slice(0, 10);
     if (filters.from && date < filters.from) return false;
     if (filters.to && date > filters.to) return false;
     if (!query) return true;
-    return [event.title, eventLocation(event).name, event.description ?? ''].join(' ').toLowerCase().includes(query);
+    return [event.title, eventLocation(event, studio).name, event.description ?? ''].join(' ').toLowerCase().includes(query);
   });
 };

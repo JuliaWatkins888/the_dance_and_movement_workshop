@@ -1,4 +1,5 @@
 import { Box, Button, Pill, Text } from '@inithium/ui';
+import { useStudioInfo } from '@inithium/api-client';
 import type { CalendarItemDto } from '@inithium/api-client';
 import { googleMapsLink } from '../../app/studioLocation';
 import { eventLocation } from '../events/eventFormat';
@@ -6,7 +7,8 @@ import { formatWhen } from './calendarFormat';
 
 // What a holiday or admin entry opens in place - they have no page of their own.
 export const CalendarItemDetails = ({ item, close }: { readonly item: CalendarItemDto; readonly close: () => void }) => {
-  const venue = item.location ? eventLocation(item.location) : undefined;
+  const studio = useStudioInfo();
+  const venue = item.location ? eventLocation(item.location, studio) : undefined;
 
   return (
     <Box flex={{ direction: 'col', gap: 16 }}>
