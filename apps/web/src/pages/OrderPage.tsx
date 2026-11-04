@@ -5,6 +5,7 @@ import type { OrderDto } from '@inithium/api-client';
 import { useCurrentUser } from '../app/useCurrentUser';
 import { OrderDetails } from './ecommerce/OrderDetails';
 import { SignInPrompt } from './ecommerce/SignInPrompt';
+import { useContinueShoppingPath } from './ecommerce/continueShopping';
 
 // A payment still settling (status 'processing' from checkout) is finished by the payment
 // webhook, usually within seconds - poll until the order leaves 'pending'.
@@ -25,6 +26,7 @@ export const OrderPage = () => {
     { userId: currentUser?.id ?? '', orderId },
     { skip: !currentUser || !orderId, pollingInterval: isPolling ? PENDING_POLL_MS : 0, skipPollingIfUnfocused: true },
   );
+  const continueShoppingPath = useContinueShoppingPath(order?.lines ?? []);
   const isPending = order?.status === 'pending';
   useEffect(() => setIsPolling(isPending), [isPending]);
 
@@ -78,7 +80,7 @@ export const OrderPage = () => {
             Back to cart
           </Button>
         ) : (
-          <Button variant={{ kind: 'filled', color: 'primary' }} onClick={() => navigate('/merch')}>
+          <Button variant={{ kind: 'filled', color: 'primary' }} onClick={() => navigate(continueShoppingPath)}>
             Continue shopping
           </Button>
         )}

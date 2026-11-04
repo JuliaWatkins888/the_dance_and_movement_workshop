@@ -20,6 +20,7 @@ import { PriceSummary } from './ecommerce/PriceSummary';
 import { ProductImage } from './ecommerce/ProductImage';
 import { QuantityStepper } from './ecommerce/QuantityStepper';
 import { SignInPrompt } from './ecommerce/SignInPrompt';
+import { useContinueShoppingPath } from './ecommerce/continueShopping';
 
 const ALERT_POSITION = 'bottom-right' as const;
 const MAX_QUANTITY = 99;
@@ -213,6 +214,7 @@ export const CartPage = () => {
   const { currentUser, isResolving } = useCurrentUser();
   const { data: cart, isLoading } = useGetCartQuery(currentUser?.id ?? '', { skip: !currentUser });
   const [clearCart, { isLoading: isClearing }] = useClearCartMutation();
+  const continueShoppingPath = useContinueShoppingPath(cart?.lines ?? []);
 
   if (isResolving || (currentUser && isLoading)) {
     return (
@@ -249,7 +251,7 @@ export const CartPage = () => {
           <Text as="p" textColor={{ color: 'surface', intensity: 600 }}>
             Your cart is empty.
           </Text>
-          <Button variant={{ kind: 'filled', color: 'primary' }} onClick={() => navigate('/merch')}>
+          <Button variant={{ kind: 'filled', color: 'primary' }} onClick={() => navigate(continueShoppingPath)}>
             Continue shopping
           </Button>
         </Box>
@@ -318,7 +320,7 @@ export const CartPage = () => {
           <Button variant={{ kind: 'filled', color: 'primary' }} disabled={cart.hasUnavailableLines} onClick={() => navigate('/checkout')}>
             Checkout
           </Button>
-          <Button variant={{ kind: 'link', color: 'accent' }} textColor={{ color: 'surface', intensity: 800 }} onClick={() => navigate('/merch')}>
+          <Button variant={{ kind: 'link', color: 'accent' }} textColor={{ color: 'surface', intensity: 800 }} onClick={() => navigate(continueShoppingPath)}>
             Continue shopping
           </Button>
         </Box>

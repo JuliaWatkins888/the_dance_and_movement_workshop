@@ -20,6 +20,7 @@ import { PaymentFields } from './ecommerce/payment/PaymentFields';
 import type { PaymentFieldsHandle } from './ecommerce/payment/payment-fields.contract';
 import { PriceSummary } from './ecommerce/PriceSummary';
 import { SignInPrompt } from './ecommerce/SignInPrompt';
+import { useContinueShoppingPath } from './ecommerce/continueShopping';
 
 const ALERT_POSITION = 'bottom-right' as const;
 const QUOTE_DEBOUNCE_MS = 500;
@@ -128,6 +129,7 @@ export const CheckoutPage = () => {
   const [quote, setQuote] = useState<CheckoutQuoteDto | null>(null);
   const [quoteError, setQuoteError] = useState<string | null>(null);
   const [isPlacing, setIsPlacing] = useState(false);
+  const continueShoppingPath = useContinueShoppingPath(cart?.lines ?? []);
 
   useEffect(() => {
     if (!shippingMethodId && shippingMethods.length > 0) setShippingMethodId(shippingMethods[0]!.id);
@@ -197,7 +199,7 @@ export const CheckoutPage = () => {
         <Text as="p" textColor={{ color: 'surface', intensity: 600 }}>
           Your cart is empty.
         </Text>
-        <Button variant={{ kind: 'filled', color: 'primary' }} onClick={() => navigate('/merch')}>
+        <Button variant={{ kind: 'filled', color: 'primary' }} onClick={() => navigate(continueShoppingPath)}>
           Continue shopping
         </Button>
       </Box>

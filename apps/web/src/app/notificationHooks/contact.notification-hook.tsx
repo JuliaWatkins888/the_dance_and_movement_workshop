@@ -1,5 +1,5 @@
 import { dialog } from '@inithium/ui';
-import type { NotificationHook } from '../registry';
+import type { NotificationHook } from './registry';
 import { ContactThreadDialogContent } from '../../pages/ContactThreadDialogContent';
 
 // 'contact:replied' notifications carry a communication id in actionUrl (as
