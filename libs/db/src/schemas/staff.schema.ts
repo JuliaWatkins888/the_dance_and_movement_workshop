@@ -9,6 +9,7 @@ export interface StaffDocument extends Document {
   photoSourceType?: StaffPhotoSourceType;
   photoAssetId?: string;
   order: number;
+  isListed: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,6 +25,7 @@ const staffSchema = new Schema<StaffDocument>(
     photoSourceType: { type: String, enum: STAFF_PHOTO_SOURCE_TYPES, required: false },
     photoAssetId: { type: String, required: false },
     order: { type: Number, required: true, default: 0 },
+    isListed: { type: Boolean, required: true, default: true },
   },
   { timestamps: true }
 );

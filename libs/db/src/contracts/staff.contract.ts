@@ -23,6 +23,9 @@ export interface StaffEntity {
   // Display order on the public staff page (ascending, ties broken by createdAt) - lets an admin
   // control who appears first without that being tied to creation order.
   order: number;
+  // Whether this person appears on the public staff page. Independent of instructor assignment:
+  // an unlisted staff member can still teach and is still named on what they teach.
+  isListed: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -35,6 +38,7 @@ export interface FindManyStaffOptions {
   pageSize: number;
   search?: string;
   searchField?: StaffSearchField;
+  listedOnly?: boolean;
 }
 
 export interface StaffRepository {

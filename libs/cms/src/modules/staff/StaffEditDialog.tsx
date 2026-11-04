@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Box, Button, Input, MediaField, Text, Textarea } from '@inithium/ui';
+import { Box, Button, Input, MediaField, Switch, Text, Textarea } from '@inithium/ui';
 import type { MediaFieldHandle, UploadedAsset } from '@inithium/ui';
 import { useCreateStaffMemberMutation, useUpdateStaffMemberMutation } from '@inithium/api-client';
 import type { StaffMemberDto, StaffUserCandidate } from '@inithium/api-client';
@@ -31,6 +31,7 @@ export const StaffEditDialog = ({ mode, initialStaff, onDone }: StaffEditDialogP
   const [title, setTitle] = useState(initialStaff?.title ?? '');
   const [bio, setBio] = useState(initialStaff?.bio ?? '');
   const [order, setOrder] = useState(String(initialStaff?.order ?? 0));
+  const [isListed, setIsListed] = useState(initialStaff?.isListed ?? true);
 
   const [photoUrl, setPhotoUrl] = useState(initialStaff?.photoUrl ?? '');
   // Only reassigned by handlePhotoAssetChange below (itself only invoked when MediaField reports
@@ -78,6 +79,7 @@ export const StaffEditDialog = ({ mode, initialStaff, onDone }: StaffEditDialogP
         title,
         bio: bio || undefined,
         order: Number.isFinite(parsedOrder) ? parsedOrder : 0,
+        isListed,
         photoUrl: finalPhotoUrl || undefined,
         photoSourceType: finalPhotoUrl ? finalPhotoSourceType : undefined,
         photoAssetId: finalPhotoSourceType === 'cloud' ? finalPhotoAssetId : undefined,
@@ -134,6 +136,8 @@ export const StaffEditDialog = ({ mode, initialStaff, onDone }: StaffEditDialogP
         defaultMode={initialStaff?.photoSourceType === 'external' ? 'url' : 'upload'}
         aspectRatio={STAFF_PHOTO_ASPECT_RATIO}
       />
+
+      <Switch label="Show on Staff page" checked={isListed} onCheckedChange={setIsListed} />
 
       {submitError ? (
         <Text as="p" textColor={{ color: 'red', intensity: 600 }} className="text-sm">
