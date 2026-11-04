@@ -1,6 +1,6 @@
 # QA-03: Rename "Child" → "Student" and remove the under-18 limit
 
-- **Status:** `in-progress`
+- **Status:** `done`
 - **Priority:** P1
 - **Depends on:** -
 - **Branch:** `feature/qa-03-students`
@@ -62,9 +62,9 @@
 
 ## Acceptance criteria
 
-- [ ] A parent can add a student born in 2000, and that student can register for an 18+ course
+- [x] A parent can add a student born in 2000, and that student can register for an 18+ course
       from the parent's account.
-- [ ] A future birthdate is still rejected.
-- [ ] No user-visible "Child"/"Children" wording remains in the profile, registration, or CMS
+- [x] A future birthdate is still rejected.
+- [x] No user-visible "Child"/"Children" wording remains in the profile, registration, or CMS
       screens (internal identifiers are unchanged).
-- [ ] Type-check passes for `api-core`, `db`, `cms` and `apps/web`.
+- [x] Type-check passes for `api-core`, `db`, `cms` and `apps/web`.
