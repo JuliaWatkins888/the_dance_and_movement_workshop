@@ -1,13 +1,16 @@
 import { z } from 'zod';
-import { CHILD_GENDERS, ageInYears } from '@inithium/db';
+import { CHILD_GENDERS } from '@inithium/db';
 
-// A real calendar date, not in the future, for someone under 18 today.
-const isChildBirthDate = (value: string): boolean => {
+// Students have no age cap (adult students can stay on a parent's account). The 1900 floor
+// only catches typos like "0201".
+const EARLIEST_BIRTH_DATE = new Date('1900-01-01T00:00:00.000Z');
+
+const isRealCalendarDate = (value: string): boolean => {
   const date = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) return false;
-  const now = new Date();
-  return date <= now && ageInYears(date, now) < 18;
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 };
+
+const toUtcDate = (value: string): Date => new Date(`${value}T00:00:00.000Z`);
 
 // parentUserId is only ever honored by the route when the caller has the children:manage
 // capability (see children.route.ts) - a plain parent's own child is always forced to their own
@@ -20,7 +23,9 @@ const childShape = {
   birthDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD')
-    .refine((value) => isChildBirthDate(value), 'Child accounts are for ages 0-17'),
+    .refine(isRealCalendarDate, 'Enter a valid date')
+    .refine((value) => !isRealCalendarDate(value) || toUtcDate(value) <= new Date(), 'Date of birth can’t be in the future')
+    .refine((value) => !isRealCalendarDate(value) || toUtcDate(value) >= EARLIEST_BIRTH_DATE, 'Date of birth can’t be before 1900'),
   gender: z.enum(CHILD_GENDERS),
 };
 

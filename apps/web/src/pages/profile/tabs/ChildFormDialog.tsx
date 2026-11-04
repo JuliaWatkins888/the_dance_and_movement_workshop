@@ -34,7 +34,7 @@ export const ChildFormDialog = ({ mode, initialChild, onDone }: ChildFormDialogP
   const validate = (): FieldErrors => {
     const errors: FieldErrors = {};
     if (!firstName.trim()) {
-      errors.firstName = "Your child's first name is required.";
+      errors.firstName = "The student's first name is required.";
     }
     const birthDateError = validateChildBirthDate(birthDate);
     if (birthDateError) {
@@ -67,7 +67,7 @@ export const ChildFormDialog = ({ mode, initialChild, onDone }: ChildFormDialogP
       }
       onDone();
     } catch {
-      setSubmitError('Could not save this child account. Check the fields and try again.');
+      setSubmitError('Could not save this student. Check the fields and try again.');
     }
   };
 
@@ -95,7 +95,7 @@ export const ChildFormDialog = ({ mode, initialChild, onDone }: ChildFormDialogP
           value={birthDate}
           onChange={(event) => setBirthDate(event.target.value)}
           error={Boolean(fieldErrors.birthDate)}
-          helperText={fieldErrors.birthDate ?? 'Used to show which classes your child is eligible for.'}
+          helperText={fieldErrors.birthDate ?? 'Used to show which classes this student is eligible for.'}
           className="flex-1"
         />
         <Select label="Gender" value={gender} onValueChange={(value) => setGender(value as typeof gender)} className="flex-1">
@@ -118,7 +118,7 @@ export const ChildFormDialog = ({ mode, initialChild, onDone }: ChildFormDialogP
           Cancel
         </Button>
         <Button variant={{ kind: 'filled', color: 'primary' }} onClick={handleSubmit} disabled={isSubmitting}>
-          {isSubmitting ? 'Saving…' : mode === 'create' ? 'Add Child' : 'Save Changes'}
+          {isSubmitting ? 'Saving…' : mode === 'create' ? 'Add Student' : 'Save Changes'}
         </Button>
       </Box>
     </Box>

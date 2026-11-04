@@ -1,6 +1,6 @@
 # QA-03: Rename "Child" → "Student" and remove the under-18 limit
 
-- **Status:** `todo`
+- **Status:** `in-progress`
 - **Priority:** P1
 - **Depends on:** -
 - **Branch:** `feature/qa-03-students`
@@ -33,21 +33,32 @@
 
 ## Implementation steps
 
-- [ ] Drop the `< 18` rule in `children.schema.ts`. Keep "valid date, not in the future", and add
+- [x] Drop the `< 18` rule in `children.schema.ts`. Keep "valid date, not in the future", and add
       a sanity floor (born after 1900) so typos don't pass.
-- [ ] Check `listEligibleAttendees` and the class/workshop purchasables don't assume children are
+- [x] Check `listEligibleAttendees` and the class/workshop purchasables don't assume children are
       under 18 anywhere (e.g. skipping children for adult-only courses). Fix them so the rule is
       birthdate vs. min/max only.
-- [ ] Rename copy: "Child" → "Student", "Child Accounts" → "Students", "Add Child" → "Add
+- [x] Rename copy: "Child" → "Student", "Child Accounts" → "Students", "Add Child" → "Add
       Student", "Add a child profile" → "Add a student", in the web profile tab, the child form
       dialog, the class/workshop detail pages, the CMS Children module (nav label → "Students"),
       and alerts/empty states. Grep for `child` in user-facing strings across `apps/web` and
       `libs/cms`.
-- [ ] Keep the `?tab=child-accounts` URL working (old links), or add `?tab=students` and redirect
+- [x] Keep the `?tab=child-accounts` URL working (old links), or add `?tab=students` and redirect
       the old value.
-- [ ] Update the "self vs. student" helper text on attendee pickers where it says children must
+- [x] Update the "self vs. student" helper text on attendee pickers where it says children must
       be under 18.
-- [ ] Update any policy/FAQ seed copy that says "child accounts".
+- [x] Update any policy/FAQ seed copy that says "child accounts".
+
+## Implementation notes
+
+- `listEligibleAttendees` / `resolveEligibleAttendee` already matched students purely on birthdate
+  vs. min/max, so no eligibility change was needed. The real cap was in two places: the API schema
+  and the client-side `validateChildBirthDate` in `@inithium/api-client`. Both now allow any
+  date from 1900-01-01 up to today.
+- Profile tab id is now `students`; `ProfilePage` maps the legacy `?tab=child-accounts` to it.
+- The privacy policy's "Children's Information" section is still about minors, so it stays as is.
+  The "student information" lines in that page were updated.
+- The policy seeds already say "student", so they didn't need changes.
 
 ## Acceptance criteria
 

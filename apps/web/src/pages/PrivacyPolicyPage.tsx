@@ -14,7 +14,7 @@ const buildSections = (appName: string): readonly PolicySection[] => [
     title: '1. Information We Collect',
     paragraphs: [
       `Account Information: When you create a parent account with ${appName}, we collect your name, email address, and password.`,
-      "Child Profile Information: Once you have an account, you may register one or more children under it. For each child, we collect information such as their name, age, and sex. This information is used solely to support registration and class enrollment and is not used or distributed for any other purpose.",
+      "Student Information: Once you have an account, you may add one or more students under it. For each student, we collect information such as their name, age, and sex. This information is used solely to support registration and class enrollment and is not used or distributed for any other purpose.",
       'Session Data: We use a browser cookie or local storage to keep you signed in between visits, so you do not need to log in again every time you return to the site.',
     ],
   },
@@ -23,7 +23,7 @@ const buildSections = (appName: string): readonly PolicySection[] => [
     paragraphs: [
       'To create, maintain, and secure your parent account.',
       'To keep you signed in and remember your session as you move around the site.',
-      'To register and enroll the children on your account in classes.',
+      'To register and enroll the students on your account in classes.',
       'To communicate with you about your account or your enrollments.',
     ],
   },
@@ -59,7 +59,7 @@ const buildSections = (appName: string): readonly PolicySection[] => [
   {
     title: '7. Your Choices',
     paragraphs: [
-      'You can review and update your account and child profile information at any time by signing in.',
+      'You can review and update your account and student information at any time by signing in.',
       'You can contact us to request a copy of your information, or to request that your account and associated information be corrected or deleted.',
     ],
   },

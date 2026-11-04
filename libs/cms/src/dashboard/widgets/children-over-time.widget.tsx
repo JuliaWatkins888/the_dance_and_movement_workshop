@@ -18,7 +18,7 @@ const ChildrenOverTimeWidget = () => {
   if (!data || data.length === 0) {
     return (
       <Text as="p" className="text-surface-500">
-        No child account data yet.
+        No student data yet.
       </Text>
     );
   }
@@ -39,7 +39,7 @@ const ChildrenOverTimeWidget = () => {
         <XAxis dataKey="date" tick={{ fontSize: 12 }} />
         <YAxis allowDecimals={false} tick={{ fontSize: 12 }} width={32} />
         <Tooltip />
-        <Line type="monotone" dataKey="total" name="Total child accounts" stroke="var(--color-primary-500)" strokeWidth={2} dot={false} />
+        <Line type="monotone" dataKey="total" name="Total students" stroke="var(--color-primary-500)" strokeWidth={2} dot={false} />
       </LineChart>
     </ResponsiveContainer>
   );
@@ -47,7 +47,7 @@ const ChildrenOverTimeWidget = () => {
 
 const childrenOverTimeWidget: DashboardWidget = {
   id: 'children-over-time',
-  title: 'Child Accounts Over Time',
+  title: 'Students Over Time',
   order: 5,
   requiredCapability: 'children:manage',
   Component: ChildrenOverTimeWidget,

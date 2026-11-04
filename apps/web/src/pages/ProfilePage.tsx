@@ -31,6 +31,9 @@ import { generateProfileBannerConfig } from './profileBannerConfig';
 import { profileSections } from './profile/sections/registry';
 import { profileTabs } from './profile/tabs/registry';
 
+// Tab ids that were renamed, so old links (emails, bookmarks) still land on the right tab.
+const LEGACY_TAB_IDS: Readonly<Record<string, string>> = { 'child-accounts': 'students' };
+
 const AVATAR_SIZE = 128;
 
 // @inithium/db's UserProfileBannerConfig stores color stops as a plain string[] (libs/db must
@@ -50,7 +53,8 @@ export const ProfilePage = () => {
   // query param, read directly via react-router-dom's useLocation, so a drawer link (e.g. the
   // friends plugin's "Friends" item) can deep-link straight to a specific tab.
   const location = useLocation();
-  const requestedTabId = new URLSearchParams(location.search).get('tab');
+  const rawRequestedTabId = new URLSearchParams(location.search).get('tab');
+  const requestedTabId = rawRequestedTabId ? (LEGACY_TAB_IDS[rawRequestedTabId] ?? rawRequestedTabId) : null;
   const { data: profile, isLoading } = useGetProfileQuery(id ?? '', { skip: !id });
   const { currentUser } = useCurrentUser();
   const [updateMyProfile] = useUpdateMyProfileMutation();

@@ -3,7 +3,7 @@ import { ChildrenAdminModule } from './children/ChildrenAdminModule';
 
 const childrenAdminModule: CmsModule = {
   id: 'children',
-  navLabel: 'Child Accounts',
+  navLabel: 'Students',
   icon: 'Baby',
   requiredCapability: 'children:manage',
   Component: ChildrenAdminModule,

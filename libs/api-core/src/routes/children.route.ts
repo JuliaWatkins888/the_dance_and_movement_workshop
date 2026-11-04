@@ -155,12 +155,12 @@ router.get(
     const id = normalizeParam(req.params.id);
     const child = await getChildById(id);
     if (!child) {
-      throw NotFoundError('Child not found');
+      throw NotFoundError('Student not found');
     }
 
     const requester = await loadRequester(req);
     if (child.parentUserId !== requester.id && !isManager(requester)) {
-      throw ForbiddenError('You do not have access to this child account');
+      throw ForbiddenError('You do not have access to this student');
     }
 
     res.status(200).json(createSuccessResponse(await toChildDto(child)));
@@ -214,13 +214,13 @@ router.put(
 
     const existing = await getChildById(id);
     if (!existing) {
-      throw NotFoundError('Child not found');
+      throw NotFoundError('Student not found');
     }
 
     const requester = await loadRequester(req);
     const requesterIsManager = isManager(requester);
     if (existing.parentUserId !== requester.id && !requesterIsManager) {
-      throw ForbiddenError('You do not have access to this child account');
+      throw ForbiddenError('You do not have access to this student');
     }
 
     let parentUserId: string | undefined;
@@ -240,7 +240,7 @@ router.put(
       gender: parsed.data.gender,
     });
     if (!child) {
-      throw NotFoundError('Child not found');
+      throw NotFoundError('Student not found');
     }
     res.status(200).json(createSuccessResponse(await toChildDto(child)));
   }),
@@ -253,12 +253,12 @@ router.delete(
     const id = normalizeParam(req.params.id);
     const child = await getChildById(id);
     if (!child) {
-      throw NotFoundError('Child not found');
+      throw NotFoundError('Student not found');
     }
 
     const requester = await loadRequester(req);
     if (child.parentUserId !== requester.id && !isManager(requester)) {
-      throw ForbiddenError('You do not have access to this child account');
+      throw ForbiddenError('You do not have access to this student');
     }
 
     // A registration keeps billing and holding a seat, so it has to finish (or be cancelled) first.

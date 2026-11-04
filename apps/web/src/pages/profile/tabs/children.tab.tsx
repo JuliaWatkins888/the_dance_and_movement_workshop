@@ -26,7 +26,7 @@ const ChildrenTab = (_props: ProfileTabProps) => {
           }}
         />
       ),
-      { title: 'Add Child Account', width: DIALOG_WIDTH },
+      { title: 'Add Student', width: DIALOG_WIDTH },
     );
   };
 
@@ -48,7 +48,7 @@ const ChildrenTab = (_props: ProfileTabProps) => {
 
   const handleDelete = async (child: ChildDto) => {
     const confirmed = await dialog.confirm({
-      title: 'Delete this child account?',
+      title: 'Delete this student?',
       description: `This permanently removes "${fullNameOf(child)}" from your account. This cannot be undone.`,
       confirmLabel: 'Delete',
       cancelLabel: 'Cancel',
@@ -59,7 +59,7 @@ const ChildrenTab = (_props: ProfileTabProps) => {
       await deleteChild(child.id).unwrap();
       refetch();
     } catch (error) {
-      alert.danger(readApiError(error, 'Could not delete this child account.').message, { position: 'bottom-right' });
+      alert.danger(readApiError(error, 'Could not delete this student.').message, { position: 'bottom-right' });
     }
   };
 
@@ -67,10 +67,10 @@ const ChildrenTab = (_props: ProfileTabProps) => {
     <Box flex={{ direction: 'col', gap: 16 }}>
       <Box flex={{ direction: 'row', justify: 'between', align: 'center', gap: 16 }}>
         <Text as="p" className="text-sm text-surface-600">
-          Add your children here so you can register them for classes.
+          Add the students on your account here (children, or adult family members you pay for) so you can register them for classes.
         </Text>
         <Button variant={{ kind: 'filled', color: 'primary' }} onClick={openCreateDialog}>
-          Add Child
+          Add Student
         </Button>
       </Box>
 
@@ -78,7 +78,7 @@ const ChildrenTab = (_props: ProfileTabProps) => {
         {isLoading ? (
           <Box padding={{ base: 24 }}>
             <Text as="p" className="text-surface-500">
-              Loading child accounts...
+              Loading students...
             </Text>
           </Box>
         ) : children && children.length > 0 ? (
@@ -108,7 +108,7 @@ const ChildrenTab = (_props: ProfileTabProps) => {
         ) : (
           <Box padding={{ base: 24 }}>
             <Text as="p" className="text-surface-500">
-              No child accounts yet.
+              No students yet.
             </Text>
           </Box>
         )}
@@ -118,8 +118,8 @@ const ChildrenTab = (_props: ProfileTabProps) => {
 };
 
 const childrenTab: ProfileTabDescriptor = {
-  id: 'child-accounts',
-  label: 'Child Accounts',
+  id: 'students',
+  label: 'Students',
   order: 10,
   visibility: 'owned',
   Component: ChildrenTab,
