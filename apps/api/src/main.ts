@@ -16,6 +16,7 @@ import { resolveSession } from '@inithium/permissions';
 import { registerCoreRoutes } from '@inithium/api-core';
 import { errorHandler } from '@inithium/api-utils';
 import { attachRealtimeGateway, connectRealtime } from '@inithium/realtime';
+import { describeStorageConfig } from '@inithium/storage';
 // inithium:block:ecommerce:imports:start
 import { createPaymentWebhookRouter } from '@inithium/ecommerce';
 // inithium:block:ecommerce:imports:end
@@ -66,8 +67,21 @@ app.use(createPaymentWebhookRouter());
 // inithium:anchor:pre-body-parser
 app.use(express.json());
 
+// Logged, not thrown: the API still boots without storage, but a misconfigured deploy is obvious
+// from the first lines of the boot log instead of from the first failed upload.
+const logStorageConfig = (): void => {
+  const storage = describeStorageConfig();
+  if (!storage.configured) {
+    console.warn(`⚠️ Storage NOT configured - image uploads will fail: ${storage.issues.join('; ')}`);
+    return;
+  }
+  console.log(`🪣 Storage: bucket "${storage.bucket}" via ${storage.endpointHost}, public URL ${storage.publicBaseUrl}`);
+  storage.warnings.forEach((warning) => console.warn(`⚠️ Storage config: ${warning}`));
+};
+
 const startServer = async () => {
   try {
+    logStorageConfig();
     await connectDatabase({ uri: process.env['MONGO_URI'] });
     await connectRealtime();
     // Idempotent - creates only the pages missing by slug, never touches an existing (possibly

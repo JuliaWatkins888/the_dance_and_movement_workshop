@@ -15,7 +15,7 @@ import type { UserEntity } from '@inithium/db';
 import { hasCapability } from '@inithium/permissions';
 import { uploadObject } from '@inithium/storage';
 import { UPLOAD_PURPOSE_CAPABILITIES, uploadAssetSchema } from '../schemas/storage.schema';
-import { releaseCloudAsset } from '../services/cloud-image.service';
+import { releaseCloudAsset, withStorageUnavailable } from '../services/cloud-image.service';
 
 const router: RouterType = Router();
 
@@ -29,7 +29,9 @@ const EXTENSION_BY_MIME_TYPE: Record<string, string> = {
   'image/gif': 'gif',
 };
 
-const UPLOAD_CAPABILITIES = Object.values(UPLOAD_PURPOSE_CAPABILITIES);
+const UNSUPPORTED_FILE_MESSAGE = 'Only JPEG, PNG, WebP or GIF images (max 5 MB) can be uploaded here';
+
+const UPLOAD_CAPABILITIES =Object.values(UPLOAD_PURPOSE_CAPABILITIES);
 
 const normalizeParam = (raw: string | string[]): string => (Array.isArray(raw) ? raw[0] : raw);
 
@@ -38,7 +40,7 @@ const upload = multer({
   limits: { fileSize: MAX_FILE_SIZE_BYTES },
   fileFilter: (_req, file, callback) => {
     if (!(file.mimetype in EXTENSION_BY_MIME_TYPE)) {
-      callback(new Error(`Unsupported file type: ${file.mimetype}`));
+      callback(new Error(`${UNSUPPORTED_FILE_MESSAGE} (received ${file.mimetype || 'an unknown type'})`));
       return;
     }
     callback(null, true);
@@ -104,11 +106,8 @@ router.post(
     // Grouped by purpose for bucket-console readability only - the Asset row is the real record.
     const key = `${parsed.data.purpose}/${randomUUID()}.${extension}`;
 
-    const { publicUrl } = await uploadObject({
-      key,
-      body: req.file.buffer,
-      contentType: req.file.mimetype,
-    });
+    const { buffer, mimetype } = req.file;
+    const { publicUrl } = await withStorageUnavailable(() => uploadObject({ key, body: buffer, contentType: mimetype }));
 
     const asset = await createAsset({
       publicUrl,
@@ -143,7 +142,7 @@ router.delete(
       throw ForbiddenError('You do not have permission to delete this asset');
     }
 
-    await releaseCloudAsset(id);
+    await withStorageUnavailable(() => releaseCloudAsset(id));
     res.status(204).send();
   }),
 );

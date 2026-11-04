@@ -6,6 +6,41 @@
 
 [Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
 
+## Environment
+
+All variables are listed in [`.env.example`](.env.example). On the deployed API, set them in the
+host's environment settings.
+
+### Image storage (Cloudflare R2)
+
+Every CMS image upload (gallery, staff, programs, workshops, events, products, logo and home
+image) goes to one R2 bucket through R2's S3-compatible API.
+
+| Variable | Value |
+| --- | --- |
+| `STORAGE_ENDPOINT` | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`, the account's S3 API host. **Don't** add the bucket name to the path. |
+| `STORAGE_BUCKET` | The bucket name. |
+| `STORAGE_ACCESS_KEY_ID` / `STORAGE_SECRET_ACCESS_KEY` | From an R2 API token (R2 → Manage API tokens) with **Object Read & Write** permission, scoped to this bucket. |
+| `STORAGE_PUBLIC_BASE_URL` | The bucket's **public** address: its `https://pub-….r2.dev` URL (bucket → Settings → Public access) or a custom domain connected to the bucket. This is never the `r2.cloudflarestorage.com` API host, because that host isn't publicly readable and images would fail to load. |
+| `STORAGE_REGION` | `auto` (the default). |
+| `STORAGE_FORCE_PATH_STYLE` | `false` (the default). |
+
+When the API starts, it logs a line like the one below, or a `⚠️ Storage NOT configured` warning
+that lists the missing variables. The log never shows the keys.
+
+```
+🪣 Storage: bucket "studio-images" via <account>.r2.cloudflarestorage.com, public URL https://pub-xxxx.r2.dev
+```
+
+It also warns about common mistakes, such as a bucket name in the endpoint path or the API host
+used as the public URL. When an upload fails, the CMS shows a short message. The API log has the
+R2 error code, for example `[storage] Storage upload failed: AccessDenied (HTTP 403) - …`:
+
+- `AccessDenied`: the token doesn't have Object Read & Write on this bucket.
+- `NoSuchBucket`: `STORAGE_BUCKET` is wrong, or the endpoint has the bucket in its path.
+- `SignatureDoesNotMatch` / `InvalidAccessKeyId`: the keys are wrong or don't belong to this account.
+- `InvalidStorageConfig`: a variable is missing or isn't a valid URL.
+
 ## Run tasks
 
 To run tasks with Nx use:

@@ -2952,9 +2952,12 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"// purpose must be one of gallery | staff | program | product | setting, each gated by the",
-									"// capability owning that image field. The default user holds none of them.",
-									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+									"// purpose must be one of gallery | staff | program | workshop | event | product | setting, each",
+									"// gated by the capability owning that image field. The default user holds none of them.",
+									"// JPEG/PNG/WebP/GIF only, max 5 MB (else 400). An R2/S3 failure returns 503 SERVICE_UNAVAILABLE",
+									"// with details.reason = the provider error code (e.g. AccessDenied); the full error is in the API log.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));",
+									"pm.test('Storage failures are a clean 503, never a raw 500', () => pm.expect(pm.response.code).to.not.equal(500));"
 								]
 							}
 						}
@@ -3004,7 +3007,8 @@
 								"type": "text/javascript",
 								"exec": [
 									"// Discards an unattached upload. Only its uploader or a storage:manageAssets holder may delete it.",
-									"pm.test('Status code is 204, 403 or 404', () => pm.expect(pm.response.code).to.be.oneOf([204, 403, 404]));"
+									"// 503 SERVICE_UNAVAILABLE when R2 refuses the delete (see the API log for the provider error).",
+									"pm.test('Status code is 204, 403, 404 or 503', () => pm.expect(pm.response.code).to.be.oneOf([204, 403, 404, 503]));"
 								]
 							}
 						}
