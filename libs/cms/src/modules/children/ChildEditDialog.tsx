@@ -60,7 +60,7 @@ export const ChildEditDialog = ({ mode, initialChild, onDone }: ChildEditDialogP
       }
       onDone();
     } catch {
-      setSubmitError('Could not save this child account. Check the fields and try again.');
+      setSubmitError('Could not save this student. Check the fields and try again.');
     }
   };
 

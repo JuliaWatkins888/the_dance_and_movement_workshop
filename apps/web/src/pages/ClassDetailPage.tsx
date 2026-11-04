@@ -243,8 +243,8 @@ export const ClassDetailPage = () => {
           <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
             None of your dancers are in this class’s age range ({formatAgeRange(course.minAgeYears, course.maxAgeYears)}).
           </Text>
-          <Link to={`/profile/${currentUser.id}?tab=child-accounts`} className="text-sm font-medium text-primary-600 hover:underline">
-            Add a child profile
+          <Link to={`/profile/${currentUser.id}?tab=students`} className="text-sm font-medium text-primary-600 hover:underline">
+            Add a student
           </Link>
         </Box>
       );

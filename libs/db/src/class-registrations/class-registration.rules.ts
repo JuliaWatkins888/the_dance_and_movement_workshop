@@ -39,10 +39,10 @@ export const resolveEligibleAttendee = async (
   if (ref.type === 'self') {
     return isSelfEnrollable(course)
       ? { ok: true, attendee: { type: 'self', name: userName } }
-      : { ok: false, reason: `This ${offering} is for children - choose one of your child profiles.` };
+      : { ok: false, reason: `This ${offering} is for younger dancers - choose one of your students.` };
   }
   const child = await getChildRepository().findById(ref.childId);
-  if (!child || child.parentUserId !== userId) return { ok: false, reason: 'Choose one of your own child profiles.' };
+  if (!child || child.parentUserId !== userId) return { ok: false, reason: 'Choose one of your own students.' };
   const name = [child.firstName, child.lastName].filter(Boolean).join(' ');
   if (!isAgeEligible(child.birthDate, now, course)) {
     return { ok: false, reason: `${child.firstName} isn’t in this ${offering}’s age range.` };

@@ -385,7 +385,7 @@ export const WorkshopEditDialog = ({ workshop, knownStyles, onDone }: WorkshopEd
           type="number"
           min={0}
           step="0.5"
-          helperText="Leave both blank for all ages. Adults can only enroll themselves at 18+."
+          helperText="Leave both blank for all ages. Account holders can enroll themselves only at 18+; students on an account are matched by birthdate."
           value={maxAge}
           onChange={(event) => setMaxAge(event.target.value)}
           className="flex-1"

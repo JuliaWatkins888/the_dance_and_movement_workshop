@@ -214,8 +214,8 @@ export const WorkshopDetailPage = () => {
           <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
             None of your dancers are in this workshop’s age range ({formatAgeRange(workshop.minAgeYears, workshop.maxAgeYears)}).
           </Text>
-          <Link to={`/profile/${currentUser.id}?tab=child-accounts`} className="text-sm font-medium text-primary-600 hover:underline">
-            Add a child profile
+          <Link to={`/profile/${currentUser.id}?tab=students`} className="text-sm font-medium text-primary-600 hover:underline">
+            Add a student
           </Link>
         </Box>
       );

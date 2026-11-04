@@ -56,7 +56,7 @@ export const ChildrenAdminModule = () => {
           }}
         />
       ),
-      { title: 'New Child Account', width: DIALOG_WIDTH },
+      { title: 'New Student', width: DIALOG_WIDTH },
     );
   };
 
@@ -78,7 +78,7 @@ export const ChildrenAdminModule = () => {
 
   const handleDelete = async (child: ChildDto) => {
     const confirmed = await dialog.confirm({
-      title: 'Delete this child account?',
+      title: 'Delete this student?',
       description: `This permanently removes "${fullNameOf(child)}" from ${parentNameOf(child)}'s account. This cannot be undone.`,
       confirmLabel: 'Delete',
       cancelLabel: 'Cancel',
@@ -88,15 +88,15 @@ export const ChildrenAdminModule = () => {
     try {
       await deleteChild(child.id).unwrap();
     } catch (error) {
-      alert.danger(readApiError(error, 'Could not delete this child account.').message, { position: ALERT_POSITION });
+      alert.danger(readApiError(error, 'Could not delete this student.').message, { position: ALERT_POSITION });
     }
     refetch();
   };
 
   const handleBulkDelete = async () => {
     const confirmed = await dialog.confirm({
-      title: `Delete ${selection.selectedCount} child accounts?`,
-      description: 'This permanently removes every selected child account. This cannot be undone.',
+      title: `Delete ${selection.selectedCount} students?`,
+      description: 'This permanently removes every selected student. This cannot be undone.',
       confirmLabel: 'Delete',
       cancelLabel: 'Cancel',
       confirmVariant: { kind: 'filled', color: 'red' },
@@ -108,8 +108,8 @@ export const ChildrenAdminModule = () => {
     if (failures.length > 0) {
       alert.danger(
         failures.length === 1
-          ? readApiError(failures[0]?.reason, 'Could not delete one child account.').message
-          : `${failures.length} child accounts could not be deleted (still registered for classes).`,
+          ? readApiError(failures[0]?.reason, 'Could not delete one student.').message
+          : `${failures.length} students could not be deleted (still registered for classes).`,
         { position: ALERT_POSITION },
       );
     }
@@ -121,7 +121,7 @@ export const ChildrenAdminModule = () => {
     <Box padding={{ base: 24 }} flex={{ direction: 'col', gap: 16 }}>
       <Box flex={{ direction: 'row', justify: 'between', align: 'center', gap: 16 }}>
         <Text as="h1" textColor={{ color: 'surface', intensity: 950 }} className="text-2xl font-bold">
-          Child Accounts
+          Students
         </Text>
         <Box flex={{ direction: 'row', align: 'center', gap: 12 }}>
           {selection.selectedCount >= 2 ? (
@@ -130,7 +130,7 @@ export const ChildrenAdminModule = () => {
             </Button>
           ) : null}
           <Button variant={{ kind: 'filled', color: 'primary' }} onClick={openCreateDialog}>
-            Add Child Account
+            Add Student
           </Button>
         </Box>
       </Box>
@@ -141,14 +141,14 @@ export const ChildrenAdminModule = () => {
         searchField={searchField}
         onSearchFieldChange={(value) => setSearchField(value as ChildSearchField)}
         fieldOptions={FIELD_OPTIONS}
-        placeholder="Search by child's name..."
+        placeholder="Search by student's name..."
       />
 
       <Box flex={{ direction: 'col' }} borderColor={{ color: 'surface', intensity: 200 }} className="rounded border">
         {isLoading ? (
           <Box padding={{ base: 24 }}>
             <Text as="p" textColor={{ color: 'surface', intensity: 600 }}>
-              Loading child accounts...
+              Loading students...
             </Text>
           </Box>
         ) : data && data.items.length > 0 ? (
@@ -180,7 +180,7 @@ export const ChildrenAdminModule = () => {
         ) : (
           <Box padding={{ base: 24 }}>
             <Text as="p" textColor={{ color: 'surface', intensity: 600 }}>
-              No child accounts found.
+              No students found.
             </Text>
           </Box>
         )}
