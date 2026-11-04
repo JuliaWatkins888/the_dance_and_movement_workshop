@@ -126,6 +126,7 @@ export const ProductDetail = ({ slug, currency, close }: ProductDetailProps) => 
       await addCartLine({ sourceType: PRODUCT_SOURCE_TYPE, sourceId: product.id, variantId: variant.id, quantity }).unwrap();
       alert.success(`${product.name} added to your cart.`, { position: ALERT_POSITION });
       close();
+      navigate('/cart');
     } catch (error) {
       alert.danger(readApiError(error, 'Could not add this item to your cart.').message, { position: ALERT_POSITION });
     }

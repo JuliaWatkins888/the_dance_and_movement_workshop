@@ -29,6 +29,7 @@ import {
 } from './classes/classFormat';
 import { ProgramBanner } from './classes/ProgramBanner';
 import { useRouteSlug } from './classes/useRouteSlug';
+import { AddStudentAction } from './students/AddStudentAction';
 
 const ALERT_POSITION = 'bottom-right' as const;
 
@@ -108,7 +109,11 @@ export const ClassDetailPage = () => {
 
   const selectedSection = course?.sections.find((section) => section.id === sectionId);
   const selectedPlan = selectedSection?.planOptions.find((plan) => planKey(plan) === selectedPlanKey);
-  const { data: attendees = [], isFetching: isLoadingAttendees } = useListEligibleAttendeesQuery(sectionId ?? '', {
+  const {
+    data: attendees = [],
+    isFetching: isLoadingAttendees,
+    refetch: refetchAttendees,
+  } = useListEligibleAttendeesQuery(sectionId ?? '', {
     skip: !currentUser || !sectionId,
   });
   const selectedAttendee = attendees.find((attendee) => attendeeKeyOf(attendee) === selectedAttendeeKey);
@@ -175,6 +180,7 @@ export const ClassDetailPage = () => {
         quantity: 1,
       }).unwrap();
       alert.success(`${course.name} for ${selectedAttendee.name} added to your cart.`, { position: ALERT_POSITION });
+      navigate('/cart');
     } catch (error) {
       alert.danger(readApiError(error, 'Could not add this class to your cart.').message, { position: ALERT_POSITION });
     }
@@ -239,14 +245,9 @@ export const ClassDetailPage = () => {
     }
     if (attendees.length === 0) {
       return (
-        <Box flex={{ direction: 'col', align: 'start', gap: 6 }}>
-          <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
-            None of your dancers are in this class’s age range ({formatAgeRange(course.minAgeYears, course.maxAgeYears)}).
-          </Text>
-          <Link to={`/profile/${currentUser.id}?tab=students`} className="text-sm font-medium text-primary-600 hover:underline">
-            Add a student
-          </Link>
-        </Box>
+        <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+          None of your dancers are in this class’s age range ({formatAgeRange(course.minAgeYears, course.maxAgeYears)}).
+        </Text>
       );
     }
     return <AttendeeChoices attendees={attendees} selectedKey={selectedAttendeeKey} onSelect={setSelectedAttendeeKey} />;
@@ -335,7 +336,12 @@ export const ClassDetailPage = () => {
 
                 <Divider />
 
-                <DetailBlock title="2. Who’s dancing?">{renderAttendees()}</DetailBlock>
+                <DetailBlock title="2. Who’s dancing?">
+                  {renderAttendees()}
+                  {currentUser && selectedSection ? (
+                    <AddStudentAction courseKind="class" refreshAttendees={refetchAttendees} onEligible={setSelectedAttendeeKey} />
+                  ) : null}
+                </DetailBlock>
 
                 <Divider />
 

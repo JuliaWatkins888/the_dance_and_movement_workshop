@@ -37,14 +37,12 @@ export const EventDetailPage = () => {
   const { currentUser } = useCurrentUser();
   const { data: cart } = useGetCartQuery(currentUser?.id ?? '', { skip: !currentUser });
   const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [justAdded, setJustAdded] = useState(false);
   const navigate = useNavigateWithTransition();
   const location = useLocation();
   const [addCartLine, { isLoading: isAdding }] = useAddCartLineMutation();
 
   useEffect(() => {
     setQuantities({});
-    setJustAdded(false);
   }, [event?.id]);
 
   if (isLoading) {
@@ -82,7 +80,6 @@ export const EventDetailPage = () => {
   );
 
   const setQuantity = (ticketTypeId: string, quantity: number) => {
-    setJustAdded(false);
     setQuantities((current) => ({ ...current, [ticketTypeId]: quantity }));
   };
 
@@ -105,8 +102,7 @@ export const EventDetailPage = () => {
       alert.success(`${selectedCount} ticket${selectedCount === 1 ? '' : 's'} for ${event.title} added to your cart.`, {
         position: ALERT_POSITION,
       });
-      setQuantities({});
-      setJustAdded(true);
+      navigate('/cart');
     } catch (error) {
       alert.danger(readApiError(error, 'Could not add these tickets to your cart.').message, { position: ALERT_POSITION });
     }
@@ -193,7 +189,7 @@ export const EventDetailPage = () => {
             Log in to buy tickets
           </Button>
         )}
-        {justAdded || inCartCount > 0 ? (
+        {inCartCount > 0 ? (
           <Button variant={{ kind: 'outlined', color: 'primary' }} className="w-full" onClick={() => navigate('/cart')}>
             View cart &amp; check out
           </Button>
