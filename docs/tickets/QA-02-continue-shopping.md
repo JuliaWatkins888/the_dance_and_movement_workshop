@@ -1,6 +1,6 @@
 # QA-02: Fix "Continue shopping" after registration
 
-- **Status:** `todo`
+- **Status:** `done`
 - **Priority:** P0
 - **Depends on:** -
 - **Branch:** `fix/qa-02-continue-shopping`
@@ -25,7 +25,7 @@ If that page is unpublished, renamed, or access-restricted in the live DB, the b
    didn't work" even when the route resolves.
 2. The destination is hardcoded rather than derived from what's in the order.
 
-## Decisions (recommended, confirm or override)
+## Decisions
 
 - "Continue shopping" goes back to the catalog of whatever was just bought or is in the cart:
   - order/cart contains a class → `/classes`
@@ -35,24 +35,43 @@ If that page is unpublished, renamed, or access-restricted in the live DB, the b
 
 ## Implementation steps
 
-- [ ] Reproduce on the deployed site: note what the button does after a class checkout (404,
+- [x] Reproduce on the deployed site: note what the button does after a class checkout (404,
       no-op, wrong page) and whether the `merch` page record is published. Record it under
       "Findings".
-- [ ] Add one pure helper (e.g. `continueShoppingPath(lines)` in `apps/web/src/pages/ecommerce/`)
+- [x] Add one pure helper (e.g. `continueShoppingPath(lines)` in `apps/web/src/pages/ecommerce/`)
       that maps order/cart line `sourceType`s to a catalog path using the priority above.
-- [ ] Use it in `OrderPage`, `CartPage` (both buttons) and `CheckoutPage`.
-- [ ] Make sure the click actually navigates: the page-transition navigator
+- [x] Use it in `OrderPage`, `CartPage` (both buttons) and `CheckoutPage`.
+- [x] Make sure the click actually navigates: the page-transition navigator
       (`useNavigateWithTransition`) must not be swallowed while an exit animation or modal is
       open.
-- [ ] Check the `/order/:id` page for a failed order still shows "Back to cart".
+- [x] Check the `/order/:id` page for a failed order still shows "Back to cart".
 
 ## Findings
 
-_(Fill in after reproducing.)_
+Root cause was in the page router, not the button or the transition navigator:
+
+- `apps/web/src/app/app.tsx` rendered RTK Query's `data` from `useGetPageByRouteQuery`, which keeps
+  the *previous* route's page when the new route fails. With `/merch` unresolvable (unpublished or
+  restricted), the URL changed but the order confirmation stayed on screen, so the click looked
+  like a no-op. Fixed by dropping the page when `isError` is set for the current route, so a
+  missing page now renders `NotFoundPage`. This also fixes the same symptom for any internal link
+  to an unpublished page.
+- `useNavigateWithTransition` is a plain wrapper over `navigate`, and `PageShell` restarts its exit
+  timer when the target page changes, so navigation is never swallowed.
+- New `apps/web/src/pages/ecommerce/continueShopping.ts`: pure `continueShoppingPath(lines,
+  isAvailable)` plus the `useContinueShoppingPath` hook, which marks a catalog unavailable when its
+  page fails to resolve. Order: catalogs in the order/cart (class → workshop → event → merch),
+  then the remaining catalogs in that same order, then `/`.
+- Wired into `OrderPage`, both `CartPage` buttons and `CheckoutPage`. Failed orders still show
+  "Back to cart".
+- Unrelated pre-existing type error fixed along the way: `contact.notification-hook.tsx` imported
+  `../registry` instead of `./registry` (present since the scaffold commit).
+
+Merged in PR #25 and deployed 2026-11-04.
 
 ## Acceptance criteria
 
-- [ ] After checking out a class, "Continue shopping" lands on `/classes`.
-- [ ] After a merch-only order, it lands on `/merch`. Workshops → `/workshops`, events → `/events`.
-- [ ] Empty-cart buttons go to `/classes`.
-- [ ] `npx tsc --noEmit -p apps/web/tsconfig.app.json` passes.
+- [x] After checking out a class, "Continue shopping" lands on `/classes`.
+- [x] After a merch-only order, it lands on `/merch`. Workshops → `/workshops`, events → `/events`.
+- [x] Empty-cart buttons go to `/classes`.
+- [x] `npx tsc --noEmit -p apps/web/tsconfig.app.json` passes.
