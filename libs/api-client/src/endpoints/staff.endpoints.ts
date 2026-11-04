@@ -15,6 +15,7 @@ export interface StaffMemberDto {
   photoSourceType?: StaffPhotoSourceType;
   photoAssetId?: string;
   order: number;
+  isListed: boolean;
   createdAt: string;
   updatedAt: string;
   firstName: string;
@@ -44,8 +45,9 @@ export interface ListStaffAdminParams {
   searchField?: StaffSearchField;
 }
 
-// What the unauthenticated /api/staff listing returns - no internal account or asset ids.
-export type PublicStaffMemberDto = Omit<StaffMemberDto, 'userId' | 'photoAssetId'>;
+// What the unauthenticated /api/staff listing returns - listed staff only, no internal account or
+// asset ids.
+export type PublicStaffMemberDto = Omit<StaffMemberDto, 'userId' | 'photoAssetId' | 'isListed'>;
 
 export interface ListPublicStaffResult {
   items: PublicStaffMemberDto[];
@@ -71,6 +73,7 @@ export interface StaffWriteInput {
   photoSourceType?: StaffPhotoSourceType;
   photoAssetId?: string;
   order?: number;
+  isListed?: boolean;
 }
 
 // null clears the photo fields (removing a photo).

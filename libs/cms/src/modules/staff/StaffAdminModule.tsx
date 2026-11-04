@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Avatar, Box, Button, IconButton, ListRow, Pagination, SearchFilterBar, Text, dialog, useSelection } from '@inithium/ui';
+import { Avatar, Box, Button, IconButton, ListRow, Pagination, Pill, SearchFilterBar, Text, dialog, useSelection } from '@inithium/ui';
 import { useDeleteStaffMemberMutation, useListStaffAdminQuery } from '@inithium/api-client';
 import type { StaffSearchField } from '@inithium/db';
 import type { StaffMemberDto } from '@inithium/api-client';
@@ -145,6 +145,11 @@ export const StaffAdminModule = () => {
               }
               trailing={
                 <>
+                  {!member.isListed ? (
+                    <Pill color={{ color: 'surface', intensity: 300 }} className="text-surface-900">
+                      Hidden
+                    </Pill>
+                  ) : null}
                   <IconButton icon="PencilSimple" label={`Edit ${fullNameOf(member)}`} onClick={() => openEditDialog(member)} />
                   <IconButton
                     icon="Trash"

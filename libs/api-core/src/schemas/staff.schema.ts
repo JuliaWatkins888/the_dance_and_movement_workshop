@@ -25,6 +25,7 @@ const staffShape = {
   photoSourceType: z.enum(STAFF_PHOTO_SOURCE_TYPES).optional(),
   photoAssetId: z.string().min(1).optional(),
   order: z.number().int().optional(),
+  isListed: z.boolean().optional(),
 };
 
 export const createStaffSchema = z.object(staffShape).superRefine(requirePhotoSourceFields);

@@ -34,7 +34,7 @@ Tick a box only when the ticket's own status is `done`.
 - [x] [QA-02](QA-02-continue-shopping.md): Fix "Continue shopping" after registration · **P0**
 - [x] [QA-03](QA-03-child-to-student.md): Rename "Child" → "Student" and remove the under-18 limit · **P1**
 - [x] [QA-04](QA-04-inline-add-student.md): Add a student inline from the registration screen · **P1** · needs QA-03
-- [ ] [QA-05](QA-05-staff-page-visibility.md): Hide staff from the public Staff page (Melissa) · **P1**
+- [x] [QA-05](QA-05-staff-page-visibility.md): Hide staff from the public Staff page (Melissa) · **P1**
 - [ ] [QA-06](QA-06-editable-hours-contact.md): CMS-editable studio hours & contact info · **P1**
 - [ ] [QA-07](QA-07-email-infrastructure.md): Transactional email package (Resend) · **P0**
 - [ ] [QA-08](QA-08-password-reset.md): Forgot-password flow + staff-initiated reset · **P0** · needs QA-07

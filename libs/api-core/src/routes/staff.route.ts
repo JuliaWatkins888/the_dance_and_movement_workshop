@@ -42,6 +42,7 @@ const toStaffDto = async (staff: StaffEntity) => {
     photoSourceType: staff.photoSourceType,
     photoAssetId: staff.photoAssetId,
     order: staff.order,
+    isListed: staff.isListed,
     createdAt: staff.createdAt,
     updatedAt: staff.updatedAt,
     firstName: user?.firstName ?? '',
@@ -50,10 +51,10 @@ const toStaffDto = async (staff: StaffEntity) => {
   };
 };
 
-// The unauthenticated /staff listing - drops internal ids (the linked account's userId, the
-// photo's storage asset) that only the CMS needs.
+// The unauthenticated /staff listing - drops the fields only the CMS needs: internal ids (the
+// linked account's userId, the photo's storage asset) and isListed, always true here.
 const toPublicStaffDto = async (staff: StaffEntity) => {
-  const { userId: _userId, photoAssetId: _photoAssetId, ...publicFields } = await toStaffDto(staff);
+  const { userId: _userId, photoAssetId: _photoAssetId, isListed: _isListed, ...publicFields } = await toStaffDto(staff);
   return publicFields;
 };
 
@@ -71,7 +72,7 @@ router.get(
     const page = Math.max(1, Number(req.query['page']) || 1);
     const pageSize = Math.min(100, Math.max(1, Number(req.query['pageSize']) || 12));
 
-    const result = await listStaff({ page, pageSize });
+    const result = await listStaff({ page, pageSize, listedOnly: true });
     const items = await Promise.all(result.items.map(toPublicStaffDto));
 
     res.status(200).json(
@@ -182,6 +183,7 @@ router.post(
         ? { photoAssetId, photoUrl: await resolveCloudAssetUrl(photoAssetId) }
         : {}),
       order: parsed.data.order ?? 0,
+      isListed: parsed.data.isListed ?? true,
     });
     res.status(201).json(createSuccessResponse(await toStaffDto(staff)));
   }),

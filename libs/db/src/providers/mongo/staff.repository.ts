@@ -20,16 +20,22 @@ const mapToStaffEntity = (doc: StaffDocument): StaffEntity => ({
   photoSourceType: doc.photoSourceType,
   photoAssetId: doc.photoAssetId,
   order: doc.order,
+  isListed: doc.isListed ?? true,
   createdAt: doc.createdAt,
   updatedAt: doc.updatedAt,
 });
 
 export const createMongoStaffRepository = (model: Model<StaffDocument>): StaffRepository => ({
   findMany: async (options: FindManyStaffOptions): Promise<PaginatedResult<StaffEntity>> => {
-    const { page, pageSize, search, searchField } = options;
+    const { page, pageSize, search, searchField, listedOnly } = options;
     const filter: QueryFilter<StaffDocument> = {};
     if (search && searchField) {
       filter[searchField] = { $regex: escapeRegExp(search), $options: 'i' };
+    }
+    // $ne rather than `true`: records created before isListed existed have no stored value and
+    // must stay visible.
+    if (listedOnly) {
+      filter.isListed = { $ne: false };
     }
 
     const skip = (page - 1) * pageSize;
