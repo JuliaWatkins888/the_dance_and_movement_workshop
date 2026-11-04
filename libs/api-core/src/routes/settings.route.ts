@@ -5,7 +5,7 @@ import { requireAuth } from '@inithium/auth';
 import { requirePermission } from '@inithium/permissions';
 import { getSetting, listSettings, upsertSetting } from '@inithium/db';
 import type { UpsertSettingInput } from '@inithium/db';
-import { upsertSettingSchema } from '../schemas/settings.schema';
+import { upsertSettingSchemaFor } from '../schemas/settings.schema';
 import { releaseReplacedCloudAsset, resolveCloudAssetUrl } from '../services/cloud-image.service';
 
 const router: RouterType = Router();
@@ -44,15 +44,16 @@ router.patch(
   requireAuth,
   requirePermission('settings:manage'),
   asyncHandler(async (req: Request, res: Response) => {
-    const parsed = upsertSettingSchema.safeParse(req.body);
+    const key = normalizeKey(req.params.key);
+    const parsed = upsertSettingSchemaFor(key).safeParse(req.body);
     if (!parsed.success) {
-      throw ValidationError('Invalid request body', parsed.error.flatten());
+      // The first issue's message is what the CMS shows the admin, so it has to say what to fix.
+      throw ValidationError(parsed.error.issues[0]?.message ?? 'Invalid request body', parsed.error.flatten());
     }
 
-    const key = normalizeKey(req.params.key);
-    // Cross-field validity (value's shape matches type) was already enforced by
-    // upsertSettingSchema's superRefine - Zod doesn't narrow `value` past `unknown` from that
-    // alone, so this cast reflects a check that already happened, not one being skipped.
+    // Cross-field validity (value's shape matches type) was already enforced by the schema's
+    // refinement - Zod doesn't narrow `value` past `unknown` from that alone, so this cast
+    // reflects a check that already happened, not one being skipped.
     const input = { key, type: parsed.data.type, value: parsed.data.value } as UpsertSettingInput;
 
     if (input.type !== 'image') {

@@ -2,35 +2,45 @@ import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { alert, Box, Button, Icon, Input, Text, Textarea } from '@inithium/ui';
 import type { IconName } from '@inithium/ui';
-import { useIsContactCaptchaEnabled, useContactCaptchaSiteKey, useSubmitContactMutation } from '@inithium/api-client';
-import { useSearchParams } from 'react-router-dom';
+import {
+  useIsContactCaptchaEnabled,
+  useContactCaptchaSiteKey,
+  useStudioInfo,
+  useSubmitContactMutation,
+} from '@inithium/api-client';
+import type { StudioHoursEntry } from '@inithium/api-client';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useCurrentUser } from '../app/useCurrentUser';
-import { STUDIO_ADDRESS, googleMapsLink } from '../app/studioLocation';
-
-const STUDIO_PHONE = '(248) 495-4756';
-const STUDIO_PHONE_TEL = '+12484954756';
-const STUDIO_EMAIL = 'thedanceandmovementworkshop@gmail.com';
-const FACEBOOK_URL = 'https://www.facebook.com/thedanceandmovementworkshop?_rdr';
-const INSTAGRAM_URL = 'https://www.instagram.com/thedanceandmovementworkshop/';
-
-const STUDIO_HOURS: ReadonlyArray<{ readonly day: string; readonly hours: string }> = [
-  { day: 'Mon', hours: '3:00 PM – 8:30 PM' },
-  { day: 'Tue', hours: '3:00 PM – 8:30 PM' },
-  { day: 'Wed', hours: '3:00 PM – 8:30 PM' },
-  { day: 'Thu', hours: '3:00 PM – 8:30 PM' },
-  { day: 'Fri', hours: '4:30 PM – 7:00 PM' },
-  { day: 'Sat', hours: '11:00 AM – 3:00 PM' },
-  { day: 'Sun', hours: 'Closed' },
-];
+import { googleMapsLink } from '../app/studioLocation';
 
 // The classic keyless "output=embed" form of a Google Maps URL renders a pinned-location iframe
 // with no API key or billing account required - unlike the official Maps Embed API
 // (maps.google.com/maps/embed/v1/...), which does require a key. Good enough for a static studio
 // address; swap to the Embed API only if this ever needs richer features (custom styling, POI
 // filtering, etc.) that the keyless form doesn't support.
-const GOOGLE_MAPS_QUERY = encodeURIComponent(STUDIO_ADDRESS);
-const GOOGLE_MAPS_EMBED_SRC = `https://www.google.com/maps?q=${GOOGLE_MAPS_QUERY}&output=embed`;
-const GOOGLE_MAPS_LINK = googleMapsLink(STUDIO_ADDRESS);
+const googleMapsEmbedSrc = (address: string): string =>
+  `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
+
+const HOURS_LINK_CLASS_NAME = 'text-xs font-medium text-primary-500 underline underline-offset-4 hover:text-accent-500';
+
+const HoursText = ({ text, linkUrl }: Pick<StudioHoursEntry, 'text' | 'linkUrl'>) => {
+  if (!linkUrl) {
+    return (
+      <Text as="span" textColor={{ color: 'surface', intensity: 700 }} className="text-xs">
+        {text}
+      </Text>
+    );
+  }
+  return linkUrl.startsWith('/') ? (
+    <Link to={linkUrl} className={HOURS_LINK_CLASS_NAME}>
+      {text}
+    </Link>
+  ) : (
+    <a href={linkUrl} target="_blank" rel="noopener noreferrer" className={HOURS_LINK_CLASS_NAME}>
+      {text}
+    </a>
+  );
+};
 
 interface ContactInfoRowProps {
   readonly icon: IconName;
@@ -118,6 +128,7 @@ export const ContactPage = () => {
   const captchaEnabled = useIsContactCaptchaEnabled();
   const captchaSiteKey = useContactCaptchaSiteKey();
   const turnstileScriptLoaded = useTurnstileScript(captchaEnabled);
+  const studio = useStudioInfo();
 
   const [firstName, setFirstName] = useState(currentUser?.firstName ?? '');
   const [lastName, setLastName] = useState(currentUser?.lastName ?? '');
@@ -127,6 +138,24 @@ export const ContactPage = () => {
   const [searchParams] = useSearchParams();
   const [subject, setSubject] = useState(searchParams.get('subject') ?? '');
   const [message, setMessage] = useState(searchParams.get('message') ?? '');
+  const location = useLocation();
+  const handledLocationKey = useRef(location.key);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+
+  // A prefilled link on this page itself (an hours entry) doesn't remount it, so the useState
+  // initializers above never see the new params. Focusing Message brings the form into view, since
+  // it sits above the hours on a phone. The location key also catches re-clicking the same link.
+  useEffect(() => {
+    if (handledLocationKey.current === location.key) return;
+    handledLocationKey.current = location.key;
+
+    const nextSubject = searchParams.get('subject');
+    const nextMessage = searchParams.get('message');
+    if (nextSubject !== null) setSubject(nextSubject);
+    if (nextMessage !== null) setMessage(nextMessage);
+    if (nextSubject !== null || nextMessage !== null) messageRef.current?.focus();
+  }, [location.key, searchParams]);
+
   // Honeypot - never rendered visibly, never touched by a real visitor. Its container is
   // off-screen and unreachable by keyboard, so only a bot that blindly fills every form field
   // (visible or not) will ever populate it.
@@ -283,6 +312,7 @@ export const ContactPage = () => {
               column flex container) then grows to fill whatever's left under the label. */}
           <Box className="grid min-h-0 flex-1">
             <Textarea
+              ref={messageRef}
               label="Message"
               required
               rows={4}
@@ -343,7 +373,7 @@ export const ContactPage = () => {
         <Box flex={{ direction: 'col', gap: 16 }}>
           <ContactInfoRow icon="MapPin">
             <Text as="span" textColor={{ color: 'surface', intensity: 900 }} className="text-sm font-medium">
-              {STUDIO_ADDRESS}
+              {studio.address}
             </Text>
           </ContactInfoRow>
 
@@ -353,7 +383,7 @@ export const ContactPage = () => {
               variant={{ kind: 'link', color: 'primary' }}
               className="inline-flex w-fit p-0 text-sm font-medium"
             >
-              <a href={`tel:${STUDIO_PHONE_TEL}`}>{STUDIO_PHONE}</a>
+              <a href={studio.phoneHref}>{studio.phone}</a>
             </Button>
           </ContactInfoRow>
 
@@ -363,13 +393,13 @@ export const ContactPage = () => {
               variant={{ kind: 'link', color: 'primary' }}
               className="inline-flex w-fit p-0 text-sm font-medium"
             >
-              <a href={`mailto:${STUDIO_EMAIL}`}>{STUDIO_EMAIL}</a>
+              <a href={`mailto:${studio.email}`}>{studio.email}</a>
             </Button>
           </ContactInfoRow>
 
           <ContactInfoRow icon="Clock">
             <Box flex={{ direction: 'col', gap: 1 }}>
-              {STUDIO_HOURS.map(({ day, hours }) => (
+              {studio.hours.map(({ day, text, linkUrl }) => (
                 <Box key={day} flex={{ direction: 'row', gap: 8 }}>
                   <Text
                     as="span"
@@ -378,9 +408,7 @@ export const ContactPage = () => {
                   >
                     {day}
                   </Text>
-                  <Text as="span" textColor={{ color: 'surface', intensity: 700 }} className="text-xs">
-                    {hours}
-                  </Text>
+                  <HoursText text={text} linkUrl={linkUrl} />
                 </Box>
               ))}
             </Box>
@@ -389,8 +417,8 @@ export const ContactPage = () => {
 
         <Box className="relative overflow-hidden rounded-lg border border-surface-300">
           <iframe
-            title="The Dance and Movement Workshop location"
-            src={GOOGLE_MAPS_EMBED_SRC}
+            title={`${studio.name} location`}
+            src={googleMapsEmbedSrc(studio.address)}
             className="block h-56 w-full border-0"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
@@ -401,7 +429,7 @@ export const ContactPage = () => {
             padding={{ top: 6, bottom: 6, left: 10, right: 10 }}
             className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full text-xs font-semibold shadow-md"
           >
-            <a href={GOOGLE_MAPS_LINK} target="_blank" rel="noopener noreferrer">
+            <a href={googleMapsLink(studio.address)} target="_blank" rel="noopener noreferrer">
               Open in Maps
               <Icon as="span" name="ArrowSquareOut" size={12} />
             </a>
@@ -409,26 +437,30 @@ export const ContactPage = () => {
         </Box>
 
         <Box flex={{ direction: 'row', gap: 12 }}>
-          <Button
-            asChild
-            variant={{ kind: 'filled', color: 'primary' }}
-            padding={{ base: 10 }}
-            className="rounded-full"
-          >
-            <a href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-              <Icon as="span" name="FacebookLogo" size={18} weight="fill" />
-            </a>
-          </Button>
-          <Button
-            asChild
-            variant={{ kind: 'filled', color: 'primary' }}
-            padding={{ base: 10 }}
-            className="rounded-full"
-          >
-            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <Icon as="span" name="InstagramLogo" size={18} weight="fill" />
-            </a>
-          </Button>
+          {studio.facebookUrl ? (
+            <Button
+              asChild
+              variant={{ kind: 'filled', color: 'primary' }}
+              padding={{ base: 10 }}
+              className="rounded-full"
+            >
+              <a href={studio.facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <Icon as="span" name="FacebookLogo" size={18} weight="fill" />
+              </a>
+            </Button>
+          ) : null}
+          {studio.instagramUrl ? (
+            <Button
+              asChild
+              variant={{ kind: 'filled', color: 'primary' }}
+              padding={{ base: 10 }}
+              className="rounded-full"
+            >
+              <a href={studio.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <Icon as="span" name="InstagramLogo" size={18} weight="fill" />
+              </a>
+            </Button>
+          ) : null}
         </Box>
       </Box>
     </Box>

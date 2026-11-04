@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { alert, Box, Breadcrumbs, Button, Divider, Loader, Text, useNavigateWithTransition } from '@inithium/ui';
-import { EVENT_SOURCE_TYPE, readApiError, useAddCartLineMutation, useGetCartQuery, useGetEventBySlugQuery } from '@inithium/api-client';
+import { EVENT_SOURCE_TYPE, readApiError, useAddCartLineMutation, useGetCartQuery, useGetEventBySlugQuery, useStudioInfo } from '@inithium/api-client';
 import { useCurrentUser } from '../app/useCurrentUser';
 import { googleMapsLink } from '../app/studioLocation';
 import { loginPathFor } from './ecommerce/SignInPrompt';
@@ -34,6 +34,7 @@ const salesCloseFormatter = new Intl.DateTimeFormat('en-US', {
 export const EventDetailPage = () => {
   const slug = useRouteSlug('/events/');
   const { data: event, isLoading, isError } = useGetEventBySlugQuery(slug ?? '', { skip: !slug });
+  const studio = useStudioInfo();
   const { currentUser } = useCurrentUser();
   const { data: cart } = useGetCartQuery(currentUser?.id ?? '', { skip: !currentUser });
   const [quantities, setQuantities] = useState<Record<string, number>>({});
@@ -66,7 +67,7 @@ export const EventDetailPage = () => {
     );
   }
 
-  const venue = eventLocation(event);
+  const venue = eventLocation(event, studio);
   const selectedCount = event.ticketTypes.reduce((sum, ticketType) => sum + (quantities[ticketType.id] ?? 0), 0);
   // Tickets for this event already in the cart count toward the group discount too.
   const inCartCount = (cart?.lines ?? [])

@@ -111,6 +111,15 @@ export type {
 } from './endpoints/gallery.endpoints';
 
 // inithium:block:gallery:exports:end
+export {
+  DEFAULT_STUDIO_INFO,
+  STUDIO_HOURS_TEXT_MAX_LENGTH,
+  parseStudioHours,
+  studioHoursEntryErrors,
+  useStudioInfo,
+} from './endpoints/studio-info';
+export type { StudioHoursEntry, StudioInfo } from './endpoints/studio-info';
+
 // inithium:block:contact:exports:start
 export { useIsContactCaptchaEnabled, useContactCaptchaSiteKey } from './endpoints/settings.endpoints';
 

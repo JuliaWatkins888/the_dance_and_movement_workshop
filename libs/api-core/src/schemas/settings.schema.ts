@@ -45,3 +45,87 @@ export const upsertSettingSchema = z
   });
 
 export type UpsertSettingRequestBody = z.infer<typeof upsertSettingSchema>;
+
+const STUDIO_HOURS_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
+const STUDIO_HOURS_TEXT_MAX_LENGTH = 60;
+const URL_MAX_LENGTH = 2000;
+const MIN_PHONE_DIGITS = 7;
+
+const isHttpsUrl = (value: string): boolean => {
+  try {
+    return new URL(value).protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
+// Browsers strip tabs/newlines from an href and read backslashes as slashes, so "/\t/evil.com" and
+// "/\evil.com" would both land on another site despite starting with a single slash.
+const isSameSitePath = (value: string): boolean =>
+  value.startsWith('/') && !value.startsWith('//') && !/[\t\r\n\\]/.test(value);
+
+const requiredTextSchema = (label: string, maxLength: number) =>
+  z
+    .string()
+    .trim()
+    .min(1, `${label} is required.`)
+    .max(maxLength, `${label} must be ${maxLength} characters or fewer.`);
+
+const socialUrlSchema = (label: string) =>
+  z
+    .string()
+    .trim()
+    .max(URL_MAX_LENGTH)
+    .refine((value) => value === '' || isHttpsUrl(value), `${label} must be blank or a full https:// link.`);
+
+const studioHoursSchema = z
+  .object({
+    days: z
+      .array(
+        z
+          .object({
+            day: z.enum(STUDIO_HOURS_DAYS),
+            text: requiredTextSchema('Hours text', STUDIO_HOURS_TEXT_MAX_LENGTH),
+            linkUrl: z
+              .string()
+              .trim()
+              .max(URL_MAX_LENGTH)
+              .refine(
+                (value) => isSameSitePath(value) || isHttpsUrl(value),
+                'Hours links must start with / or https://.',
+              )
+              .optional(),
+          })
+          .strict(),
+      )
+      .length(STUDIO_HOURS_DAYS.length, 'Hours must have exactly one entry per day.'),
+  })
+  .strict()
+  .refine(
+    ({ days }) => days.every((entry, index) => entry.day === STUDIO_HOURS_DAYS[index]),
+    'Hours must list Mon through Sun in order.',
+  );
+
+const stringSetting = <Value extends z.ZodTypeAny>(value: Value) => z.object({ type: z.literal('string'), value });
+
+// The stricter rules some settings need beyond their declared type. A Map rather than an object so
+// a :key of "__proto__" or "constructor" can't resolve to an inherited property.
+const keyedSettingSchemas = new Map<string, z.ZodType<{ type: (typeof SETTING_TYPES)[number]; value: unknown }>>([
+  ['studio.name', stringSetting(requiredTextSchema('Studio name', 120))],
+  ['studio.address', stringSetting(requiredTextSchema('Address', 200))],
+  [
+    'studio.phone',
+    stringSetting(
+      requiredTextSchema('Phone', 40).refine(
+        (value) => value.replace(/\D/g, '').length >= MIN_PHONE_DIGITS,
+        'Enter a phone number with its area code.',
+      ),
+    ),
+  ],
+  ['studio.email', stringSetting(z.string().trim().pipe(z.email('Enter a valid email address.')))],
+  ['studio.facebookUrl', stringSetting(socialUrlSchema('Facebook link'))],
+  ['studio.instagramUrl', stringSetting(socialUrlSchema('Instagram link'))],
+  ['studio.hours', z.object({ type: z.literal('json'), value: studioHoursSchema })],
+]);
+
+export const upsertSettingSchemaFor = (key: string) => keyedSettingSchemas.get(key) ?? upsertSettingSchema;

@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Box, Button, IconButton, Input, ListRow, Switch, Text, Textarea, HEX_COLOR_PATTERN } from '@inithium/ui';
-import { useUpsertSettingMutation } from '@inithium/api-client';
+import { alert, Box, Button, IconButton, Input, ListRow, Switch, Text, Textarea, HEX_COLOR_PATTERN } from '@inithium/ui';
+import { parseStudioHours, readApiError, studioHoursEntryErrors, useUpsertSettingMutation } from '@inithium/api-client';
 import type { SettingEntity, SettingImageValue, UpsertSettingInput } from '@inithium/api-client';
 import { CloudImageUploadButton } from '../../media/CloudImageUploadButton';
 import type { SettingDefinition } from '../../settings/definitions/registry';
+import { StudioHoursEditor } from './StudioHoursEditor';
 
 export interface SettingRowProps {
   readonly definition: SettingDefinition;
@@ -62,8 +63,16 @@ export const SettingRow = ({ definition, stored }: SettingRowProps) => {
     // Cross-field validity (value's shape matches definition.type) is guaranteed by how each
     // case below constructs `value` - this cast reflects that, not a skipped check.
     const input = { key: definition.key, type: definition.type, value } as UpsertSettingInput;
-    await upsertSetting(input).unwrap();
+    try {
+      await upsertSetting(input).unwrap();
+    } catch (error) {
+      alert.danger(readApiError(error, `Could not save ${definition.label}.`).message, { position: 'bottom-right' });
+    }
   };
+
+  const hasStudioHoursEditor = definition.type === 'json' && definition.editor === 'studioHours';
+  const studioHours = hasStudioHoursEditor ? parseStudioHours(draft as Record<string, unknown>) : [];
+  const isStudioHoursInvalid = studioHours.some((entry) => Object.keys(studioHoursEntryErrors(entry)).length > 0);
 
   const handleSaveJson = async () => {
     try {
@@ -166,6 +175,9 @@ export const SettingRow = ({ definition, stored }: SettingRowProps) => {
         );
       }
       case 'json':
+        if (hasStudioHoursEditor) {
+          return <StudioHoursEditor days={studioHours} onChange={(days) => setDraft({ days })} />;
+        }
         return (
           <Textarea
             value={jsonText}
@@ -188,8 +200,8 @@ export const SettingRow = ({ definition, stored }: SettingRowProps) => {
         needsExplicitSave ? (
           <Button
             variant={{ kind: 'filled', color: 'primary' }}
-            disabled={isLoading || isColorInvalid}
-            onClick={definition.type === 'json' ? handleSaveJson : () => save(draft)}
+            disabled={isLoading || isColorInvalid || isStudioHoursInvalid}
+            onClick={definition.type === 'json' && !hasStudioHoursEditor ? handleSaveJson : () => save(draft)}
           >
             {isLoading ? 'Saving…' : 'Save'}
           </Button>
