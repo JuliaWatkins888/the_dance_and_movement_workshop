@@ -1,6 +1,6 @@
 # QA-06: CMS-editable studio hours & contact info
 
-- **Status:** `review`
+- **Status:** `done`
 - **Priority:** P1
 - **Depends on:** -
 - **Branch:** `feature/qa-06-studio-info-settings`
@@ -68,16 +68,16 @@ Added beyond the steps above, because the feature doesn't work without them:
 
 ## Acceptance criteria
 
-- [ ] The owner can change phone, email, address, social links and each day's hours in CMS →
+- [x] The owner can change phone, email, address, social links and each day's hours in CMS →
       Settings → Studio Info, and the Contact page reflects it after refresh.
-- [ ] Sunday shows "By Appointment Only" and links to a prefilled contact form.
-- [ ] Events marked "At the studio" show the address from settings.
+- [x] Sunday shows "By Appointment Only" and links to a prefilled contact form.
+- [x] Events marked "At the studio" show the address from settings.
 - [x] No hardcoded studio contact constants remain in `apps/web`.
 - [x] Type-check passes for `cms`, `api-core`, `api-client`, `apps/web`. `apps/web` has no
       `type-check` target, so it was checked with `tsc --noEmit -p apps/web/tsconfig.app.json`.
 
-The three unticked criteria need the developer's manual check in the running app. The validation
-rules were exercised directly against the schema (26 cases, all passing).
+The developer tested this in the app and merged it to `main` in PR #31. The validation rules were
+also exercised directly against the schema (26 cases, all passing).
 
 ## Note for the client response
 
