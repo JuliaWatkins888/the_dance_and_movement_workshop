@@ -1,9 +1,12 @@
 # QA-08: Forgot-password flow + staff-initiated reset
 
-- **Status:** `todo`
+- **Status:** `closed` (not implemented, see "Closeout")
 - **Priority:** P0
 - **Depends on:** QA-07
-- **Branch:** `feature/qa-08-password-reset`
+- **Branch:** none, no code changed
+
+The steps and acceptance criteria below are unticked on purpose. Nothing in them was built. They
+stay here as the spec if the client later chooses self-service reset.
 
 ## Client request
 
@@ -68,3 +71,80 @@
       must change it on next login.
 - [ ] Type-check passes for `db`, `auth`, `api-core`, `email`, `api-client`, `cms`, `time`,
       `apps/web`. Postman updated.
+
+## Closeout
+
+**The forgot-password flow was NOT built.** The developer closed this ticket on 2026-11-05, because a
+logged-out reset needs an email provider (QA-07) and that is a new dependency the client may have to
+pay for. The owner and admins can already reset a password in the CMS, so that is the answer for now.
+
+**How it works today:** CMS → Users → pencil icon on the user → New Password → Save Changes.
+This is `UserFormDialog.tsx` calling `PATCH /api/users/:id`. The password is hashed the same way as
+at registration, and the user's existing sessions are revoked.
+
+**Confirmed on 2026-11-05** by sending the same request body the dialog sends through the real route,
+permission, auth and bcrypt code over HTTP, with the database swapped for an in-memory user store:
+
+- The owner and an admin can each reset a family account. The old password then fails, the new one
+  signs in, and a device already signed in as that family gets a 401.
+- An admin can also reset a contributor or another default admin. The owner can reset an admin who
+  holds extra grants.
+- A blank password leaves the current password unchanged.
+- A contributor gets 403, an anonymous request gets 401, and a password under 8 characters gets 400.
+
+Not exercised: the Mongo repository (read only, its `update` does write `passwordHash`) and the dialog
+in a browser. **Still to do by hand:** reset one test account in the deployed CMS before sending the
+note below.
+
+**Limits of the manual approach**, all confirmed by the same test or by reading the code:
+
+- **Nobody can reset the owner account in the CMS.** An admin gets 403. The owner editing their own
+  row gets 400, because the dialog always sends `role`. If the owner forgets their password while
+  signed out, the developer has to fix it directly in the database. Ownership transfer doesn't help,
+  because it requires being signed in as the owner.
+- **Admins can't reset themselves in Users either**, for the same reason. While signed in they can use
+  Change Password. If they've forgotten it, the owner or another admin resets it.
+- **An admin can't reset an account with more permissions than their own.** Only the owner can.
+- **These blocked cases show a generic error** in the dialog ("Could not save this user. Check the
+  fields and try again."), not the real reason.
+- **No forced change.** There is no `mustChangePassword` flag, so the temporary password keeps working
+  until the user changes it, and the staff member who set it knows it until then.
+- **No identity check or audit trail.** Staff have to confirm who is asking, and nothing records who
+  reset a password.
+- **A reset doesn't clear the sign-in rate limit.** After 10 failed attempts per IP in 15 minutes, or
+  20 per account in an hour, the user still has to wait.
+- **The client's original complaint still stands on screen.** The login pages show nothing about a
+  forgotten password. A "Forgot your password? Contact the studio" line needs no provider, but it
+  hasn't been added.
+
+## Note for the client response
+
+Include this in the client response. It covers QA-07 as well, so send it once. These are the points
+to cover, not the final email. There's no code change to deploy first.
+
+> A "Forgot password?" link on the login screen needs the site to be able to send email, and it can't
+> do that today. We haven't added that, because it means signing you up for another outside service.
+> You can already reset anyone's password yourself in the CMS:
+>
+> - **Resetting a password:** Go to Users, find the person, and click the pencil icon. Enter a temporary
+>   password (at least 8 characters) under New Password and click Save Changes. The field hides what
+>   you type, so type it carefully.
+> - **Who can do this:** The owner, and anyone with the Admin role. An admin can't reset an account
+>   that has more permissions than they do. If saving fails, that's the likely reason, and the owner
+>   will need to do it.
+> - **What happens next:** The old password stops working right away and the person is signed out on
+>   every device. Give them the temporary password and ask them to change it under Change Password in
+>   their account settings. The site doesn't make them change it, so it's worth asking.
+> - **Check who's asking:** Nothing verifies the person's identity for you, so make sure it's really
+>   them before giving out a new password.
+> - **If they're still locked out:** After too many wrong attempts, the site can make someone wait up to
+>   an hour before trying again, even with the new password.
+> - **The owner's own password:** Nobody can reset the owner account from the CMS. While signed in, you
+>   can change it under Change Password. If you forget it, contact us and we'll fix it for you, so
+>   please keep it somewhere safe.
+>
+> **If you'd like families to reset their own passwords without logging in**, we'd need to add a
+> third-party email provider. Some providers have a free tier, so this wouldn't necessarily cost you
+> more, but it would mean another account in your name, possibly another card on file, and a few DNS
+> records on your domain. It would also let the site send other email later, like receipts. The work
+> is already scoped, so let us know if you'd like it. Otherwise, the CMS reset covers this.

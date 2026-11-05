@@ -1,9 +1,12 @@
 # QA-07: Transactional email package (Resend)
 
-- **Status:** `todo`
-- **Priority:** P0 (blocks QA-08 password reset)
+- **Status:** `closed` (not implemented, see "Closeout")
+- **Priority:** P0 (blocked QA-08 password reset, which is also closed)
 - **Depends on:** -
-- **Branch:** `feature/qa-07-email`
+- **Branch:** none, no code changed
+
+The steps and acceptance criteria below are unticked on purpose. Nothing in them was built. They
+stay here as the spec if the client later chooses to add an email provider.
 
 ## Why this ticket exists
 
@@ -53,3 +56,28 @@ reuse it, so it gets its own infrastructure ticket.
 - [ ] `npx nx run email:type-check` and `npx nx build email` pass.
 - [ ] With no API key locally, calling `sendEmail` logs the rendered message.
 - [ ] With a key, a test email arrives from the verified domain, not in spam.
+
+## Closeout
+
+**`@inithium/email` was NOT built and no provider was added.** The developer closed this ticket on
+2026-11-05. Its only firm consumer was the QA-08 forgot-password flow, and the owner and admins can
+already reset passwords in the CMS (QA-08 has the steps, what was confirmed, and the limits).
+
+The reasoning:
+
+- **It's another dependency for the client to own.** That means a provider account, DNS records on
+  their domain, and API keys to keep on the deployed API.
+- **It might cost them money.** Some providers have a free tier, so a higher bill isn't certain, but
+  the client may have to put a card down again, and they may not want to.
+- **It should be their choice.** A logged-out reset can't be done without a provider, so if they want
+  one, this ticket is the spec. Resend was only the first provider picked, so check current pricing
+  and free-tier terms before recommending one.
+
+**Nothing else is waiting on this.** The "Why this ticket exists" section says receipts, QA-11 balance
+notices and QA-12 invites would reuse it, but neither QA-11 nor QA-12 includes a step that sends
+email. If email is added later, those would be new work.
+
+## Note for the client response
+
+Covered by the note in [QA-08](QA-08-password-reset.md), including the email provider decision. Send
+that note once. There's nothing separate to send for this ticket.

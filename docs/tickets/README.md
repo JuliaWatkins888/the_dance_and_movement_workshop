@@ -7,7 +7,8 @@ decisions already confirmed, the implementation steps, and the acceptance criter
 ## How to use these tickets
 
 - **Status** lives in each ticket's header (`todo` → `in-progress` → `review` → `done`, or
-  `blocked`) *and* in the checklist below. Update both when a ticket changes state.
+  `blocked`, or `closed` when the developer decides not to build it) *and* in the checklist below.
+  Update both when a ticket changes state.
 - Work a ticket on its own branch (name given in the ticket), following the Git & PR strategy in
   `CLAUDE.md`. One ticket = one PR unless the ticket says otherwise.
 - Tick each implementation step (`- [x]`) as it lands, so a half-finished ticket shows exactly
@@ -28,7 +29,7 @@ decisions already confirmed, the implementation steps, and the acceptance criter
 
 ## Board
 
-Tick a box only when the ticket's own status is `done`.
+Tick a box only when the ticket's own status is `done` or `closed`.
 
 - [ ] [QA-01](QA-01-fix-r2-uploads.md): Fix CMS uploads on R2 + clearer upload errors · **P0**
 - [x] [QA-02](QA-02-continue-shopping.md): Fix "Continue shopping" after registration · **P0**
@@ -36,8 +37,8 @@ Tick a box only when the ticket's own status is `done`.
 - [x] [QA-04](QA-04-inline-add-student.md): Add a student inline from the registration screen · **P1** · needs QA-03
 - [x] [QA-05](QA-05-staff-page-visibility.md): Hide staff from the public Staff page (Melissa) · **P1**
 - [x] [QA-06](QA-06-editable-hours-contact.md): CMS-editable studio hours & contact info · **P1**
-- [ ] [QA-07](QA-07-email-infrastructure.md): Transactional email package (Resend) · **P0**
-- [ ] [QA-08](QA-08-password-reset.md): Forgot-password flow + staff-initiated reset · **P0** · needs QA-07
+- [x] [QA-07](QA-07-email-infrastructure.md): Transactional email package (Resend) · **P0** · closed, not implemented
+- [x] [QA-08](QA-08-password-reset.md): Forgot-password flow + staff-initiated reset · **P0** · closed, not implemented
 - [ ] [QA-09](QA-09-policy-consent-signature.md): Policy acknowledgement + typed signature at registration · **P0**
 - [ ] [QA-10](QA-10-show-semester-withdrawal-lock.md): Show-semester withdrawal lock for dancers 7+ · **P1**
 - [ ] [QA-11](QA-11-account-ledger.md): Account ledger: one-off charges, cash/check payments, pay balance online · **P0**
@@ -51,7 +52,7 @@ Tick a box only when the ticket's own status is `done`.
 ## Suggested order
 
 1. Quick fixes: QA-01, QA-02, QA-03 → QA-04, QA-05, QA-06
-2. Account & legal: QA-07 → QA-08, QA-09, QA-10
+2. Account & legal: QA-09, QA-10
 3. Money: QA-11 → QA-12, QA-13, QA-14, QA-15
 4. Ops & extras: QA-16, QA-17
 
