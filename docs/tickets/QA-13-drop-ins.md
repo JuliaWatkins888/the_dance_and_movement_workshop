@@ -78,3 +78,9 @@
 
 - Is $22 the drop-in price for every course (including 30-minute and kids' classes), or only
   some? (The per-course field handles either; this just sets what to enter.)
+
+## Notes from QA-09
+
+Registration lines need a policy signature. Set `requiresPolicyConsent: true` on the new purchasable
+source, and add `policySchoolYearId` if its lines belong to a specific school year. Without that
+function, a line counts toward the current school year.

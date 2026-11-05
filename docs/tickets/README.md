@@ -39,7 +39,7 @@ Tick a box only when the ticket's own status is `done` or `closed`.
 - [x] [QA-06](QA-06-editable-hours-contact.md): CMS-editable studio hours & contact info · **P1**
 - [x] [QA-07](QA-07-email-infrastructure.md): Transactional email package (Resend) · **P0** · closed, not implemented
 - [x] [QA-08](QA-08-password-reset.md): Forgot-password flow + staff-initiated reset · **P0** · closed, not implemented
-- [ ] [QA-09](QA-09-policy-consent-signature.md): Policy acknowledgement + typed signature at registration · **P0**
+- [x] [QA-09](QA-09-policy-consent-signature.md): Policy acknowledgement + typed signature at registration · **P0**
 - [ ] [QA-10](QA-10-show-semester-withdrawal-lock.md): Show-semester withdrawal lock for dancers 7+ · **P1**
 - [ ] [QA-11](QA-11-account-ledger.md): Account ledger: one-off charges, cash/check payments, pay balance online · **P0**
 - [ ] [QA-12](QA-12-desk-registration.md): Staff registers families from the CMS (desk registration) · **P0** · needs QA-03, QA-09, QA-11

@@ -4,13 +4,17 @@ import { alert, Box, Button, Checkbox, Divider, Loader, RadioGroup, RadioGroupIt
 import {
   describeRenewal,
   formatMoney,
+  POLICY_CONSENT_REQUIRED,
+  POLICY_VERSION_CHANGED,
   readApiError,
   useConfirmOrderPaymentMutation,
   useGetCartQuery,
+  useGetPolicyConsentStatusQuery,
   useGetStoreConfigQuery,
   useListShippingMethodsQuery,
   usePlaceOrderMutation,
   useQuoteCheckoutMutation,
+  useSignPolicyConsentMutation,
 } from '@inithium/api-client';
 import type { CheckoutDetailsInput, CheckoutQuoteDto, PostalAddressInput, ShippingMethodDto } from '@inithium/api-client';
 import { useCurrentUser } from '../app/useCurrentUser';
@@ -18,6 +22,7 @@ import { AddressFields, emptyAddress, isAddressComplete, toAddressPayload, valid
 import type { AddressErrors } from './ecommerce/AddressFields';
 import { PaymentFields } from './ecommerce/payment/PaymentFields';
 import type { PaymentFieldsHandle } from './ecommerce/payment/payment-fields.contract';
+import { PolicyConsentStep, validatePolicyConsent } from './ecommerce/PolicyConsentStep';
 import { PriceSummary } from './ecommerce/PriceSummary';
 import { SignInPrompt } from './ecommerce/SignInPrompt';
 import { useContinueShoppingPath } from './ecommerce/continueShopping';
@@ -118,17 +123,27 @@ export const CheckoutPage = () => {
   const [quoteCheckout] = useQuoteCheckoutMutation();
   const [placeOrder] = usePlaceOrderMutation();
   const [confirmOrderPayment] = useConfirmOrderPaymentMutation();
+  const {
+    data: consentStatus,
+    isError: isConsentStatusError,
+    refetch: refetchConsentStatus,
+  } = useGetPolicyConsentStatusQuery(undefined, { skip: !currentUser, refetchOnMountOrArgChange: true });
+  const [signPolicyConsent] = useSignPolicyConsentMutation();
   const paymentRef = useRef<PaymentFieldsHandle>(null);
 
   const [shippingMethodId, setShippingMethodId] = useState<string | undefined>(undefined);
   const [shippingAddress, setShippingAddress] = useState<PostalAddressInput>(emptyAddress);
   const [billingAddress, setBillingAddress] = useState<PostalAddressInput>(emptyAddress);
   const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
-  const [shippingErrors, setShippingErrors] = useState<AddressErrors>({});
-  const [billingErrors, setBillingErrors] = useState<AddressErrors>({});
+  // Off until the first attempt to place the order; then errors follow what's typed, so each one
+  // clears as soon as its field is fixed.
+  const [showErrors, setShowErrors] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
   const [quote, setQuote] = useState<CheckoutQuoteDto | null>(null);
   const [quoteError, setQuoteError] = useState<string | null>(null);
   const [isPlacing, setIsPlacing] = useState(false);
+  const [policiesAgreed, setPoliciesAgreed] = useState(false);
+  const [signedName, setSignedName] = useState('');
   const continueShoppingPath = useContinueShoppingPath(cart?.lines ?? []);
 
   useEffect(() => {
@@ -224,20 +239,42 @@ export const CheckoutPage = () => {
   const hasRecurring = cart.lines.some((line) => line.billing?.type === 'recurring');
   const needsPayment = amountDueCents > 0;
 
-  const validateForm = (): boolean => {
-    const nextShippingErrors = needsShippingAddress ? validateAddress(shippingAddress) : {};
-    const nextBillingErrors = needsShippingAddress && billingSameAsShipping ? {} : validateAddress(billingAddress);
-    setShippingErrors(nextShippingErrors);
-    setBillingErrors(nextBillingErrors);
-    return Object.keys(nextShippingErrors).length === 0 && Object.keys(nextBillingErrors).length === 0;
-  };
+  const currentShippingErrors: AddressErrors = needsShippingAddress ? validateAddress(shippingAddress) : {};
+  const currentBillingErrors: AddressErrors = needsShippingAddress && billingSameAsShipping ? {} : validateAddress(billingAddress);
+  const currentConsentErrors = consentStatus?.required ? validatePolicyConsent(policiesAgreed, signedName) : {};
 
   const handlePlaceOrder = async () => {
-    if (!validateForm()) {
+    setShowErrors(true);
+    // Disables the button right away, so a double click can't get past the await and place two orders.
+    setIsValidating(true);
+    // Always runs, even when the fields below have errors, so every problem shows at once.
+    const paymentError = needsPayment ? ((await paymentRef.current?.validate()) ?? null) : null;
+    setIsValidating(false);
+
+    const hasFieldErrors = [currentShippingErrors, currentBillingErrors, currentConsentErrors].some((errors) => Object.keys(errors).length > 0);
+    if (hasFieldErrors) {
       alert.danger('Please complete the highlighted fields.', { position: ALERT_POSITION });
+      // The button sits below the form, so the first problem may be off screen. Waits a frame for
+      // the error states above to render.
+      requestAnimationFrame(() => document.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
       return;
     }
-    if (!details || !quote) return;
+    if (paymentError) {
+      alert.danger(paymentError, { position: ALERT_POSITION });
+      return;
+    }
+    if (!consentStatus) {
+      alert.danger(
+        isConsentStatusError ? 'We couldn’t load the studio policies. Please refresh the page.' : 'The studio policies are still loading. Please try again in a moment.',
+        { position: ALERT_POSITION },
+      );
+      return;
+    }
+    if (!details || !quote) {
+      const reason = cart.requiresShipping && !selectedMethod ? 'Please choose a shipping method.' : quoteError;
+      alert.danger(reason ?? 'We’re still calculating your total. Please try again in a moment.', { position: ALERT_POSITION });
+      return;
+    }
 
     setIsPlacing(true);
     let pendingOrderId: string | null = null;
@@ -250,6 +287,12 @@ export const CheckoutPage = () => {
               address: toAddressPayload(effectiveBilling),
             })
           : undefined;
+
+      // After the card is validated, so an incomplete card never leaves a signature on record, and
+      // before the charge, so a policy change mid-checkout can't cost anyone money.
+      if (consentStatus.required) {
+        await signPolicyConsent({ versionHash: consentStatus.versionHash, signedName: signedName.trim(), agreed: true }).unwrap();
+      }
 
       let result = await placeOrder({
         ...details,
@@ -279,6 +322,12 @@ export const CheckoutPage = () => {
         alert.info('Your order total changed. Please review it before paying.', { position: ALERT_POSITION });
         return;
       }
+      if (info.code === POLICY_VERSION_CHANGED || info.code === POLICY_CONSENT_REQUIRED) {
+        setPoliciesAgreed(false);
+        refetchConsentStatus();
+        alert.info(info.message, { position: ALERT_POSITION });
+        return;
+      }
       alert.danger(info.message, { position: ALERT_POSITION });
     } finally {
       setIsPlacing(false);
@@ -294,7 +343,8 @@ export const CheckoutPage = () => {
         totalCents: (line.subtotalCents ?? 0) - (line.discountCents ?? 0),
       }));
 
-  const canPlaceOrder = Boolean(quote) && !isPlacing && (!needsPayment || Boolean(payment));
+  // Only disabled when clicking couldn't help. Anything the shopper can fix is reported on click.
+  const canPlaceOrder = !isPlacing && !isValidating && (!needsPayment || Boolean(payment));
 
   return (
     <Box flex={{ direction: 'col', gap: 24 }} className="p-4 md:p-8">
@@ -318,7 +368,7 @@ export const CheckoutPage = () => {
                 </RadioGroup>
               )}
               {needsShippingAddress ? (
-                <AddressFields idPrefix="shipping" value={shippingAddress} onChange={setShippingAddress} errors={shippingErrors} disabled={isPlacing} />
+                <AddressFields idPrefix="shipping" value={shippingAddress} onChange={setShippingAddress} errors={showErrors ? currentShippingErrors : {}} disabled={isPlacing} />
               ) : null}
             </Section>
           ) : null}
@@ -333,9 +383,28 @@ export const CheckoutPage = () => {
               />
             ) : null}
             {!needsShippingAddress || !billingSameAsShipping ? (
-              <AddressFields idPrefix="billing" value={billingAddress} onChange={setBillingAddress} errors={billingErrors} disabled={isPlacing} />
+              <AddressFields idPrefix="billing" value={billingAddress} onChange={setBillingAddress} errors={showErrors ? currentBillingErrors : {}} disabled={isPlacing} />
             ) : null}
           </Section>
+
+          {consentStatus?.required ? (
+            <Section title="Studio Policies">
+              <PolicyConsentStep
+                policies={consentStatus.policies}
+                agreed={policiesAgreed}
+                signedName={signedName}
+                onAgreedChange={setPoliciesAgreed}
+                onSignedNameChange={setSignedName}
+                errors={showErrors ? currentConsentErrors : {}}
+                disabled={isPlacing}
+              />
+            </Section>
+          ) : null}
+          {isConsentStatusError && !consentStatus ? (
+            <Text as="p" textColor={{ color: 'surface', intensity: 800 }} className="text-sm">
+              We couldn’t load the studio policies. Please refresh the page to continue.
+            </Text>
+          ) : null}
 
           {needsPayment ? (
             <Section title="Payment">

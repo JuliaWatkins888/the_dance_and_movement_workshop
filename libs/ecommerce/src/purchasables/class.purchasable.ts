@@ -121,6 +121,8 @@ const loadUserName = async (userId: string): Promise<string> => {
 
 const classPurchasable: PurchasableSource = {
   sourceType: CLASS_SOURCE_TYPE,
+  requiresPolicyConsent: true,
+  policySchoolYearId: async (ref) => (await getClassSectionRepository().findById(ref.sourceId))?.schoolYearId ?? null,
 
   resolve: async (ref: PurchasableLineRef, ctx: PurchasableContext): Promise<ResolvedPurchasable | null> => {
     const line = parseClassLine(ref.sourceId, ref.options);

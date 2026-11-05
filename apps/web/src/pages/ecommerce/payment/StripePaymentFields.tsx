@@ -51,11 +51,17 @@ const StripeFieldsInner = forwardRef<PaymentFieldsHandle>((_props, ref) => {
   useImperativeHandle(
     ref,
     () => ({
+      validate: async () => {
+        if (!stripe || !elements) return 'The payment form is still loading. Please try again.';
+        try {
+          const { error } = await elements.submit();
+          return error ? (error.message ?? 'Please check your payment details.') : null;
+        } catch {
+          return 'Please check your payment details.';
+        }
+      },
       createPaymentToken: async ({ name, email, address }: PaymentBillingDetails) => {
         if (!stripe || !elements) throw new Error('The payment form is still loading. Please try again.');
-
-        const { error: submitError } = await elements.submit();
-        if (submitError) throw new Error(submitError.message ?? 'Please check your payment details.');
 
         const { error, confirmationToken } = await stripe.createConfirmationToken({
           elements,

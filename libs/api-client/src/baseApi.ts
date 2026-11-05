@@ -63,6 +63,7 @@ export const baseApi = createApi({
 // inithium:block:time:tag-types:end
 // inithium:block:policy:tag-types:start
     'PolicyCategory',
+    'PolicyConsent',
 // inithium:block:policy:tag-types:end
 // inithium:block:classes:tag-types:start
     'Class',

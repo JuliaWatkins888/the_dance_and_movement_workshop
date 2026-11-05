@@ -1,18 +1,7 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Box, Icon, Loader, Text } from '@inithium/ui';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Box, Icon, Loader, RichTextContent, Text } from '@inithium/ui';
 import type { IconName } from '@inithium/ui';
 import { useListPoliciesQuery } from '@inithium/api-client';
 import type { PolicyCategoryDto } from '@inithium/api-client';
-
-// Rendered as raw HTML (dangerouslySetInnerHTML) - safe because this content is sanitized
-// server-side on every write (see libs/api-core/src/schemas/policy.schema.ts) before it's ever
-// persisted, so nothing reaching this page can carry a <script> tag or an event handler
-// attribute.
-const PolicyItemBody = ({ html }: { readonly html: string }) => (
-  <div
-    className="[&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:mb-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_strong]:font-semibold [&_a]:text-primary-600 [&_a]:underline"
-    dangerouslySetInnerHTML={{ __html: html }}
-  />
-);
 
 interface CategoryItemsProps {
   readonly category: PolicyCategoryDto;
@@ -26,7 +15,8 @@ const CategoryItems = ({ category }: CategoryItemsProps) => (
       <AccordionItem key={item.id} value={item.id} className="border-b border-surface-200 last:border-b-0">
         <AccordionTrigger>{item.title}</AccordionTrigger>
         <AccordionContent>
-          <PolicyItemBody html={item.content} />
+          {/* Safe as raw HTML: sanitized on every write (libs/api-core/src/schemas/policy.schema.ts). */}
+          <RichTextContent html={item.content} />
         </AccordionContent>
       </AccordionItem>
     ))}

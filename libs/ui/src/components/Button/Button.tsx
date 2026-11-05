@@ -68,6 +68,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       // no variant at all) doesn't declare its own border-width utility; variant classes
       // below win this conflict whenever they do declare one (border-2 / border-b-2).
       resolvedBorderColor && 'border',
+      // pointer-events-none rather than a not-allowed cursor: variants carry hover colors, which
+      // would otherwise still fire and make a disabled button look active.
+      'disabled:opacity-50 disabled:pointer-events-none',
       defaults.className,
       resolveColorClass('bg', resolvedBgColor),
       resolveColorClass('text', resolvedTextColor),

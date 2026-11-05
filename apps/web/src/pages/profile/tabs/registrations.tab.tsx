@@ -6,6 +6,7 @@ import {
   readApiError,
   useCancelClassRegistrationMutation,
   useGetStoreConfigQuery,
+  useListMyPolicyConsentsQuery,
   useListMyClassRegistrationsQuery,
   useListMyWorkshopRegistrationsQuery,
 } from '@inithium/api-client';
@@ -210,6 +211,22 @@ const RegistrationGroup = ({
   </Box>
 );
 
+const SignedPolicies = () => {
+  const { data: consents = [] } = useListMyPolicyConsentsQuery();
+  if (consents.length === 0) return null;
+  return (
+    <Box flex={{ direction: 'col', gap: 4 }}>
+      {consents.map((consent) => (
+        <Text key={consent.id} as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+          {`Policies signed${consent.schoolYearName ? ` for ${consent.schoolYearName}` : ''} on ${formatDate(consent.agreedAt)}`}
+          {consent.method === 'paper' ? ' (paper copy)' : ''}
+          {consent.isCurrentVersion ? '' : '. The policies have changed since, so you’ll be asked to sign again at your next registration.'}
+        </Text>
+      ))}
+    </Box>
+  );
+};
+
 // Every class and workshop the account's dancers are (or were) registered for. Monthly class plans
 // that are still renewing can be cancelled here; everything else is paid in full and can't be.
 const RegistrationsTab = (_props: ProfileTabProps) => {
@@ -257,6 +274,7 @@ const RegistrationsTab = (_props: ProfileTabProps) => {
     <Box flex={{ direction: 'col', gap: 24 }}>
       {current.length > 0 ? <RegistrationGroup title="Current" entries={current} currency={storeConfig?.currency} /> : null}
       {past.length > 0 ? <RegistrationGroup title="Past" entries={past} currency={storeConfig?.currency} /> : null}
+      <SignedPolicies />
     </Box>
   );
 };

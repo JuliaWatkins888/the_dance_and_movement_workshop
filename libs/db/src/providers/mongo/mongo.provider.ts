@@ -45,6 +45,9 @@ import { TimeAuditLogModel } from '../../schemas/time-audit-log.schema';
 import { PolicyRepository } from '../../contracts/policy.contract';
 import { createMongoPolicyRepository } from './policy.repository';
 import { PolicyCategoryModel } from '../../schemas/policy.schema';
+import { PolicyConsentRepository } from '../../contracts/policy-consent.contract';
+import { createMongoPolicyConsentRepository } from './policy-consent.repository';
+import { PolicyConsentModel } from '../../schemas/policy-consent.schema';
 // inithium:block:policy:imports:end
 // inithium:block:classes:imports:start
 import { ProgramRepository } from '../../contracts/program.contract';
@@ -141,6 +144,7 @@ const timeAuditLogRepository = createMongoTimeAuditLogRepository(TimeAuditLogMod
 // inithium:block:time:repository-instances:end
 // inithium:block:policy:repository-instances:start
 const policyRepository = createMongoPolicyRepository(PolicyCategoryModel);
+const policyConsentRepository = createMongoPolicyConsentRepository(PolicyConsentModel);
 // inithium:block:policy:repository-instances:end
 // inithium:block:classes:repository-instances:start
 const programRepository = createMongoProgramRepository(ProgramModel);
@@ -213,6 +217,7 @@ export const mongoProvider: DbProvider = {
 // inithium:block:time:members:end
 // inithium:block:policy:members:start
   getPolicyRepository: (): PolicyRepository => policyRepository,
+  getPolicyConsentRepository: (): PolicyConsentRepository => policyConsentRepository,
 // inithium:block:policy:members:end
 // inithium:block:classes:members:start
   getProgramRepository: (): ProgramRepository => programRepository,

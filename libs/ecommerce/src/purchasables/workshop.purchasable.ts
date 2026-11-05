@@ -69,6 +69,7 @@ const loadUserName = async (userId: string): Promise<string> => {
 
 const workshopPurchasable: PurchasableSource = {
   sourceType: WORKSHOP_SOURCE_TYPE,
+  requiresPolicyConsent: true,
 
   resolve: async (ref: PurchasableLineRef, ctx: PurchasableContext): Promise<ResolvedPurchasable | null> => {
     const line = parseWorkshopLine(ref.sourceId, ref.options);
