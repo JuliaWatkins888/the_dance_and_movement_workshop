@@ -221,6 +221,7 @@ export const updatePolicyItem = (categoryId: string, itemId: string, input: Upda
   getPolicyRepository().updateItem(categoryId, itemId, input);
 export const deletePolicyItem = (categoryId: string, itemId: string) =>
   getPolicyRepository().deleteItem(categoryId, itemId);
+export const getPolicyConsentRepository = () => activeProvider.getPolicyConsentRepository();
 
 // inithium:block:policy:repositories:end
 // inithium:block:classes:repositories:start
@@ -444,6 +445,15 @@ export type {
   UpdatePolicyItemInput,
   PolicyRepository,
 } from './contracts/policy.contract';
+export type {
+  PolicyConsentEntity,
+  PolicyConsentMethod,
+  PolicyConsentRepository,
+  PolicySnapshotCategory,
+  PolicySnapshotItem,
+  CreatePolicyConsentInput,
+} from './contracts/policy-consent.contract';
+export { hashPolicies, toPolicySnapshot } from './utils/policy-version';
 // inithium:block:policy:type-exports:end
 // inithium:block:classes:type-exports:start
 export type {

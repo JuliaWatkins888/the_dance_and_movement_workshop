@@ -65,6 +65,10 @@ export type PurchasableValidation = { ok: true } | { ok: false; reason: string }
 // orders, and subscriptions only ever go through this, never through a source's own collection.
 export interface PurchasableSource {
   sourceType: string;
+  // Buying this is a registration, so the account must have signed the studio policies first.
+  requiresPolicyConsent?: boolean;
+  // The school year a line's signature counts toward. Sources without one use the current year.
+  policySchoolYearId?: (ref: PurchasableLineRef) => Promise<string | null>;
   // null when the item no longer exists or is no longer for sale.
   resolve: (ref: PurchasableLineRef, ctx: PurchasableContext) => Promise<ResolvedPurchasable | null>;
   // Business rules beyond existence (a required attendee chosen, registration open, not already

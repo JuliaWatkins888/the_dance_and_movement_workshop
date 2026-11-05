@@ -101,6 +101,7 @@ export const initialVariantSelection = (product: ProductDto): VariantSelection =
 
 export interface ApiErrorInfo {
   status?: number;
+  code?: string;
   message: string;
   details?: Record<string, unknown>;
 }
@@ -108,10 +109,11 @@ export interface ApiErrorInfo {
 // Normalizes an RTK Query error (fetchBaseQuery's { status, data } with the API's
 // { success: false, error: { code, message, details } } body) into something a component can show.
 export const readApiError = (error: unknown, fallback = 'Something went wrong. Please try again.'): ApiErrorInfo => {
-  const candidate = error as { status?: unknown; data?: { error?: { message?: string; details?: Record<string, unknown> } } };
+  const candidate = error as { status?: unknown; data?: { error?: { code?: string; message?: string; details?: Record<string, unknown> } } };
   const status = typeof candidate?.status === 'number' ? candidate.status : undefined;
   return {
     ...(status !== undefined ? { status } : {}),
+    ...(candidate?.data?.error?.code ? { code: candidate.data.error.code } : {}),
     message: candidate?.data?.error?.message ?? fallback,
     ...(candidate?.data?.error?.details ? { details: candidate.data.error.details } : {}),
   };

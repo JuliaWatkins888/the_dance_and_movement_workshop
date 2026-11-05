@@ -81,3 +81,9 @@
 - Can a card be used for **any** adult class (Yoga, adult tap, etc.)?
 - Can two adults on one account share a card, or is each card tied to one person? (Default:
   tied to one person.)
+
+## Notes from QA-09
+
+Registration lines need a policy signature. Set `requiresPolicyConsent: true` on the new purchasable
+source, and add `policySchoolYearId` if its lines belong to a specific school year. Without that
+function, a line counts toward the current school year.

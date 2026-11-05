@@ -1,6 +1,9 @@
 export { Text } from './Text/Text';
 export type { TextProps } from './Text/Text';
 
+export { RichTextContent } from './RichTextContent/RichTextContent';
+export type { RichTextContentProps } from './RichTextContent/RichTextContent';
+
 export { AmpersandText } from './AmpersandText/AmpersandText';
 export type { AmpersandTextProps } from './AmpersandText/AmpersandText';
 

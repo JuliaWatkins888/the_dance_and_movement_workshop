@@ -122,6 +122,10 @@
 			"key": "staffId",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "policyVersionHash",
+			"value": ""
 		}
 	],
 	"item": [
@@ -3798,6 +3802,241 @@
 								"api",
 								"settings",
 								"studio.phone"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Policy Consent",
+			"item": [
+				{
+					"name": "Get Policy Consent Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.collectionVariables.set('policyVersionHash', pm.response.json().data.versionHash);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/policy-consent/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"policy-consent",
+								"status"
+							]
+						}
+					}
+				},
+				{
+					"name": "List My Policy Consents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/policy-consent/mine",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"policy-consent",
+								"mine"
+							]
+						}
+					}
+				},
+				{
+					"name": "Sign Policy Consent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is one of 200, 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"versionHash\": \"{{policyVersionHash}}\",\n  \"signedName\": \"{{firstName}} {{lastName}}\",\n  \"agreed\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/policy-consent",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"policy-consent"
+							]
+						}
+					}
+				},
+				{
+					"name": "Sign Policy Consent (Stale Version)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 409', () => pm.response.to.have.status(409));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"versionHash\": \"stale-version\",\n  \"signedName\": \"{{firstName}} {{lastName}}\",\n  \"agreed\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/policy-consent",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"policy-consent"
+							]
+						}
+					}
+				},
+				{
+					"name": "List User Policy Consents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{userId}}/policy-consents",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{userId}}",
+								"policy-consents"
+							]
+						}
+					}
+				},
+				{
+					"name": "Record Paper Policy Consent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"schoolYearId\": \"{{schoolYearId}}\",\n  \"signedName\": \"{{firstName}} {{lastName}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{userId}}/policy-consents/paper",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{userId}}",
+								"policy-consents",
+								"paper"
 							]
 						}
 					}

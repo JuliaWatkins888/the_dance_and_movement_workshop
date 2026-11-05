@@ -14,6 +14,7 @@ import {
 } from '@inithium/ui';
 import { useDeleteUserMutation, useListUsersQuery } from '@inithium/api-client';
 import type { AdminUser, UserSearchField } from '@inithium/api-client';
+import { PolicyConsentsDialog } from './PolicyConsentsDialog';
 import { UserFormDialog } from './UserFormDialog';
 
 const PAGE_SIZE = 10;
@@ -83,6 +84,10 @@ export const UsersModule = () => {
       ),
       { title: 'Edit User', width: 480 },
     );
+  };
+
+  const openPolicyConsentsDialog = (user: AdminUser) => {
+    dialog.show(() => <PolicyConsentsDialog user={user} />, { title: `Policy signatures: ${user.email}`, width: 720 });
   };
 
   const handleDelete = async (user: AdminUser) => {
@@ -163,6 +168,7 @@ export const UsersModule = () => {
               }
               trailing={
                 <>
+                  <IconButton icon="Signature" label={`Policy signatures for ${user.email}`} onClick={() => openPolicyConsentsDialog(user)} />
                   <IconButton icon="PencilSimple" label={`Edit ${user.email}`} onClick={() => openEditDialog(user)} />
                   <IconButton
                     icon="Trash"

@@ -97,3 +97,12 @@
 - [ ] Semester/year plans and workshops can be registered at the desk in both modes.
 - [ ] Eligibility, capacity and consent rules match online checkout.
 - [ ] Type-check passes for all touched projects. Postman updated.
+
+## Notes from QA-09
+
+- `createManualOrder` doesn't check policy consent. QA-09 only guards `placeOrder`, so the desk flow
+  has to enforce it itself to meet "consent rules match online checkout".
+- Paper signatures already exist: `POST /api/users/:id/policy-consents/paper`, with a form in
+  CMS → Users. `recordPaperPolicyConsent` in `@inithium/ecommerce` is the service to reuse.
+- `PolicyConsentEntity.orderId` exists but nothing sets it yet. Records are create-only, so it has
+  to be passed when the record is created.

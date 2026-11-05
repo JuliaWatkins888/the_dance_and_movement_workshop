@@ -36,6 +36,24 @@ export {
 export type { PlaceOrderInput, PlaceOrderResult } from './checkout/checkout.service';
 export type { CheckoutDetailsInput } from './checkout/prepare-checkout';
 
+export {
+  POLICY_CONSENT_REQUIRED,
+  POLICY_VERSION_CHANGED,
+  getPolicyConsentStatus,
+  signPolicyConsent,
+  assertPolicyConsent,
+  listPolicyConsentsForUser,
+  listPolicyConsentSummaries,
+  recordPaperPolicyConsent,
+} from './policy-consent/policy-consent.service';
+export type {
+  ConsentSchoolYear,
+  PolicyConsentStatus,
+  PolicyConsentSummary,
+  SignPolicyConsentInput,
+  RecordPaperConsentInput,
+} from './policy-consent/policy-consent.service';
+
 export { createManualOrder, quoteManualOrder, MANUAL_PAYMENT_PROVIDER } from './orders/manual-order.service';
 export type { ManualOrderInput, ManualOrderLineInput } from './orders/manual-order.service';
 export { getSalesReport, SALES_PERIODS } from './orders/sales-report';

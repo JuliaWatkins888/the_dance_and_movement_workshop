@@ -236,6 +236,25 @@ export type {
   PolicyItemWriteInput,
   UpdatePolicyItemInput,
 } from './endpoints/policies.endpoints';
+export {
+  policyConsentApi,
+  useGetPolicyConsentStatusQuery,
+  useListMyPolicyConsentsQuery,
+  useSignPolicyConsentMutation,
+  useListUserPolicyConsentsQuery,
+  useRecordPaperPolicyConsentMutation,
+  POLICY_CONSENT_REQUIRED,
+  POLICY_VERSION_CHANGED,
+} from './endpoints/policy-consent.endpoints';
+export type {
+  PolicyConsentDto,
+  PolicyConsentMethod,
+  PolicyConsentStatusDto,
+  PolicyConsentSummaryDto,
+  PolicySnapshotCategoryDto,
+  SignPolicyConsentInput,
+  RecordPaperPolicyConsentInput,
+} from './endpoints/policy-consent.endpoints';
 
 // inithium:block:policy:exports:end
 // inithium:block:classes:exports:start

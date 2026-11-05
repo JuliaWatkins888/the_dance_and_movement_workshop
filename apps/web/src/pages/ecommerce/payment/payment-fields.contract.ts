@@ -10,8 +10,11 @@ export interface PaymentBillingDetails {
 // touches a provider SDK. A new provider adds a component implementing this and a case in
 // PaymentFields.tsx - mirroring libs/payments' PaymentProvider on the API side.
 export interface PaymentFieldsHandle {
-  // Validates what the shopper entered and turns it into the opaque paymentToken the API's
-  // POST /api/checkout expects. Rejects with a shopper-readable Error.
+  // Checks what the shopper entered and shows the provider's own inline errors. Resolves to a
+  // shopper-readable message, or null when the details are complete.
+  validate: () => Promise<string | null>;
+  // Turns the details into the opaque paymentToken the API's POST /api/checkout expects. Call only
+  // after validate resolves to null. Rejects with a shopper-readable Error.
   createPaymentToken: (billing: PaymentBillingDetails) => Promise<string>;
   // Runs the provider's extra verification step (e.g. a 3-D Secure pop-up) for an order the API
   // answered with requires_action. Rejects with a shopper-readable Error if it isn't completed.

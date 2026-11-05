@@ -3,6 +3,7 @@ import { getOrderRepository } from '@inithium/db';
 import type { CreateOrderInput, OrderEntity, OrderStatus } from '@inithium/db';
 import { getPaymentProvider } from '@inithium/payments';
 import type { PaymentResult } from '@inithium/payments';
+import { assertPolicyConsent } from '../policy-consent/policy-consent.service';
 import type { CheckoutQuote } from '../views';
 import { failOrder, finalizeOrder, reserveOrderLines, sweepStalePendingOrders } from './order-lifecycle';
 import { toOrderDiscountSnapshot, toOrderLine } from './order-snapshot';
@@ -98,6 +99,7 @@ export const placeOrder = async (userId: string, input: PlaceOrderInput): Promis
   if (quote.totalCents > 0 && !input.paymentToken) {
     throw ValidationError('Payment details are required');
   }
+  await assertPolicyConsent(userId, prepared.cart.lines);
 
   const orders = getOrderRepository();
   const order = await reserveOrderLines(await orders.create(buildPendingOrder(prepared)));

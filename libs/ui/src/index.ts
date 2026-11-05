@@ -156,6 +156,7 @@ export type { DrawerRecord, DrawerContent, DrawerRenderContext, ShowDrawerOption
 
 export {
   Text,
+  RichTextContent,
   AmpersandText,
   Box,
   AnimateBox,
@@ -198,6 +199,7 @@ export {
 } from './components';
 export type {
   TextProps,
+  RichTextContentProps,
   AmpersandTextProps,
   BoxProps,
   AnimateBoxProps,
