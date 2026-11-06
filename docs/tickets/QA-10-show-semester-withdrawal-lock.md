@@ -141,7 +141,7 @@ settings don't exist before then.
 > **Good to know**
 >
 > - **Start time:** The lock begins the evening before your chosen date, because the system changes
->   dates at midnight UTC. If that matters, tell families a date one day later than the one you set.
+>   dates at midnight UTC. Families lose the last few hours of the day before, so plan around that.
 > - **Two show semesters:** Each has its own lock date. Once the first semester ends, online
 >   withdrawals reopen until the second semester's lock date.
 > - **Missed payments:** The lock only stops families from cancelling online. It doesn't change how a
