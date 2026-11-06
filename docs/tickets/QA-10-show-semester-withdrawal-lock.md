@@ -1,6 +1,6 @@
 # QA-10: Show-semester withdrawal lock for dancers 7+
 
-- **Status:** `review`
+- **Status:** `done`
 - **Priority:** P1
 - **Depends on:** -
 - **Branch:** `feature/qa-10-show-lock`
@@ -59,10 +59,10 @@
 
 ## Acceptance criteria
 
-- [ ] Before the lock date, a parent can cancel a monthly registration as today.
-- [ ] On/after the lock date, a parent can't cancel for a 7+ dancer (UI hides it, API rejects
+- [x] Before the lock date, a parent can cancel a monthly registration as today.
+- [x] On/after the lock date, a parent can't cancel for a 7+ dancer (UI hides it, API rejects
       it), but can for a 6-year-old.
-- [ ] An admin can still withdraw a locked registration from the CMS.
+- [x] An admin can still withdraw a locked registration from the CMS.
 - [x] Type-check passes for `db`, `api-core`, `cms`, `apps/web`. Helper edge cases are verified.
 
 ## Work done
@@ -83,34 +83,78 @@ Added beyond the original steps:
   `POST /api/subscriptions/admin/:id/lines/:lineId/cancel`. It appears when a subscription has more
   than one active line. The existing admin cancel stops the whole subscription, which would also
   have stopped billing for a sibling.
+- CMS Subscriptions now shows the dancer next to each class. Siblings in the same class otherwise
+  had identical rows, so an admin could not tell which one they were withdrawing.
 
-Still needs the developer's manual check: the first three acceptance criteria.
+The developer tested this in the app with a four-student test family and closed the ticket before
+opening the PR.
 
 ## Note for the client response
 
-Include this in the client response. Send it only once this branch is deployed, because the setting
-doesn't exist before then.
+Include this in the client response. Send it only once this branch is deployed, because these
+settings don't exist before then.
 
-> The show-semester withdrawal lock is ready for you to set up:
+> The show-semester withdrawal lock is ready for you to use. It stops families from pulling a dancer
+> close to a show, while you can still withdraw anyone yourself. It stays off until you turn it on.
 >
-> - **Turn it on:** In the CMS, go to Classes → School Years and edit the school year. Switch on
->   "Show semester" for that semester and choose the withdrawal lock date. The date has to fall
->   inside the semester.
-> - **What families see:** The class page shows the lock date before they sign up. From that date
->   until the semester ends, the Cancel button is replaced on their profile with "Withdrawals for
->   this class are closed for the show. Please contact the studio." This applies to monthly
->   registrations for dancers who are 7 or older on the lock date, and to adults registered
->   themselves.
-> - **When you need to withdraw someone anyway:** Go to Subscriptions in the CMS. If the family has
->   one class on the subscription, use **Cancel**. If they have more than one, use **Cancel item**
->   next to that class so the others keep billing.
+> **Setting it up**
 >
-> Two things we need from you:
+> 1. In the CMS, go to **Classes**, open **School Years**, and edit the school year.
+> 2. Under the semester, switch on **Show semester**.
+> 3. Choose the **Withdrawal Lock Date**. It has to fall inside that semester.
+> 4. Click **Save**.
 >
-> 1. Which semester(s) are show semesters this year, and what date should withdrawals lock?
-> 2. Your written Withdrawal Policy doesn't mention this lock yet. It only says notice is due before
->    the 1st of the month. You may want to add the rule when you update your policies.
+> The lock applies as soon as its date arrives, including to families who are already registered. If
+> you change the date or switch it off, that takes effect as soon as you save.
+>
+> **Who is locked**
+>
+> From the lock date through the last day of the semester, families can't cancel online for:
+>
+> - Dancers on a monthly plan who are 7 or older on the lock date. A dancer who turns 7 after that
+>   date can still be withdrawn online for the rest of the semester.
+> - Adults on a monthly plan who registered themselves.
+>
+> Dancers under 7 can still cancel as usual. Semester and full-year plans aren't affected, because
+> they're paid up front and could never be cancelled online.
+>
+> **What families see**
+>
+> - **Before they sign up:** Each class time in a show semester shows a notice like "Spring is a show
+>   semester: monthly withdrawals close Apr 15 for dancers 7+." The payment section explains it too.
+> - **Before the lock date:** Nothing changes. They can cancel from the **Registrations** tab on their
+>   profile. There are no more monthly charges, and the dancer attends through the month already paid.
+> - **From the lock date on:** The Cancel button is replaced with "Withdrawals for this class are
+>   closed for the show. Please contact the studio." and a link to your contact page.
+>
+> **When a family contacts you to withdraw**
+>
+> 1. In the CMS, go to **Subscriptions** and find the family.
+> 2. If they have more than one class on the subscription, click **Cancel item** next to the right
+>    dancer. Their other classes keep billing.
+> 3. If they have only one class, click **Cancel**. **Don't use Cancel on a subscription with several
+>    classes unless you mean to stop all of them**, because it ends billing for every dancer on it.
+>
+> Either way, billing stops right away with no refund or proration, and the dancer attends through
+> the month already paid. This can't be undone.
+>
+> **Good to know**
+>
+> - **Start time:** The lock begins the evening before your chosen date, because the system changes
+>   dates at midnight UTC. If that matters, tell families a date one day later than the one you set.
+> - **Two show semesters:** Each has its own lock date. Once the first semester ends, online
+>   withdrawals reopen until the second semester's lock date.
+> - **Missed payments:** The lock only stops families from cancelling online. It doesn't change how a
+>   failed monthly payment is handled.
+>
+> **Two things we need from you**
+>
+> 1. Which semester(s) are show semesters this year, and what date should withdrawals lock? You can
+>    also set this yourself using the steps above.
+> 2. Your written Withdrawal Policy only says notice is due before the 1st of the month. You may want
+>    to add this rule when you next update your policies, since you write those yourself.
 
 ## Open questions (for the client)
 
-- Which semester(s) are show semesters this year, and what's the lock date?
+- Which semester(s) are show semesters this year, and what's the lock date? This doesn't block
+  closing the ticket: the answer is entered in the CMS, not in code.
