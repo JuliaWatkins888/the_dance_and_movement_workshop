@@ -25,6 +25,7 @@ export interface ClassRegistrationDto {
   nextBillingAt?: string;
   isPastDue: boolean;
   canCancel: boolean;
+  cancelLockedReason?: string;
 }
 
 // The cart line options a class registration is added with - see the API's class.purchasable.ts.

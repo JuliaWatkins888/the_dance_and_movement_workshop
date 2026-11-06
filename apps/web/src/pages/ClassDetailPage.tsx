@@ -26,6 +26,7 @@ import {
   planDetail,
   planPriceLabel,
   planTitle,
+  showLockNotices,
 } from './classes/classFormat';
 import { ProgramBanner } from './classes/ProgramBanner';
 import { useRouteSlug } from './classes/useRouteSlug';
@@ -68,6 +69,11 @@ const SectionChoice = ({ section }: { section: CatalogSectionDto }) => (
     >
       {formatOpenings(section.openings)}
     </Text>
+    {showLockNotices(section, new Date()).map((notice) => (
+      <Text key={notice} as="span" textColor={{ color: 'surface', intensity: 800 }} className="text-xs font-medium">
+        {notice}
+      </Text>
+    ))}
   </>
 );
 
@@ -368,6 +374,9 @@ export const ClassDetailPage = () => {
                   <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
                     Semester and full-year plans are paid up front and can’t be withdrawn. Monthly plans can be withdrawn
                     anytime; you just won’t be charged for the following month.
+                    {selectedSection && showLockNotices(selectedSection, new Date()).length > 0
+                      ? ' The exception is a show semester: once its withdrawal date above passes, dancers 7+ can only be withdrawn by contacting the studio.'
+                      : ''}
                   </Text>
                 </DetailBlock>
 

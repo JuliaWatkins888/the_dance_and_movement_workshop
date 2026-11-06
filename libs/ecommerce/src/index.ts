@@ -65,6 +65,7 @@ export {
   cancelSubscriptionLine,
   cancelSubscriptionLinesForSource,
   cancelSubscriptionByAdmin,
+  cancelSubscriptionLineByAdmin,
 } from './subscriptions/subscription.service';
 export type { CancelSourceLinesInput } from './subscriptions/subscription.service';
 

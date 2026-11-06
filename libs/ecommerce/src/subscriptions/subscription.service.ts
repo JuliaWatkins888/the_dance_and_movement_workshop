@@ -97,6 +97,12 @@ export const cancelSubscriptionLinesForSource = async (input: CancelSourceLinesI
   return removed;
 };
 
+export const cancelSubscriptionLineByAdmin = async (subscriptionId: string, lineId: string): Promise<BillingSubscriptionEntity> => {
+  const subscription = await getBillingSubscriptionRepository().findById(subscriptionId);
+  if (!subscription) throw NotFoundError('Subscription not found');
+  return removeLine(subscription, lineId);
+};
+
 export const cancelSubscriptionByAdmin = async (subscriptionId: string): Promise<BillingSubscriptionEntity> => {
   const subscription = await getBillingSubscriptionRepository().findById(subscriptionId);
   if (!subscription) throw NotFoundError('Subscription not found');

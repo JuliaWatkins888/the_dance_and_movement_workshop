@@ -34,6 +34,8 @@ export const SchoolYearEditDialog = ({ schoolYear, onDone }: SchoolYearEditDialo
           name: semester.name,
           startDate: toDateInputValue(semester.startDate),
           endDate: toDateInputValue(semester.endDate),
+          isShowSemester: semester.isShowSemester ?? false,
+          withdrawalLockDate: toDateInputValue(semester.withdrawalLockDate),
         }))
       : [emptySemester(0), emptySemester(1)],
   );
@@ -51,8 +53,19 @@ export const SchoolYearEditDialog = ({ schoolYear, onDone }: SchoolYearEditDialo
     if (semesters.some((semester) => semester.endDate < semester.startDate)) {
       return setError('A semester ends before it starts.');
     }
+    const showSemesters = semesters.filter((semester) => semester.isShowSemester);
+    if (showSemesters.some((semester) => !semester.withdrawalLockDate)) {
+      return setError('Every show semester needs a withdrawal lock date.');
+    }
+    if (showSemesters.some((semester) => (semester.withdrawalLockDate ?? '') < semester.startDate || (semester.withdrawalLockDate ?? '') > semester.endDate)) {
+      return setError('A withdrawal lock date must fall inside its semester.');
+    }
 
-    const semesterInputs = semesters.map(({ key: _key, ...semester }) => ({ ...semester, name: semester.name.trim() }));
+    const semesterInputs = semesters.map(({ key: _key, isShowSemester, withdrawalLockDate, ...semester }) => ({
+      ...semester,
+      name: semester.name.trim(),
+      ...(isShowSemester ? { isShowSemester, withdrawalLockDate } : {}),
+    }));
 
     try {
       if (schoolYear) {
@@ -98,17 +111,33 @@ export const SchoolYearEditDialog = ({ schoolYear, onDone }: SchoolYearEditDialo
           Every calendar month a semester touches is billed as a full month - these dates drive semester and full-year pricing.
         </Text>
         {semesters.map((semester) => (
-          <Box key={semester.key} flex={{ direction: 'row', align: 'end', gap: 8 }}>
-            <Input label="Semester" value={semester.name} onChange={(event) => updateSemester(semester.key, { name: event.target.value })} className="flex-1" />
-            <Input label="Starts" type="date" value={semester.startDate} onChange={(event) => updateSemester(semester.key, { startDate: event.target.value })} className="flex-1" />
-            <Input label="Ends" type="date" value={semester.endDate} onChange={(event) => updateSemester(semester.key, { endDate: event.target.value })} className="flex-1" />
-            <IconButton
-              icon="Trash"
-              label={`Remove ${semester.name || 'semester'}`}
-              textColor={{ color: 'red', intensity: 600 }}
-              onClick={() => setSemesters((previous) => previous.filter((candidate) => candidate.key !== semester.key))}
-              className="mb-1"
+          <Box key={semester.key} flex={{ direction: 'col', gap: 8 }}>
+            <Box flex={{ direction: 'row', align: 'end', gap: 8 }}>
+              <Input label="Semester" value={semester.name} onChange={(event) => updateSemester(semester.key, { name: event.target.value })} className="flex-1" />
+              <Input label="Starts" type="date" value={semester.startDate} onChange={(event) => updateSemester(semester.key, { startDate: event.target.value })} className="flex-1" />
+              <Input label="Ends" type="date" value={semester.endDate} onChange={(event) => updateSemester(semester.key, { endDate: event.target.value })} className="flex-1" />
+              <IconButton
+                icon="Trash"
+                label={`Remove ${semester.name || 'semester'}`}
+                textColor={{ color: 'red', intensity: 600 }}
+                onClick={() => setSemesters((previous) => previous.filter((candidate) => candidate.key !== semester.key))}
+                className="mb-1"
+              />
+            </Box>
+            <Switch
+              label="Show semester (locks family withdrawals for dancers 7+)"
+              checked={semester.isShowSemester ?? false}
+              onCheckedChange={(isShowSemester) => updateSemester(semester.key, { isShowSemester })}
             />
+            {semester.isShowSemester ? (
+              <Input
+                label="Withdrawal Lock Date"
+                type="date"
+                required
+                value={semester.withdrawalLockDate ?? ''}
+                onChange={(event) => updateSemester(semester.key, { withdrawalLockDate: event.target.value })}
+              />
+            ) : null}
           </Box>
         ))}
         <Box>

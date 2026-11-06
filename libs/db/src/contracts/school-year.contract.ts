@@ -6,6 +6,10 @@ export interface SemesterEntity {
   name: string;
   startDate: Date;
   endDate: Date;
+  // From withdrawalLockDate until the semester ends, families can't self-cancel a monthly plan for
+  // a dancer 7 or older (see utils/class-withdrawal.ts).
+  isShowSemester?: boolean;
+  withdrawalLockDate?: Date;
 }
 
 // The billing calendar classes run on. Semester plans are sold per semester, and a year plan is

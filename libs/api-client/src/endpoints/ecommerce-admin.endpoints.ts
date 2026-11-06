@@ -208,6 +208,7 @@ export interface AdminSubscriptionDto {
     quantity: number;
     status: 'active' | 'removed';
     removedAt?: string;
+    attendeeName?: string;
   }[];
   canceledAt?: string;
   createdAt: string;
@@ -341,6 +342,11 @@ export const ecommerceAdminApi = baseApi.injectEndpoints({
       transformResponse: unwrap<AdminSubscriptionDto>,
       invalidatesTags: ['Subscription'],
     }),
+    cancelSubscriptionLineAdmin: builder.mutation<AdminSubscriptionDto, { subscriptionId: string; lineId: string }>({
+      query: ({ subscriptionId, lineId }) => ({ url: `/api/subscriptions/admin/${subscriptionId}/lines/${lineId}/cancel`, method: 'POST' }),
+      transformResponse: unwrap<AdminSubscriptionDto>,
+      invalidatesTags: ['Subscription'],
+    }),
   }),
 });
 
@@ -369,4 +375,5 @@ export const {
   useCreateManualOrderMutation,
   useListSubscriptionsAdminQuery,
   useCancelSubscriptionAdminMutation,
+  useCancelSubscriptionLineAdminMutation,
 } = ecommerceAdminApi;

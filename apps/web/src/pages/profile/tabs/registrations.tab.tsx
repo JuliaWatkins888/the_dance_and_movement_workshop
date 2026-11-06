@@ -110,6 +110,14 @@ const RegistrationRow = ({ registration, currency }: { readonly registration: Cl
             The last monthly charge didn’t go through. Please update your card or contact the studio.
           </Text>
         ) : null}
+        {registration.cancelLockedReason ? (
+          <Text as="span" textColor={{ color: 'surface', intensity: 800 }} className="text-xs font-medium">
+            {registration.cancelLockedReason}{' '}
+            <Link to="/contact" className="text-surface-950 underline underline-offset-2 hover:text-accent-500">
+              Contact us
+            </Link>
+          </Text>
+        ) : null}
       </Box>
       <Box flex={{ direction: 'row', align: 'center', gap: 12 }} className="shrink-0">
         <StatusPill registration={registration} />

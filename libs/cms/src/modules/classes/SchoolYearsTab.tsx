@@ -7,7 +7,10 @@ import { SchoolYearEditDialog } from './SchoolYearEditDialog';
 
 const describeSemesters = (schoolYear: SchoolYearDto): string =>
   schoolYear.semesters
-    .map((semester) => `${semester.name}: ${formatCalendarDate(semester.startDate)} – ${formatCalendarDate(semester.endDate)}`)
+    .map((semester) => {
+      const dates = `${semester.name}: ${formatCalendarDate(semester.startDate)} – ${formatCalendarDate(semester.endDate)}`;
+      return semester.isShowSemester && semester.withdrawalLockDate ? `${dates} (show, withdrawals lock ${formatCalendarDate(semester.withdrawalLockDate)})` : dates;
+    })
     .join(' · ');
 
 export const SchoolYearsTab = () => {

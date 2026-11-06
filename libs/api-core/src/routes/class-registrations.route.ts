@@ -11,9 +11,11 @@ import {
   getSchoolYearById,
   getUserRepository,
   listEligibleAttendees,
+  WITHDRAWAL_LOCKED_MESSAGE,
 } from '@inithium/db';
 import type { ClassRegistrationEntity } from '@inithium/db';
 import { cancelSubscriptionLine } from '@inithium/ecommerce';
+import { assertRegistrationWithdrawable, isRegistrationWithdrawalLocked } from '../services/class-withdrawal.service';
 
 const router: RouterType = Router();
 
@@ -52,6 +54,10 @@ const toRegistrationDto = async (registration: ClassRegistrationEntity, now: Dat
     subscription !== null &&
     (subscription.status === 'active' || subscription.status === 'past_due') &&
     subscriptionLine?.status === 'active';
+  // Only a monthly plan that's still renewing can be cancelled; semester/year plans are paid in
+  // full and non-withdrawable.
+  const isRenewingMonthly = registration.plan === 'monthly' && isBilling;
+  const isLocked = isRenewingMonthly && (await isRegistrationWithdrawalLocked(registration, section, schoolYear, now));
 
   return {
     id: registration.id,
@@ -73,9 +79,8 @@ const toRegistrationDto = async (registration: ClassRegistrationEntity, now: Dat
     monthlyAmountCents: subscriptionLine?.unitAmountCents,
     nextBillingAt: isBilling ? subscription?.currentPeriodEnd : undefined,
     isPastDue: isBilling && subscription?.status === 'past_due',
-    // Only a monthly plan that's still renewing can be cancelled; semester/year plans are
-    // paid in full and non-withdrawable.
-    canCancel: registration.plan === 'monthly' && isBilling,
+    canCancel: isRenewingMonthly && !isLocked,
+    cancelLockedReason: isLocked ? WITHDRAWAL_LOCKED_MESSAGE : undefined,
   };
 };
 
@@ -122,6 +127,7 @@ router.post(
     if (registration.status !== 'active' || !registration.subscriptionId || !registration.subscriptionLineId) {
       throw ConflictError('This registration has no monthly billing left to cancel');
     }
+    await assertRegistrationWithdrawable(registration, new Date());
 
     await cancelSubscriptionLine(userId, registration.subscriptionId, registration.subscriptionLineId);
     const updated = (await repository.findById(registration.id)) ?? registration;

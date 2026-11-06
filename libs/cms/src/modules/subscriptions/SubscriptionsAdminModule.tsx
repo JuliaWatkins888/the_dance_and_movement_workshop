@@ -6,6 +6,7 @@ import {
   formatMoney,
   readApiError,
   useCancelSubscriptionAdminMutation,
+  useCancelSubscriptionLineAdminMutation,
   useListSubscriptionsAdminQuery,
 } from '@inithium/api-client';
 import type { AdminSubscriptionDto } from '@inithium/api-client';
@@ -32,9 +33,13 @@ const STATUS_CLASSES: Record<BillingSubscriptionStatus, string> = {
 
 const isLive = (subscription: AdminSubscriptionDto): boolean => subscription.status === 'active' || subscription.status === 'past_due';
 
+const liveLines = (subscription: AdminSubscriptionDto) => subscription.lines.filter((line) => line.status === 'active');
+
+const lineLabel = (line: AdminSubscriptionDto['lines'][number]): string => (line.attendeeName ? `${line.name} (${line.attendeeName})` : line.name);
+
 const describe = (subscription: AdminSubscriptionDto): string => {
-  const activeLines = subscription.lines.filter((line) => line.status === 'active');
-  const lines = (activeLines.length > 0 ? activeLines : subscription.lines).map((line) => `${line.quantity} × ${line.name}`).join(', ');
+  const activeLines = liveLines(subscription);
+  const lines = (activeLines.length > 0 ? activeLines : subscription.lines).map((line) => `${line.quantity} × ${lineLabel(line)}`).join(', ');
   const perPeriod = activeLines.reduce((sum, line) => sum + line.unitAmountCents * line.quantity, 0);
   const cadence = `${formatMoney(perPeriod, subscription.currency)} / ${formatBillingInterval(subscription.interval, subscription.intervalCount)}`;
   const next = isLive(subscription) && subscription.currentPeriodEnd ? `next charge ${formatDate(subscription.currentPeriodEnd)}` : '';
@@ -50,6 +55,25 @@ export const SubscriptionsAdminModule = () => {
 
   const { data, isLoading } = useListSubscriptionsAdminQuery({ page, pageSize: PAGE_SIZE, ...(status !== ALL ? { status } : {}) });
   const [cancelSubscription, { isLoading: isCanceling }] = useCancelSubscriptionAdminMutation();
+  const [cancelLine, { isLoading: isCancelingLine }] = useCancelSubscriptionLineAdminMutation();
+
+  const handleCancelLine = async (subscription: AdminSubscriptionDto, lineId: string, lineName: string) => {
+    const confirmed = await dialog.confirm({
+      title: `Cancel "${lineName}"?`,
+      description:
+        'Billing for this item stops immediately, with no proration or refund - the period already paid for is kept. Everything else on this subscription keeps billing. This cannot be undone.',
+      confirmLabel: 'Cancel item',
+      cancelLabel: 'Keep it',
+      confirmVariant: { kind: 'filled', color: 'red' },
+    });
+    if (!confirmed) return;
+    try {
+      await cancelLine({ subscriptionId: subscription.id, lineId }).unwrap();
+      alert.success(`"${lineName}" canceled.`, { position: ALERT_POSITION });
+    } catch (error) {
+      alert.danger(readApiError(error, 'Could not cancel this item.').message, { position: ALERT_POSITION });
+    }
+  };
 
   const handleCancel = async (subscription: AdminSubscriptionDto) => {
     const confirmed = await dialog.confirm({
@@ -120,6 +144,23 @@ export const SubscriptionsAdminModule = () => {
               <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
                 {describe(subscription)}
               </Text>
+              {isLive(subscription) && liveLines(subscription).length > 1
+                ? liveLines(subscription).map((line) => (
+                    <Box key={line.id} flex={{ direction: 'row', align: 'center', gap: 8 }}>
+                      <Text as="span" textColor={{ color: 'surface', intensity: 800 }} className="text-sm">
+                        {lineLabel(line)}
+                      </Text>
+                      <Button
+                        variant={{ kind: 'outlined', color: 'surface', intensity: 400 }}
+                        textColor={{ color: 'surface', intensity: 900 }}
+                        disabled={isCancelingLine}
+                        onClick={() => handleCancelLine(subscription, line.id, lineLabel(line))}
+                      >
+                        Cancel item
+                      </Button>
+                    </Box>
+                  ))
+                : null}
             </ListRow>
           ))
         ) : (

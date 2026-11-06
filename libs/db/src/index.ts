@@ -513,6 +513,8 @@ export {
   resolvePlanCoverage,
 } from './utils/class-eligibility';
 export type { MonthlySchedule, PlanCoverage } from './utils/class-eligibility';
+export { WITHDRAWAL_LOCKED_MESSAGE, WITHDRAWAL_LOCK_MIN_AGE_YEARS, isWithdrawalLocked } from './utils/class-withdrawal';
+export type { WithdrawalLockInput } from './utils/class-withdrawal';
 export { CLASS_REGISTRATION_STATUSES } from './contracts/class-registration.contract';
 export {
   attendeeKey,

@@ -19,6 +19,8 @@ const mapToSchoolYearEntity = (doc: SchoolYearDocument): SchoolYearEntity => ({
     name: semester.name,
     startDate: semester.startDate,
     endDate: semester.endDate,
+    isShowSemester: semester.isShowSemester ?? undefined,
+    withdrawalLockDate: semester.withdrawalLockDate ?? undefined,
   })),
   isPublished: doc.isPublished,
   createdAt: doc.createdAt,
