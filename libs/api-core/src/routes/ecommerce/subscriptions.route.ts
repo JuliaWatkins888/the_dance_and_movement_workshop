@@ -3,9 +3,10 @@ import type { Request, Response, Router as RouterType } from 'express';
 import { asyncHandler, createSuccessResponse } from '@inithium/api-utils';
 import { requireAuth } from '@inithium/auth';
 import { requirePermission } from '@inithium/permissions';
-import { BILLING_SUBSCRIPTION_STATUSES, getBillingSubscriptionRepository, getUserRepository } from '@inithium/db';
+import { BILLING_SUBSCRIPTION_STATUSES, getBillingSubscriptionRepository, getClassRegistrationRepository, getUserRepository } from '@inithium/db';
 import type { BillingSubscriptionEntity, BillingSubscriptionStatus } from '@inithium/db';
-import { cancelSubscriptionByAdmin, cancelSubscriptionLine, listUserSubscriptions } from '@inithium/ecommerce';
+import { cancelSubscriptionByAdmin, cancelSubscriptionLine, cancelSubscriptionLineByAdmin, listUserSubscriptions } from '@inithium/ecommerce';
+import { assertRegistrationWithdrawable } from '../../services/class-withdrawal.service';
 import { currentUserId, normalizeParam, paginatedResponse, parsePaging, queryString } from './ecommerceHttp';
 
 const router: RouterType = Router();
@@ -13,9 +14,15 @@ const MANAGE = 'ecommerce:manage-orders';
 
 // Admin views resolve the subscriber at response time, like the admin order views.
 const toAdminSubscriptionDto = async (subscription: BillingSubscriptionEntity) => {
-  const user = await getUserRepository().findById(subscription.userId);
+  const [user, registrations] = await Promise.all([
+    getUserRepository().findById(subscription.userId),
+    getClassRegistrationRepository().findByUserId(subscription.userId),
+  ]);
+  // Line names describe the class, so siblings in one class read identically without the dancer.
+  const attendeeByLineId = new Map(registrations.map((registration) => [registration.subscriptionLineId, registration.attendee.name]));
   return {
     ...subscription,
+    lines: subscription.lines.map((line) => ({ ...line, attendeeName: attendeeByLineId.get(line.id) })),
     customer: { id: subscription.userId, firstName: user?.firstName ?? '', lastName: user?.lastName, email: user?.email ?? '' },
   };
 };
@@ -38,11 +45,14 @@ router.delete(
   '/api/subscriptions/mine/:id/lines/:lineId',
   requireAuth,
   asyncHandler(async (req: Request, res: Response) => {
-    const subscription = await cancelSubscriptionLine(
-      currentUserId(req),
-      normalizeParam(req.params['id']),
-      normalizeParam(req.params['lineId']),
-    );
+    const userId = currentUserId(req);
+    const lineId = normalizeParam(req.params['lineId']);
+    // A class line is also a registration, so this path honors the show-semester withdrawal lock.
+    const registrations = await getClassRegistrationRepository().findByUserId(userId);
+    const registration = registrations.find((candidate) => candidate.subscriptionLineId === lineId);
+    if (registration) await assertRegistrationWithdrawable(registration, new Date());
+
+    const subscription = await cancelSubscriptionLine(userId, normalizeParam(req.params['id']), lineId);
     res.status(200).json(createSuccessResponse(subscription));
   }),
 );
@@ -71,6 +81,17 @@ router.post(
   requirePermission(MANAGE),
   asyncHandler(async (req: Request, res: Response) => {
     const subscription = await cancelSubscriptionByAdmin(normalizeParam(req.params['id']));
+    res.status(200).json(createSuccessResponse(await toAdminSubscriptionDto(subscription)));
+  }),
+);
+
+// Withdraws one dancer without stopping a sibling billed on the same subscription.
+router.post(
+  '/api/subscriptions/admin/:id/lines/:lineId/cancel',
+  requireAuth,
+  requirePermission(MANAGE),
+  asyncHandler(async (req: Request, res: Response) => {
+    const subscription = await cancelSubscriptionLineByAdmin(normalizeParam(req.params['id']), normalizeParam(req.params['lineId']));
     res.status(200).json(createSuccessResponse(await toAdminSubscriptionDto(subscription)));
   }),
 );

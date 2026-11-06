@@ -1793,7 +1793,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"2026–2027\",\n  \"registrationOpensAt\": \"2026-07-13\",\n  \"semesters\": [\n    {\n      \"name\": \"Semester 1\",\n      \"startDate\": \"2026-09-14\",\n      \"endDate\": \"2026-12-20\"\n    },\n    {\n      \"name\": \"Semester 2\",\n      \"startDate\": \"2027-01-02\",\n      \"endDate\": \"2027-05-15\"\n    }\n  ],\n  \"isPublished\": true\n}",
+							"raw": "{\n  \"name\": \"2026–2027\",\n  \"registrationOpensAt\": \"2026-07-13\",\n  \"semesters\": [\n    {\n      \"name\": \"Semester 1\",\n      \"startDate\": \"2026-09-14\",\n      \"endDate\": \"2026-12-20\"\n    },\n    {\n      \"name\": \"Semester 2\",\n      \"startDate\": \"2027-01-02\",\n      \"endDate\": \"2027-05-15\",\n      \"isShowSemester\": true,\n      \"withdrawalLockDate\": \"2027-04-15\"\n    }\n  ],\n  \"isPublished\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2311,7 +2311,7 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"// 200 for an active monthly registration; 409 for a paid-in-full or already-cancelled one.",
+									"// 200 for an active monthly registration; 409 for a paid-in-full or already-cancelled one, or during a show-semester withdrawal lock.",
 									"pm.test('Status code is 200 or 409', () => pm.expect(pm.response.code).to.be.oneOf([200, 409]));"
 								]
 							}
@@ -2335,6 +2335,120 @@
 								"class-registrations",
 								"mine",
 								"{{registrationId}}",
+								"cancel"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "409 Show-semester withdrawal lock",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/class-registrations/mine/{{registrationId}}/cancel",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"class-registrations",
+										"mine",
+										"{{registrationId}}",
+										"cancel"
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"CONFLICT\",\n    \"message\": \"Withdrawals for this class are closed for the show. Please contact the studio.\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Cancel My Subscription Line",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// 200 when removed; 404 for an unknown line; 409 when the line's class registration is under a show-semester withdrawal lock.",
+									"pm.test('Status code is 200, 404 or 409', () => pm.expect(pm.response.code).to.be.oneOf([200, 404, 409]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/subscriptions/mine/{{subscriptionId}}/lines/{{subscriptionLineId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"subscriptions",
+								"mine",
+								"{{subscriptionId}}",
+								"lines",
+								"{{subscriptionLineId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Cancel Subscription Line (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Withdraws one dancer, ignoring the show-semester lock. Default user lacks ecommerce:manage-orders capability.",
+									"pm.test('Status code is 403', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/subscriptions/admin/{{subscriptionId}}/lines/{{subscriptionLineId}}/cancel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"subscriptions",
+								"admin",
+								"{{subscriptionId}}",
+								"lines",
+								"{{subscriptionLineId}}",
 								"cancel"
 							]
 						}

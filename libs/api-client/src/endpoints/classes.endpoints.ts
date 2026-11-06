@@ -15,6 +15,8 @@ export interface SemesterDto {
   name: string;
   startDate: string;
   endDate: string;
+  isShowSemester?: boolean;
+  withdrawalLockDate?: string;
 }
 
 export interface ClassPlanOptionDto {
@@ -191,6 +193,8 @@ export interface SemesterWriteInput {
   name: string;
   startDate: string;
   endDate: string;
+  isShowSemester?: boolean;
+  withdrawalLockDate?: string;
 }
 
 export interface SchoolYearWriteInput {

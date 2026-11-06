@@ -161,11 +161,22 @@ const semesterSchema = z
     name: z.string().trim().min(1, 'Semester name is required').max(60),
     startDate: calendarDateString,
     endDate: calendarDateString,
+    isShowSemester: z.boolean().optional(),
+    withdrawalLockDate: calendarDateString.optional(),
   })
   .refine((semester) => semester.endDate >= semester.startDate, {
     path: ['endDate'],
     message: 'End date must be on or after the start date',
-  });
+  })
+  .refine((semester) => !semester.isShowSemester || semester.withdrawalLockDate !== undefined, {
+    path: ['withdrawalLockDate'],
+    message: 'A show semester needs a withdrawal lock date',
+  })
+  .refine(
+    ({ isShowSemester, withdrawalLockDate, startDate, endDate }) =>
+      !isShowSemester || withdrawalLockDate === undefined || (withdrawalLockDate >= startDate && withdrawalLockDate <= endDate),
+    { path: ['withdrawalLockDate'], message: 'The withdrawal lock date must fall inside the semester' },
+  );
 
 const semesterList = z.array(semesterSchema).min(1, 'Add at least one semester').max(6);
 

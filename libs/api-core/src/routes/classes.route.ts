@@ -63,11 +63,12 @@ const parseBody = <T>(schema: ZodType<T>, body: unknown): T => {
 const toUtcDate = (calendarDate: string): Date => new Date(`${calendarDate}T00:00:00.000Z`);
 
 const toSemesterInputs = (semesters: NonNullable<CreateSchoolYearBody['semesters']>) =>
-  semesters.map(({ id, name, startDate, endDate }) => ({
+  semesters.map(({ id, name, startDate, endDate, isShowSemester, withdrawalLockDate }) => ({
     ...(id ? { id } : {}),
     name,
     startDate: toUtcDate(startDate),
     endDate: toUtcDate(endDate),
+    ...(isShowSemester && withdrawalLockDate ? { isShowSemester: true, withdrawalLockDate: toUtcDate(withdrawalLockDate) } : {}),
   }));
 
 const assertSlugAvailable = async (slug: string, courseId?: string): Promise<void> => {

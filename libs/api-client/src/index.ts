@@ -436,6 +436,7 @@ export {
   useCreateManualOrderMutation,
   useListSubscriptionsAdminQuery,
   useCancelSubscriptionAdminMutation,
+  useCancelSubscriptionLineAdminMutation,
 } from './endpoints/ecommerce-admin.endpoints';
 export type {
   ClearableUpdate,

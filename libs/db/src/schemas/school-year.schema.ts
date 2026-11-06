@@ -5,6 +5,8 @@ export interface SemesterSubdocument {
   name: string;
   startDate: Date;
   endDate: Date;
+  isShowSemester?: boolean;
+  withdrawalLockDate?: Date;
 }
 
 export interface SchoolYearDocument extends Document {
@@ -20,6 +22,8 @@ const semesterSchema = new Schema<SemesterSubdocument>({
   name: { type: String, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
+  isShowSemester: { type: Boolean, required: false },
+  withdrawalLockDate: { type: Date, required: false },
 });
 
 const schoolYearSchema = new Schema<SchoolYearDocument>(

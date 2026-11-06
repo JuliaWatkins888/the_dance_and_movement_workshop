@@ -61,7 +61,16 @@ export const planDetail = (plan: ClassPlanOptionDto): string => {
   return `${range}${plan.months} months, paid once · save ${plan.discountPercent}%`;
 };
 
-export const courseMatchesAge = (course: CatalogCourseDto, age: number): boolean =>
+// A semester's endDate is midnight UTC of its last class day, so the notice lasts through that day.
+export const showLockNotices = (section: CatalogSectionDto, now: Date): string[] =>
+  section.semesters.flatMap((semester) => {
+    if (!semester.isShowSemester || !semester.withdrawalLockDate) return [];
+    if (new Date(semester.endDate).getTime() + 86_400_000 <= now.getTime()) return [];
+    const verb = new Date(semester.withdrawalLockDate) <= now ? 'closed' : 'close';
+    return [`${semester.name} is a show semester: monthly withdrawals ${verb} ${formatShortDate(semester.withdrawalLockDate)} for dancers 7+.`];
+  });
+
+export const courseMatchesAge =(course: CatalogCourseDto, age: number): boolean =>
   (course.minAgeYears ?? 0) <= age && age <= (course.maxAgeYears ?? Number.POSITIVE_INFINITY);
 
 export const sectionMatchesDay = (section: CatalogSectionDto, day: DayOfWeek): boolean => section.daysOfWeek.includes(day);
