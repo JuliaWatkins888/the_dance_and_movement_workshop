@@ -3,7 +3,7 @@ import type { OrderEntity, UserEntity } from '@inithium/db';
 
 // Minor units -> a plain decimal amount ("1234.50") in the currency's own fraction digits, with no
 // symbol or grouping, so spreadsheets and accounting imports read it as a number.
-const toMajorUnits = (amountMinor: number, currency: string): string => {
+export const toMajorUnits = (amountMinor: number, currency: string): string => {
   const digits = new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).resolvedOptions().maximumFractionDigits ?? 2;
   return (amountMinor / 10 ** digits).toFixed(digits);
 };

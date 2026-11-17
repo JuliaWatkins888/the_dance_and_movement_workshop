@@ -4,6 +4,7 @@ import { getBillingSubscriptionRepository, getOrderRepository } from '@inithium/
 import type { BillingSubscriptionEntity, BillingSubscriptionLine, LineOptions, OrderEntity } from '@inithium/db';
 import { getPaymentProvider } from '@inithium/payments';
 import type { PaymentWebhookEvent } from '@inithium/payments';
+import { recordOrderLedgerEntries } from '../ledger/ledger.service';
 import { findPurchasableSource } from '../purchasables/registry';
 
 const LIVE_STATUSES = ['active', 'past_due'];
@@ -184,6 +185,12 @@ const handleRenewalPaid = async (event: InvoicePaidEvent): Promise<void> => {
   }
 
   const errors: string[] = [];
+  try {
+    await recordOrderLedgerEntries(order);
+  } catch (error) {
+    logError(error);
+    errors.push(`Account ledger: ${error instanceof Error ? error.message : String(error)}`);
+  }
   for (const line of activeLines(subscription)) {
     const source = findPurchasableSource(line.sourceType);
     if (!source?.onRenewalPaid) continue;

@@ -325,12 +325,12 @@ export const ecommerceApi = baseApi.injectEndpoints({
       transformResponse: unwrap<PlaceOrderResultDto>,
       // Class/Workshop and their registrations: a paid class or workshop line enrolls a dancer and
       // takes a seat.
-      invalidatesTags: ['Cart', 'Order', 'Product', 'Class', 'ClassRegistration', 'Workshop', 'WorkshopRegistration'],
+      invalidatesTags: ['Cart', 'Order', 'Product', 'Class', 'ClassRegistration', 'Workshop', 'WorkshopRegistration', 'Ledger'],
     }),
     confirmOrderPayment: builder.mutation<PlaceOrderResultDto, string>({
       query: (orderId) => ({ url: `/api/checkout/orders/${orderId}/confirm`, method: 'POST' }),
       transformResponse: unwrap<PlaceOrderResultDto>,
-      invalidatesTags: ['Cart', 'Order', 'Product', 'Class', 'ClassRegistration', 'Workshop', 'WorkshopRegistration'],
+      invalidatesTags: ['Cart', 'Order', 'Product', 'Class', 'ClassRegistration', 'Workshop', 'WorkshopRegistration', 'Ledger'],
     }),
 
     listMyOrders: builder.query<PaginatedList<OrderDto>, ListMyOrdersParams>({

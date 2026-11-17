@@ -10,6 +10,7 @@ import {
 } from '@inithium/api-client';
 import type { AdminOrderDto, AdminOrderStatus, PostalAddressInput } from '@inithium/api-client';
 import { fullNameOf } from '../ecommerce/shared';
+import { openAccountLedger } from '../ledger/openAccountLedger';
 import { OrderStatusPill, orderKindLabel, shortOrderNumber } from './orderDisplay';
 
 const ALERT_POSITION = 'bottom-right' as const;
@@ -96,7 +97,11 @@ const StatusActions = ({ order }: { readonly order: AdminOrderDto }) => {
         <Box flex={{ direction: 'col', gap: 8 }}>
           <Input label="Note (optional)" value={note} onChange={(event) => setNote(event.target.value)} />
           {pending === 'refunded' || pending === 'cancelled' ? (
-            <Muted>This only records the outcome - issue any refund in your payment provider (e.g. the Stripe dashboard).</Muted>
+            <Muted>
+              {pending === 'refunded'
+                ? 'This records the refund on the family’s account ledger, but no money moves here - issue the actual refund in your payment provider (e.g. the Stripe dashboard).'
+                : 'This only records the outcome - issue any refund in your payment provider (e.g. the Stripe dashboard).'}
+            </Muted>
           ) : null}
           <Box flex={{ direction: 'row', gap: 8 }}>
             <Button variant={{ kind: 'filled', color: 'primary' }} disabled={isLoading} onClick={confirm}>
@@ -145,7 +150,7 @@ const Bookkeeping = ({ order }: { readonly order: AdminOrderDto }) => {
   );
 };
 
-export const OrderAdminDetail = ({ orderId }: { readonly orderId: string }) => {
+export const OrderAdminDetail = ({ orderId, canManageLedger }: { readonly orderId: string; readonly canManageLedger: boolean }) => {
   const { data: order, isLoading, isError } = useGetOrderAdminQuery(orderId);
 
   if (isLoading) {
@@ -194,6 +199,17 @@ export const OrderAdminDetail = ({ orderId }: { readonly orderId: string }) => {
             {fullNameOf(order.customer)}
           </Text>
           <Muted>{order.customer.email}</Muted>
+          {canManageLedger ? (
+            <Box>
+              <Button
+                variant={{ kind: 'link', color: 'accent' }}
+                textColor={{ color: 'surface', intensity: 800 }}
+                onClick={() => openAccountLedger(order.userId, fullNameOf(order.customer))}
+              >
+                View account ledger
+              </Button>
+            </Box>
+          ) : null}
         </Section>
         <Section title="Payment">
           <Muted>

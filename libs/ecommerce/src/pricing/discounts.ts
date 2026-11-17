@@ -27,7 +27,7 @@ const matchesTarget = (discount: DiscountEntity, line: PricingLine): boolean => 
 };
 
 export const isLineEligible = (discount: DiscountEntity, line: PricingLine): boolean =>
-  matchesBilling(discount, line) && (discount.scope === 'order' || matchesTarget(discount, line));
+  !line.resolved.excludeFromDiscounts && matchesBilling(discount, line) && (discount.scope === 'order' || matchesTarget(discount, line));
 
 // Splits `total` across `weights` in proportion, in whole cents, with the rounding remainder going
 // to the largest fractional shares - so the parts always sum to exactly `total`.
@@ -101,7 +101,9 @@ export const evaluateDiscount = (discount: DiscountEntity, lines: PricingLine[],
   const eligible = lines.filter((line) => isLineEligible(discount, line));
   if (eligible.length === 0) return { ok: false, message: 'This code does not apply to any items in your cart.' };
 
-  const cartSubtotal = lines.reduce((sum, line) => sum + lineTodaySubtotalCents(line), 0);
+  const cartSubtotal = lines
+    .filter((line) => !line.resolved.excludeFromDiscounts)
+    .reduce((sum, line) => sum + lineTodaySubtotalCents(line), 0);
   if (discount.minSubtotalCents !== undefined && cartSubtotal < discount.minSubtotalCents) {
     return { ok: false, message: 'Your cart does not meet the minimum order amount for this code.' };
   }

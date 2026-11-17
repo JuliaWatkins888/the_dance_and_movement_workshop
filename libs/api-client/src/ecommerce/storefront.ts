@@ -37,6 +37,11 @@ export const formatBillingInterval = (interval: BillingInterval, intervalCount: 
 export const formatDate = (iso: string): string =>
   new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 
+// For dates stored as UTC midnight (a due date, a day a check was received), which formatDate would
+// show as the previous day anywhere west of UTC.
+export const formatCalendarDate = (iso: string): string =>
+  new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+
 // "then $120.00 / month from Oct 1, 2026 until May 31, 2027" - the renewal half of a recurring
 // line's price, shown next to what's charged today.
 export const describeRenewal = (billing: LineBillingDto, quantity: number, currency: string): string | null => {

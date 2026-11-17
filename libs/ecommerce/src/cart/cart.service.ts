@@ -102,7 +102,8 @@ export interface AddCartLineInput {
 
 export const addCartLine = async (userId: string, input: AddCartLineInput): Promise<CartView> => {
   assertQuantity(input.quantity);
-  if (!findPurchasableSource(input.sourceType)) {
+  const source = findPurchasableSource(input.sourceType);
+  if (!source) {
     throw ValidationError(`Unknown item type "${input.sourceType}"`);
   }
 
@@ -113,6 +114,14 @@ export const addCartLine = async (userId: string, input: AddCartLineInput): Prom
     ...(input.variantId ? { variantId: input.variantId } : {}),
     options: input.options ?? {},
   };
+
+  if (source.singleCartLine) {
+    const nextLine: CartLine = { id: randomUUID(), ...candidate, quantity: input.quantity, addedAt: new Date() };
+    await assertLineAcceptable(userId, nextLine);
+    const lines = [...cart.lines.filter((line) => line.sourceType !== input.sourceType), nextLine];
+    return buildCartView(await getCartRepository().save(userId, { lines }));
+  }
+
   const existing = cart.lines.find((line) => isSameLine(line, candidate));
 
   const nextLine: CartLine = existing

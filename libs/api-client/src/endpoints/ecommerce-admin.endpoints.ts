@@ -306,7 +306,7 @@ export const ecommerceAdminApi = baseApi.injectEndpoints({
     setOrderStatusAdmin: builder.mutation<AdminOrderDto, { id: string; status: AdminOrderStatus; note?: string }>({
       query: ({ id, ...body }) => ({ url: `/api/orders/admin/${id}/status`, method: 'PATCH', body }),
       transformResponse: unwrap<AdminOrderDto>,
-      invalidatesTags: ['Order'],
+      invalidatesTags: ['Order', 'Ledger'],
     }),
     updateOrderAdmin: builder.mutation<AdminOrderDto, { id: string; internalNotes?: string; trackingNumber?: string }>({
       query: ({ id, ...body }) => ({ url: `/api/orders/admin/${id}`, method: 'PATCH', body }),
@@ -329,7 +329,7 @@ export const ecommerceAdminApi = baseApi.injectEndpoints({
     createManualOrder: builder.mutation<AdminOrderDto, ManualOrderInput>({
       query: (body) => ({ url: '/api/orders/admin', method: 'POST', body }),
       transformResponse: unwrap<AdminOrderDto>,
-      invalidatesTags: ['Order', 'Product'],
+      invalidatesTags: ['Order', 'Product', 'Ledger'],
     }),
 
     listSubscriptionsAdmin: builder.query<PaginatedList<AdminSubscriptionDto>, ListSubscriptionsAdminParams>({

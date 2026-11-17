@@ -12,7 +12,8 @@ import {
 type IssueContext = { addIssue: (issue: { code: 'custom'; path: (string | number)[]; message: string }) => void };
 
 const cents = z.number().int().min(0);
-const lineOptions = z.record(z.string(), z.string().max(200));
+// Long enough for a balance line's comma-joined charge ids (100 ids of 24 characters).
+const lineOptions = z.record(z.string(), z.string().max(2500));
 
 export const postalAddressSchema = z.object({
   name: z.string().max(200).optional(),

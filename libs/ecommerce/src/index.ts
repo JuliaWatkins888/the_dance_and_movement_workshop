@@ -11,6 +11,7 @@ export { PRODUCT_SOURCE_TYPE } from './purchasables/product.purchasable';
 export { CLASS_SOURCE_TYPE } from './purchasables/class.purchasable';
 export { WORKSHOP_SOURCE_TYPE } from './purchasables/workshop.purchasable';
 export { EVENT_SOURCE_TYPE } from './purchasables/event.purchasable';
+export { LEDGER_BALANCE_SOURCE_TYPE } from './purchasables/ledger-balance.purchasable';
 
 export { addInterval } from './pricing/billing';
 export { getStoreCurrency } from './settings';
@@ -68,6 +69,25 @@ export {
   cancelSubscriptionLineByAdmin,
 } from './subscriptions/subscription.service';
 export type { CancelSourceLinesInput } from './subscriptions/subscription.service';
+
+export {
+  addLedgerCharge,
+  buildLedgerPaymentsCsv,
+  getAccountLedger,
+  listOutstandingBalances,
+  recordLedgerPayment,
+  searchLedgerAccounts,
+  voidLedgerEntry,
+} from './ledger/ledger.service';
+export type {
+  AccountLedgerView,
+  AddLedgerChargeInput,
+  LedgerAccountSummary,
+  LedgerEntryView,
+  LedgerOpenChargeView,
+  LedgerPerson,
+  RecordLedgerPaymentInput,
+} from './ledger/ledger.service';
 
 export { createPaymentWebhookRouter, processPaymentWebhook, PAYMENT_WEBHOOK_PATH } from './webhooks/payment-webhook';
 export type { PaymentWebhookOutcome } from './webhooks/payment-webhook';
