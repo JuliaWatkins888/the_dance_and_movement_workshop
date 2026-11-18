@@ -2,6 +2,7 @@ import { Router } from 'express';
 import type { Request, Response, Router as RouterType } from 'express';
 import { asyncHandler, ConflictError, createSuccessResponse, NotFoundError, UnauthorizedError, ValidationError } from '@inithium/api-utils';
 import { requireAuth } from '@inithium/auth';
+import { requirePermission } from '@inithium/permissions';
 import {
   getBillingSubscriptionRepository,
   getClassRegistrationRepository,
@@ -14,10 +15,13 @@ import {
   WITHDRAWAL_LOCKED_MESSAGE,
 } from '@inithium/db';
 import type { ClassRegistrationEntity } from '@inithium/db';
-import { cancelSubscriptionLine } from '@inithium/ecommerce';
+import { accrueLedgerTuition, cancelSubscriptionLine, withdrawClassRegistrationByStaff } from '@inithium/ecommerce';
 import { assertRegistrationWithdrawable, isRegistrationWithdrawalLocked } from '../services/class-withdrawal.service';
 
 const router: RouterType = Router();
+const DESK_CAPABILITY = 'registrations:desk';
+
+const nextMonthStart = (date: Date): Date => new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1));
 
 const normalizeParam = (raw: string | string[]): string => (Array.isArray(raw) ? raw[0] : raw);
 
@@ -58,6 +62,9 @@ const toRegistrationDto = async (registration: ClassRegistrationEntity, now: Dat
   // full and non-withdrawable.
   const isRenewingMonthly = registration.plan === 'monthly' && isBilling;
   const isLocked = isRenewingMonthly && (await isRegistrationWithdrawalLocked(registration, section, schoolYear, now));
+  // Pay-in-person monthly: tuition posts to the account ledger on the 1st.
+  const isLedgerBilling = registration.billingMode === 'ledger' && registration.plan === 'monthly' && status === 'active';
+  const ledgerNextMonth = isLedgerBilling ? nextMonthStart(now > registration.startsAt ? now : registration.startsAt) : undefined;
 
   return {
     id: registration.id,
@@ -76,11 +83,18 @@ const toRegistrationDto = async (registration: ClassRegistrationEntity, now: Dat
     section: section
       ? { id: section.id, daysOfWeek: section.daysOfWeek, startTime: section.startTime, endTime: section.endTime }
       : undefined,
-    monthlyAmountCents: subscriptionLine?.unitAmountCents,
-    nextBillingAt: isBilling ? subscription?.currentPeriodEnd : undefined,
+    billingMode: registration.billingMode,
+    monthlyAmountCents: subscriptionLine?.unitAmountCents ?? registration.ledgerTerms?.monthlyAmountCents,
+    nextBillingAt: isBilling
+      ? subscription?.currentPeriodEnd
+      : ledgerNextMonth && ledgerNextMonth < registration.endsAt
+        ? ledgerNextMonth
+        : undefined,
     isPastDue: isBilling && subscription?.status === 'past_due',
     canCancel: isRenewingMonthly && !isLocked,
     cancelLockedReason: isLocked ? WITHDRAWAL_LOCKED_MESSAGE : undefined,
+    // Staff can stop any monthly plan still billing, however it's paid, regardless of the show lock.
+    canStaffWithdraw: isRenewingMonthly || isLedgerBilling,
   };
 };
 
@@ -107,7 +121,9 @@ router.get(
   requireAuth,
   asyncHandler(async (req: Request, res: Response) => {
     const now = new Date();
-    const registrations = await getClassRegistrationRepository().findByUserId(currentUserId(req));
+    const userId = currentUserId(req);
+    await accrueLedgerTuition(userId, now);
+    const registrations = await getClassRegistrationRepository().findByUserId(userId);
     res.status(200).json(createSuccessResponse(await Promise.all(registrations.map((registration) => toRegistrationDto(registration, now)))));
   }),
 );
@@ -132,6 +148,34 @@ router.post(
     await cancelSubscriptionLine(userId, registration.subscriptionId, registration.subscriptionLineId);
     const updated = (await repository.findById(registration.id)) ?? registration;
     res.status(200).json(createSuccessResponse(await toRegistrationDto(updated, new Date())));
+  }),
+);
+
+// Every registration on a family's account, for staff at the desk.
+router.get(
+  '/api/users/:id/class-registrations',
+  requireAuth,
+  requirePermission(DESK_CAPABILITY),
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = normalizeParam(req.params['id']);
+    if (!(await getUserRepository().findById(userId))) throw NotFoundError('Account not found');
+    const now = new Date();
+    await accrueLedgerTuition(userId, now);
+    const registrations = await getClassRegistrationRepository().findByUserId(userId);
+    res.status(200).json(createSuccessResponse(await Promise.all(registrations.map((registration) => toRegistrationDto(registration, now)))));
+  }),
+);
+
+// Staff stopping a monthly plan, whether it renews on a card or posts to the ledger. Unlike the
+// family's own cancel, the show-semester lock doesn't apply.
+router.post(
+  '/api/class-registrations/:id/withdraw',
+  requireAuth,
+  requirePermission(DESK_CAPABILITY),
+  asyncHandler(async (req: Request, res: Response) => {
+    const now = new Date();
+    const updated = await withdrawClassRegistrationByStaff(normalizeParam(req.params['id']), now);
+    res.status(200).json(createSuccessResponse(await toRegistrationDto(updated, now)));
   }),
 );
 

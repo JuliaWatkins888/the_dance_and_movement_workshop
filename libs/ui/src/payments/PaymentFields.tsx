@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Text } from '@inithium/ui';
+import { Text } from '../components';
 import type { PaymentFieldsHandle, PaymentFieldsProps } from './payment-fields.contract';
 import { StripePaymentFields } from './StripePaymentFields';
 

@@ -6,6 +6,16 @@ export type ClassAttendeeDto = { type: 'child'; childId: string; name: string } 
 
 export type ClassRegistrationStatus = 'active' | 'withdrawn' | 'ended';
 
+// subscription - renews on a saved card; ledger - paid in person, tuition posts to the account
+// ledger on the 1st; prepaid - semester/year paid in full.
+export type ClassBillingMode = 'subscription' | 'ledger' | 'prepaid';
+
+export const CLASS_BILLING_MODE_LABELS: Record<ClassBillingMode, string> = {
+  subscription: 'Monthly · card on file',
+  ledger: 'Monthly · pays in person',
+  prepaid: 'Paid in full',
+};
+
 export interface ClassRegistrationDto {
   id: string;
   attendee: ClassAttendeeDto;
@@ -21,11 +31,13 @@ export interface ClassRegistrationDto {
   course?: { id: string; name: string; slug: string };
   programName?: string;
   section?: { id: string; daysOfWeek: DayOfWeek[]; startTime: string; endTime: string };
+  billingMode: ClassBillingMode;
   monthlyAmountCents?: number;
   nextBillingAt?: string;
   isPastDue: boolean;
   canCancel: boolean;
   cancelLockedReason?: string;
+  canStaffWithdraw: boolean;
 }
 
 // The cart line options a class registration is added with - see the API's class.purchasable.ts.
@@ -61,8 +73,23 @@ export const classRegistrationsApi = baseApi.injectEndpoints({
       transformResponse: unwrap<ClassRegistrationDto>,
       invalidatesTags: ['ClassRegistration', 'Class'],
     }),
+    listAccountClassRegistrations: builder.query<ClassRegistrationDto[], string>({
+      query: (userId) => `/api/users/${userId}/class-registrations`,
+      transformResponse: unwrap<ClassRegistrationDto[]>,
+      providesTags: ['ClassRegistration'],
+    }),
+    withdrawClassRegistration: builder.mutation<ClassRegistrationDto, string>({
+      query: (id) => ({ url: `/api/class-registrations/${id}/withdraw`, method: 'POST' }),
+      transformResponse: unwrap<ClassRegistrationDto>,
+      invalidatesTags: ['ClassRegistration', 'Class', 'Ledger'],
+    }),
   }),
 });
 
-export const { useListEligibleAttendeesQuery, useListMyClassRegistrationsQuery, useCancelClassRegistrationMutation } =
-  classRegistrationsApi;
+export const {
+  useListEligibleAttendeesQuery,
+  useListMyClassRegistrationsQuery,
+  useCancelClassRegistrationMutation,
+  useListAccountClassRegistrationsQuery,
+  useWithdrawClassRegistrationMutation,
+} = classRegistrationsApi;

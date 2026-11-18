@@ -1,4 +1,5 @@
-export const POLICY_CONSENT_METHODS = ['online', 'paper'] as const;
+// desk - typed by the family on a staff member's screen at the front desk
+export const POLICY_CONSENT_METHODS = ['online', 'paper', 'desk'] as const;
 export type PolicyConsentMethod = (typeof POLICY_CONSENT_METHODS)[number];
 
 export interface PolicySnapshotItem {

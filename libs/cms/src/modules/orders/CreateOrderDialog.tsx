@@ -20,6 +20,7 @@ import type {
   PostalAddressInput,
   ProductDto,
 } from '@inithium/api-client';
+import { AddressInputs, emptyAddress, toAddressPayload } from '../ecommerce/AddressInputs';
 import { FormError, fullNameOf, useStoreCurrency } from '../ecommerce/shared';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -177,31 +178,6 @@ const ItemPicker = ({ currency, onAdd }: { readonly currency: string; readonly o
   );
 };
 
-const ADDRESS_FIELDS: { key: keyof PostalAddressInput; label: string; wide?: boolean }[] = [
-  { key: 'name', label: 'Recipient name', wide: true },
-  { key: 'line1', label: 'Address', wide: true },
-  { key: 'line2', label: 'Apartment, suite, etc.', wide: true },
-  { key: 'city', label: 'City' },
-  { key: 'state', label: 'State / Province' },
-  { key: 'postalCode', label: 'Postal code' },
-  { key: 'country', label: 'Country (2-letter code)' },
-];
-
-const emptyAddress: PostalAddressInput = { name: '', line1: '', line2: '', city: '', state: '', postalCode: '', country: 'US' };
-
-const toAddressPayload = (address: PostalAddressInput): PostalAddressInput | undefined => {
-  if (!address.line1.trim() || !address.city.trim() || !address.postalCode.trim() || address.country.trim().length !== 2) return undefined;
-  return {
-    line1: address.line1.trim(),
-    city: address.city.trim(),
-    postalCode: address.postalCode.trim(),
-    country: address.country.trim().toUpperCase(),
-    ...(address.name?.trim() ? { name: address.name.trim() } : {}),
-    ...(address.line2?.trim() ? { line2: address.line2.trim() } : {}),
-    ...(address.state?.trim() ? { state: address.state.trim() } : {}),
-  };
-};
-
 interface CreateOrderDialogProps {
   readonly onCreated: (order: AdminOrderDto) => void;
   readonly onCancel: () => void;
@@ -321,19 +297,7 @@ export const CreateOrderDialog = ({ onCreated, onCancel }: CreateOrderDialogProp
         </Select>
       </Box>
 
-      {method?.requiresAddress ? (
-        <Box className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {ADDRESS_FIELDS.map((field) => (
-            <Input
-              key={field.key}
-              label={field.label}
-              value={address[field.key] ?? ''}
-              onChange={(event) => setAddress({ ...address, [field.key]: event.target.value })}
-              className={field.wide ? 'sm:col-span-2' : undefined}
-            />
-          ))}
-        </Box>
-      ) : null}
+      {method?.requiresAddress ? <AddressInputs value={address} onChange={setAddress} nameLabel="Recipient name" /> : null}
 
       <Textarea label="Internal notes" helperText="e.g. how and when it was paid. Only visible to staff." rows={2} value={internalNotes} onChange={(event) => setInternalNotes(event.target.value)} />
 

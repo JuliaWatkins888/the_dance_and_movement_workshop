@@ -29,6 +29,8 @@ export interface LedgerEntryDocument extends Document {
   source: LedgerEntrySource;
   orderId?: string;
   subscriptionId?: string;
+  registrationId?: string;
+  billingMonth?: string;
   createdByUserId?: string;
   voidedAt?: Date;
   voidedByUserId?: string;
@@ -61,6 +63,8 @@ const ledgerEntrySchema = new Schema<LedgerEntryDocument>(
     source: { type: String, enum: LEDGER_ENTRY_SOURCES, required: true },
     orderId: { type: String, required: false },
     subscriptionId: { type: String, required: false },
+    registrationId: { type: String, required: false },
+    billingMonth: { type: String, required: false },
     createdByUserId: { type: String, required: false },
     voidedAt: { type: Date, required: false },
     voidedByUserId: { type: String, required: false },
@@ -72,6 +76,10 @@ const ledgerEntrySchema = new Schema<LedgerEntryDocument>(
 ledgerEntrySchema.index({ userId: 1, createdAt: -1 });
 ledgerEntrySchema.index({ orderId: 1 });
 ledgerEntrySchema.index({ kind: 1, receivedAt: 1 });
+ledgerEntrySchema.index(
+  { registrationId: 1, billingMonth: 1 },
+  { unique: true, partialFilterExpression: { registrationId: { $type: 'string' }, billingMonth: { $type: 'string' } } },
+);
 
 export const LedgerEntryModel =
   mongoose.models['LedgerEntry'] || mongoose.model<LedgerEntryDocument>('LedgerEntry', ledgerEntrySchema);

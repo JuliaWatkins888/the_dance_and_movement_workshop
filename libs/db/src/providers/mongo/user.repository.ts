@@ -19,6 +19,7 @@ const mapToUserEntity = (doc: UserDocument): UserEntity => ({
   email: doc.email,
   firstName: doc.firstName,
   lastName: doc.lastName,
+  ...(doc.phone ? { phone: doc.phone } : {}),
   passwordHash: doc.passwordHash,
   role: doc.role,
   // Defensive fallbacks - a document written before this field existed won't have it until
@@ -32,6 +33,14 @@ const mapToUserEntity = (doc: UserDocument): UserEntity => ({
   tokenVersion: doc.tokenVersion ?? 0,
   createdAt: doc.createdAt,
 });
+
+// Phone numbers are stored as typed, so "5551234" has to find "(555) 123-4". Anything that isn't
+// a phone number is searched literally.
+const phonePattern = (search: string): string => {
+  const digits = search.replace(/\D/g, '');
+  const looksLikePhone = /^[\d\s().+-]+$/.test(search);
+  return looksLikePhone && digits.length >= 3 ? digits.split('').join('\\D*') : escapeRegExp(search);
+};
 
 // Case-insensitive so accounts saved before emails were normalized to lowercase still match.
 const CASE_INSENSITIVE = { locale: 'en', strength: 2 } as const;
@@ -50,7 +59,7 @@ export const createMongoUserRepository = (model: Model<UserDocument>): UserRepos
     const { page, pageSize, search, searchField } = options;
     const filter: QueryFilter<UserDocument> = {};
     if (search && searchField) {
-      filter[searchField] = { $regex: escapeRegExp(search), $options: 'i' };
+      filter[searchField] = { $regex: searchField === 'phone' ? phonePattern(search) : escapeRegExp(search), $options: 'i' };
     }
 
     const skip = (page - 1) * pageSize;
@@ -66,6 +75,7 @@ export const createMongoUserRepository = (model: Model<UserDocument>): UserRepos
       email: input.email,
       firstName: input.firstName,
       lastName: input.lastName,
+      ...(input.phone ? { phone: input.phone } : {}),
       passwordHash: input.passwordHash,
       role: input.role ?? 'user',
       avatar: input.avatar ?? DEFAULT_AVATAR_CONFIG,
@@ -83,6 +93,7 @@ export const createMongoUserRepository = (model: Model<UserDocument>): UserRepos
     if (input.email !== undefined) updateDoc['email'] = input.email;
     if (input.firstName !== undefined) updateDoc['firstName'] = input.firstName;
     if (input.lastName !== undefined) updateDoc['lastName'] = input.lastName;
+    if (input.phone !== undefined) updateDoc['phone'] = input.phone;
     if (input.passwordHash !== undefined) updateDoc['passwordHash'] = input.passwordHash;
     if (input.role !== undefined) updateDoc['role'] = input.role;
     if (input.capabilityOverrides !== undefined) updateDoc['capabilityOverrides'] = input.capabilityOverrides;

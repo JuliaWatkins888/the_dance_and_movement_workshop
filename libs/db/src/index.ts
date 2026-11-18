@@ -519,11 +519,21 @@ export {
   YEAR_DISCOUNT_PERCENT,
   applyDiscount,
   countMonthsTouched,
+  ledgerTuitionAccessEndsAt,
+  ledgerTuitionMonths,
+  toBillingMonth,
   resolveClassPlanOptions,
   resolveSectionSemesters,
   sortSemesters,
 } from './utils/class-pricing';
-export type { ClassPlanKind, ClassPlanOption, ClassPlanInput } from './utils/class-pricing';
+export type {
+  ClassPlanKind,
+  ClassPlanOption,
+  ClassPlanInput,
+  LedgerTuitionInput,
+  LedgerTuitionMonth,
+  LedgerTuitionTermsInput,
+} from './utils/class-pricing';
 export {
   SELF_ENROLL_MIN_AGE_YEARS,
   ageInMonths,
@@ -538,7 +548,7 @@ export {
 export type { MonthlySchedule, PlanCoverage } from './utils/class-eligibility';
 export { WITHDRAWAL_LOCKED_MESSAGE, WITHDRAWAL_LOCK_MIN_AGE_YEARS, isWithdrawalLocked } from './utils/class-withdrawal';
 export type { WithdrawalLockInput } from './utils/class-withdrawal';
-export { CLASS_REGISTRATION_STATUSES } from './contracts/class-registration.contract';
+export { CLASS_BILLING_MODES, CLASS_REGISTRATION_STATUSES } from './contracts/class-registration.contract';
 export {
   attendeeKey,
   describeAttendee,
@@ -550,6 +560,8 @@ export {
 export type { AttendeeRef, AttendeeResolution } from './class-registrations/class-registration.rules';
 export type {
   ClassAttendee,
+  ClassBillingMode,
+  LedgerTuitionTerms,
   ClassRegistrationEntity,
   ClassRegistrationStatus,
   CreateClassRegistrationInput,

@@ -66,7 +66,7 @@ const buildPendingOrder = (prepared: PreparedCheckout): CreateOrderInput => {
   };
 };
 
-const settlePayment = async (order: OrderEntity, result: PaymentResult): Promise<PlaceOrderResult> => {
+export const settlePayment = async (order: OrderEntity, result: PaymentResult): Promise<PlaceOrderResult> => {
   switch (result.status) {
     case 'succeeded': {
       const paid = await finalizeOrder(order.id, result.paymentMethodId);
@@ -139,16 +139,26 @@ export const placeOrder = async (userId: string, input: PlaceOrderInput): Promis
   return settlePayment(withPayment, result);
 };
 
-// Called by the frontend after the shopper completes a requires_action step.
-export const confirmOrderPayment = async (userId: string, orderId: string): Promise<PlaceOrderResult> => {
-  const order = await getOrderRepository().findById(orderId);
-  if (!order || order.userId !== userId) throw NotFoundError('Order not found');
-
+const confirmPendingPayment = async (order: OrderEntity): Promise<PlaceOrderResult> => {
   if (order.status === 'failed') throw ValidationError('This order’s payment did not complete. Please check out again.');
   if (order.status !== 'pending') return { status: 'paid', order };
   if (!order.payment.paymentId) throw ConflictError('This order has no payment to confirm');
 
   return settlePayment(order, await getPaymentProvider().retrievePayment(order.payment.paymentId));
+};
+
+// Called by the frontend after the shopper completes a requires_action step.
+export const confirmOrderPayment = async (userId: string, orderId: string): Promise<PlaceOrderResult> => {
+  const order = await getOrderRepository().findById(orderId);
+  if (!order || order.userId !== userId) throw NotFoundError('Order not found');
+  return confirmPendingPayment(order);
+};
+
+// The same step for a card a family entered on a staff member's screen at the front desk.
+export const confirmStaffOrderPayment = async (orderId: string): Promise<PlaceOrderResult> => {
+  const order = await getOrderRepository().findById(orderId);
+  if (!order || order.kind !== 'manual') throw NotFoundError('Order not found');
+  return confirmPendingPayment(order);
 };
 
 // Admin-recorded outcomes only - no money moves. How a refund is actually issued is left to each

@@ -47,6 +47,34 @@ const resolveShipping = async (
   return { method, ...(method.requiresAddress && input.shippingAddress ? { address: input.shippingAddress } : {}) };
 };
 
+export interface OrderTax {
+  tax: TaxCalculation;
+  taxByLineId: Map<string, number>;
+}
+
+// Goods shipped to an address are taxed where they're delivered; everything else (services,
+// pickup) against the billing address.
+export const calculateOrderTax = async (
+  currency: string,
+  priced: PricedCart,
+  billingAddress: PostalAddress,
+  shippingAddress?: PostalAddress,
+): Promise<OrderTax> => {
+  const tax = await getTaxProvider().calculate({
+    currency,
+    address: shippingAddress ?? billingAddress,
+    addressSource: shippingAddress ? 'shipping' : 'billing',
+    lines: priced.lines.map((line) => ({
+      reference: line.lineId,
+      amountCents: line.subtotalCents - line.discountCents,
+      quantity: line.ref.quantity,
+      ...(line.resolved.taxCode ? { taxCode: line.resolved.taxCode } : {}),
+    })),
+    shippingCents: priced.shippingCents,
+  });
+  return { tax, taxByLineId: new Map(tax.lines.map((line) => [line.reference, line.taxCents])) };
+};
+
 export const prepareCheckout = async (userId: string, input: CheckoutDetailsInput): Promise<PreparedCheckout> => {
   const cart = await getCartRepository().findByUserId(userId);
   if (!cart || cart.lines.length === 0) throw ValidationError('Your cart is empty');
@@ -65,21 +93,7 @@ export const prepareCheckout = async (userId: string, input: CheckoutDetailsInpu
   const shipping = await resolveShipping(requiresShipping, input);
   const priced = priceCart(resolution.available, discountState?.allocation ?? new Map(), shipping.method);
 
-  // Goods shipped to an address are taxed where they're delivered; everything else (services,
-  // pickup) against the billing address.
-  const tax = await getTaxProvider().calculate({
-    currency,
-    address: shipping.address ?? input.billingAddress,
-    addressSource: shipping.address ? 'shipping' : 'billing',
-    lines: priced.lines.map((line) => ({
-      reference: line.lineId,
-      amountCents: line.subtotalCents - line.discountCents,
-      quantity: line.ref.quantity,
-      ...(line.resolved.taxCode ? { taxCode: line.resolved.taxCode } : {}),
-    })),
-    shippingCents: priced.shippingCents,
-  });
-  const taxByLineId = new Map(tax.lines.map((line) => [line.reference, line.taxCents]));
+  const { tax, taxByLineId } = await calculateOrderTax(currency, priced, input.billingAddress, shipping.address);
 
   const quote: CheckoutQuote = buildQuoteView({
     currency,

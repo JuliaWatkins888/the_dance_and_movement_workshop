@@ -334,11 +334,15 @@ export {
   useListEligibleAttendeesQuery,
   useListMyClassRegistrationsQuery,
   useCancelClassRegistrationMutation,
+  useListAccountClassRegistrationsQuery,
+  useWithdrawClassRegistrationMutation,
   toClassLineOptions,
   CLASS_SOURCE_TYPE,
+  CLASS_BILLING_MODE_LABELS,
 } from './endpoints/class-registrations.endpoints';
 export type {
   ClassAttendeeDto,
+  ClassBillingMode,
   ClassRegistrationDto,
   ClassRegistrationStatus,
   ClassLineOptions,
@@ -572,4 +576,29 @@ export type {
   HolidayDto,
 } from './endpoints/calendar.endpoints';
 // inithium:block:calendar:exports:end
+export {
+  deskApi,
+  useSearchDeskAccountsQuery,
+  useGetDeskAccountQuery,
+  useCreateDeskAccountMutation,
+  useAddDeskStudentMutation,
+  useQuoteDeskOrderMutation,
+  useCreateDeskOrderMutation,
+  useConfirmDeskOrderPaymentMutation,
+} from './endpoints/desk.endpoints';
+export type {
+  AddDeskStudentInput,
+  CreateDeskAccountInput,
+  DeskAccountDetailDto,
+  DeskAccountDto,
+  DeskConsentInput,
+  DeskOrderInput,
+  DeskOrderResultDto,
+  DeskOrderSummaryDto,
+  DeskPaymentInput,
+  DeskPaymentRecordInput,
+  DeskQuoteDto,
+  DeskQuoteInput,
+  DeskStudentDto,
+} from './endpoints/desk.endpoints';
 // inithium:anchor:exports
