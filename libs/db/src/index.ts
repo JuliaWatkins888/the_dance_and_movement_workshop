@@ -224,6 +224,7 @@ export const deletePolicyItem = (categoryId: string, itemId: string) =>
 export const getPolicyConsentRepository = () => activeProvider.getPolicyConsentRepository();
 
 // inithium:block:policy:repositories:end
+export const getLedgerEntryRepository = () => activeProvider.getLedgerEntryRepository();
 // inithium:block:classes:repositories:start
 export const getProgramRepository = () => activeProvider.getProgramRepository();
 export const listPrograms = () => getProgramRepository().findAll();
@@ -455,6 +456,28 @@ export type {
 } from './contracts/policy-consent.contract';
 export { hashPolicies, toPolicySnapshot } from './utils/policy-version';
 // inithium:block:policy:type-exports:end
+export type {
+  CreateLedgerEntryInput,
+  FindLedgerPaymentsOptions,
+  LedgerAllocation,
+  LedgerChargeCategory,
+  LedgerEntryEntity,
+  LedgerEntryKind,
+  LedgerEntryRepository,
+  LedgerEntrySource,
+  LedgerPaymentMethod,
+  LedgerUserBalance,
+  VoidLedgerEntryInput,
+} from './contracts/ledger-entry.contract';
+export {
+  LEDGER_CHARGE_CATEGORIES,
+  LEDGER_ENTRY_KINDS,
+  LEDGER_ENTRY_SOURCES,
+  LEDGER_PAYMENT_METHODS,
+  STAFF_LEDGER_PAYMENT_METHODS,
+} from './contracts/ledger-entry.contract';
+export { autoApply, computeBalance, ledgerPosition, openCharges } from './utils/ledger';
+export type { LedgerBalanceEntry, LedgerPosition, OpenCharge } from './utils/ledger';
 // inithium:block:classes:type-exports:start
 export type {
   ProgramEntity,

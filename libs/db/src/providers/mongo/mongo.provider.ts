@@ -49,6 +49,9 @@ import { PolicyConsentRepository } from '../../contracts/policy-consent.contract
 import { createMongoPolicyConsentRepository } from './policy-consent.repository';
 import { PolicyConsentModel } from '../../schemas/policy-consent.schema';
 // inithium:block:policy:imports:end
+import { LedgerEntryRepository } from '../../contracts/ledger-entry.contract';
+import { createMongoLedgerEntryRepository } from './ledger-entry.repository';
+import { LedgerEntryModel } from '../../schemas/ledger-entry.schema';
 // inithium:block:classes:imports:start
 import { ProgramRepository } from '../../contracts/program.contract';
 import { CourseRepository } from '../../contracts/course.contract';
@@ -146,6 +149,7 @@ const timeAuditLogRepository = createMongoTimeAuditLogRepository(TimeAuditLogMod
 const policyRepository = createMongoPolicyRepository(PolicyCategoryModel);
 const policyConsentRepository = createMongoPolicyConsentRepository(PolicyConsentModel);
 // inithium:block:policy:repository-instances:end
+const ledgerEntryRepository = createMongoLedgerEntryRepository(LedgerEntryModel);
 // inithium:block:classes:repository-instances:start
 const programRepository = createMongoProgramRepository(ProgramModel);
 const courseRepository = createMongoCourseRepository(CourseModel);
@@ -219,6 +223,7 @@ export const mongoProvider: DbProvider = {
   getPolicyRepository: (): PolicyRepository => policyRepository,
   getPolicyConsentRepository: (): PolicyConsentRepository => policyConsentRepository,
 // inithium:block:policy:members:end
+  getLedgerEntryRepository: (): LedgerEntryRepository => ledgerEntryRepository,
 // inithium:block:classes:members:start
   getProgramRepository: (): ProgramRepository => programRepository,
   getCourseRepository: (): CourseRepository => courseRepository,

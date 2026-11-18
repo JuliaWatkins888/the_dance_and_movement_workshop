@@ -74,6 +74,7 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:storage:editor:start
   'storage:manageAssets',
 // inithium:block:storage:editor:end
+  'ledger:manage',
     // inithium:anchor:editor
   ],
   // users:managePermissions is deliberately absent even from admin - granting the ability to
@@ -127,6 +128,7 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:storage:admin:start
   'storage:manageAssets',
 // inithium:block:storage:admin:end
+  'ledger:manage',
     // inithium:anchor:admin
   ],
 };

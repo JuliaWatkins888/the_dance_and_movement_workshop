@@ -91,6 +91,7 @@ export const baseApi = createApi({
     'ShippingMethod',
     'Subscription',
 // inithium:block:ecommerce:tag-types:end
+    'Ledger',
 // inithium:block:storage:tag-types:start
     'Asset',
 // inithium:block:storage:tag-types:end

@@ -55,6 +55,8 @@ export interface ResolvedPurchasable {
   taxCode?: string;
   requiresShipping: boolean;
   maxQuantity?: number;
+  // Promo codes skip this line entirely, e.g. paying off money already owed.
+  excludeFromDiscounts?: boolean;
   billing: ResolvedBilling;
 }
 
@@ -65,6 +67,9 @@ export type PurchasableValidation = { ok: true } | { ok: false; reason: string }
 // orders, and subscriptions only ever go through this, never through a source's own collection.
 export interface PurchasableSource {
   sourceType: string;
+  // A cart holds at most one line of this source; adding another replaces it rather than sitting
+  // beside it.
+  singleCartLine?: boolean;
   // Buying this is a registration, so the account must have signed the studio policies first.
   requiresPolicyConsent?: boolean;
   // The school year a line's signature counts toward. Sources without one use the current year.

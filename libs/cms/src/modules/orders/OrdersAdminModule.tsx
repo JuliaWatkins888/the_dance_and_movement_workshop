@@ -32,6 +32,7 @@ const summarizeItems = (order: AdminOrderDto): string => {
 export const OrdersAdminModule = () => {
   const currentUser = useCmsCurrentUser();
   const canRecordSales = canAccessCmsResource(currentUser, 'ecommerce:record-sales');
+  const canManageLedger = canAccessCmsResource(currentUser, 'ledger:manage');
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<OrderDto['status'] | typeof ALL>(ALL);
   const [kind, setKind] = useState<OrderDto['kind'] | typeof ALL>(ALL);
@@ -52,7 +53,8 @@ export const OrdersAdminModule = () => {
   });
 
   const openOrder = (orderId: string) => {
-    dialog.show(() => <OrderAdminDetail orderId={orderId} />, { title: 'Order', width: DIALOG_WIDTH_WIDE });
+    // A dialog renders outside the CMS's current-user context, so the capability is passed in.
+    dialog.show(() => <OrderAdminDetail orderId={orderId} canManageLedger={canManageLedger} />, { title: 'Order', width: DIALOG_WIDTH_WIDE });
   };
 
   const openCreate = () => {

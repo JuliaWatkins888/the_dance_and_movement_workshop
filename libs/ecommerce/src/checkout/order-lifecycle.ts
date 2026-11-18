@@ -9,6 +9,7 @@ import {
 import type { OrderDiscountSnapshot, OrderEntity, OrderLine } from '@inithium/db';
 import { getPaymentProvider, getTaxProvider } from '@inithium/payments';
 import type { SubscriptionCoupon } from '@inithium/payments';
+import { recordOrderLedgerEntries } from '../ledger/ledger.service';
 import { findPurchasableSource } from '../purchasables/registry';
 import type { PurchasableContext, PurchasableLineRef } from '../purchasables/purchasable.contract';
 import { findPaymentCustomerId } from './payment-customer';
@@ -239,6 +240,8 @@ export const finalizeOrder = async (orderId: string, paymentMethodId?: string): 
   }
 
   const subscriptionIds = await createOrderSubscriptions(paid, errors);
+
+  await attempt('Account ledger', () => recordOrderLedgerEntries(paid));
 
   for (const line of paid.lines) {
     const source = findPurchasableSource(line.sourceType);
