@@ -134,6 +134,31 @@
 		{
 			"key": "ledgerChargeId",
 			"value": ""
+		},
+		{
+			"key": "deskAccountId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "deskStudentId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "deskOrderId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "classSectionId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "classRegistrationId",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -2461,6 +2486,76 @@
 							]
 						}
 					}
+				},
+				{
+					"name": "List Account Registrations (Staff)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{deskAccountId}}/class-registrations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{deskAccountId}}",
+								"class-registrations"
+							]
+						}
+					}
+				},
+				{
+					"name": "Withdraw Registration (Staff)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/class-registrations/{{classRegistrationId}}/withdraw",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"class-registrations",
+								"{{classRegistrationId}}",
+								"withdraw"
+							]
+						}
+					}
 				}
 			]
 		},
@@ -4688,6 +4783,364 @@
 									"key": "method",
 									"value": "cash"
 								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Front Desk",
+			"description": "Staff registering families from the CMS (QA-12). Requires the registrations:desk capability.",
+			"item": [
+				{
+					"name": "Search Accounts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/desk/accounts?search=smith",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"desk",
+								"accounts"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "smith"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"if (pm.response.code === 201) pm.collectionVariables.set('deskAccountId', pm.response.json().data.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/desk/accounts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"desk",
+								"accounts"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Pat\",\n  \"lastName\": \"Grandparent\",\n  \"email\": \"pat.grandparent@example.com\",\n  \"phone\": \"(555) 123-4567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Get Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/desk/accounts/{{deskAccountId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"desk",
+								"accounts",
+								"{{deskAccountId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"if (pm.response.code === 201) pm.collectionVariables.set('deskStudentId', pm.response.json().data.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/desk/accounts/{{deskAccountId}}/students",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"desk",
+								"accounts",
+								"{{deskAccountId}}",
+								"students"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Sam\",\n  \"lastName\": \"Grandparent\",\n  \"birthDate\": \"2018-04-12\",\n  \"gender\": \"they_them\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Quote Desk Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/desk/quote",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"desk",
+								"quote"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerUserId\": \"{{deskAccountId}}\",\n  \"lines\": [\n    {\n      \"sourceType\": \"class\",\n      \"sourceId\": \"{{classSectionId}}\",\n      \"options\": {\n        \"attendee\": \"child\",\n        \"childId\": \"{{deskStudentId}}\",\n        \"plan\": \"monthly\"\n      },\n      \"quantity\": 1\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Create Desk Order (Pay In Person + Cash)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"if (pm.response.code === 201) pm.collectionVariables.set('deskOrderId', pm.response.json().data.order.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/desk/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"desk",
+								"orders"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerUserId\": \"{{deskAccountId}}\",\n  \"lines\": [\n    {\n      \"sourceType\": \"class\",\n      \"sourceId\": \"{{classSectionId}}\",\n      \"options\": {\n        \"attendee\": \"child\",\n        \"childId\": \"{{deskStudentId}}\",\n        \"plan\": \"monthly\"\n      },\n      \"quantity\": 1\n    }\n  ],\n  \"consent\": {\n    \"method\": \"paper\",\n    \"signedName\": \"Pat Grandparent\",\n    \"versionHash\": \"{{policyVersionHash}}\"\n  },\n  \"payment\": {\n    \"mode\": \"in_person\",\n    \"record\": {\n      \"method\": \"cash\",\n      \"amountCents\": 6000\n    }\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Create Desk Order (Card)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"if (pm.response.code === 201) pm.collectionVariables.set('deskOrderId', pm.response.json().data.order.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/desk/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"desk",
+								"orders"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerUserId\": \"{{deskAccountId}}\",\n  \"lines\": [\n    {\n      \"sourceType\": \"class\",\n      \"sourceId\": \"{{classSectionId}}\",\n      \"options\": {\n        \"attendee\": \"child\",\n        \"childId\": \"{{deskStudentId}}\",\n        \"plan\": \"monthly\"\n      },\n      \"quantity\": 1\n    }\n  ],\n  \"consent\": {\n    \"method\": \"desk\",\n    \"signedName\": \"Pat Grandparent\",\n    \"versionHash\": \"{{policyVersionHash}}\"\n  },\n  \"payment\": {\n    \"mode\": \"card\",\n    \"billingAddress\": {\n      \"name\": \"Pat Grandparent\",\n      \"line1\": \"123 Main St\",\n      \"city\": \"Springfield\",\n      \"state\": \"IL\",\n      \"postalCode\": \"62701\",\n      \"country\": \"US\"\n    },\n    \"paymentToken\": \"ctoken_from_payment_element\",\n    \"expectedTotalCents\": 6000\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Confirm Desk Card Payment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/desk/orders/{{deskOrderId}}/confirm-payment",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"desk",
+								"orders",
+								"{{deskOrderId}}",
+								"confirm-payment"
 							]
 						}
 					}

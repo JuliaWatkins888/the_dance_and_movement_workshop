@@ -229,7 +229,7 @@ const entryDetails = (entry: LedgerEntryDto): string =>
     entry.checkNumber ? `Check #${entry.checkNumber}` : undefined,
     entry.receivedAt ? `Received ${entry.source === 'staff' ? formatCalendarDate(entry.receivedAt) : formatDate(entry.receivedAt)}` : undefined,
     entry.dueDate ? `Due ${formatCalendarDate(entry.dueDate)}` : undefined,
-    entry.source === 'staff' ? undefined : 'From an order',
+    entry.source === 'staff' ? undefined : entry.source === 'system' ? 'Monthly tuition (pays in person)' : 'From an order',
   ]
     .filter(Boolean)
     .join(' · ');
@@ -262,7 +262,8 @@ const EntryRow = ({ entry, currency, onVoid }: { readonly entry: LedgerEntryDto;
       <Text as="span" textColor={{ color: 'surface', intensity: isVoided ? 600 : 950 }} className={`font-semibold tabular-nums ${isVoided ? 'line-through' : ''}`}>
         {formatMoney(signedAmount, currency)}
       </Text>
-      {!isVoided && entry.source === 'staff' ? (
+      {/* Posted tuition can be voided to waive a month; order entries change only through their order. */}
+      {!isVoided && (entry.source === 'staff' || entry.source === 'system') ? (
         <Button variant={{ kind: 'ghost', color: 'surface' }} textColor={{ color: 'surface', intensity: 900 }} onClick={() => onVoid(entry)}>
           Void
         </Button>

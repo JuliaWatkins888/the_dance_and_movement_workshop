@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { CLASS_REGISTRATION_STATUSES } from '../contracts/class-registration.contract';
-import type { ClassAttendee, ClassRegistrationStatus } from '../contracts/class-registration.contract';
+import { CLASS_BILLING_MODES, CLASS_REGISTRATION_STATUSES } from '../contracts/class-registration.contract';
+import type { ClassAttendee, ClassBillingMode, ClassRegistrationStatus, LedgerTuitionTerms } from '../contracts/class-registration.contract';
 import type { ClassPlanKind } from '../utils/class-pricing';
 
 export interface ClassRegistrationDocument extends Document {
@@ -10,6 +10,9 @@ export interface ClassRegistrationDocument extends Document {
   courseId: string;
   schoolYearId: string;
   plan: ClassPlanKind;
+  // Absent on registrations created before QA-12; the repository derives it.
+  billingMode?: ClassBillingMode;
+  ledgerTerms?: LedgerTuitionTerms;
   semesterId?: string;
   startsAt: Date;
   endsAt: Date;
@@ -34,6 +37,16 @@ const attendeeSchema = new Schema(
   { _id: false },
 );
 
+const ledgerTermsSchema = new Schema(
+  {
+    firstMonthCents: { type: Number, required: true },
+    monthlyAmountCents: { type: Number, required: true },
+    discountCents: { type: Number, required: true, default: 0 },
+    discountMonths: { type: Number, required: false },
+  },
+  { _id: false },
+);
+
 const classRegistrationSchema = new Schema<ClassRegistrationDocument>(
   {
     userId: { type: String, required: true, index: true },
@@ -42,6 +55,8 @@ const classRegistrationSchema = new Schema<ClassRegistrationDocument>(
     courseId: { type: String, required: true },
     schoolYearId: { type: String, required: true },
     plan: { type: String, enum: ['monthly', 'semester', 'year'], required: true },
+    billingMode: { type: String, enum: CLASS_BILLING_MODES, required: false, index: true },
+    ledgerTerms: { type: ledgerTermsSchema, required: false },
     semesterId: { type: String, required: false },
     startsAt: { type: Date, required: true },
     endsAt: { type: Date, required: true },

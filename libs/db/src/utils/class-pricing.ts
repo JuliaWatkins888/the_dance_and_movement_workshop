@@ -97,3 +97,57 @@ export const resolveClassPlanOptions = ({
 
   return [{ kind: 'monthly', amountCents: monthlyPriceCents }, ...semesterOptions, ...yearOptions];
 };
+
+export interface LedgerTuitionTermsInput {
+  firstMonthCents: number;
+  monthlyAmountCents: number;
+  discountCents: number;
+  discountMonths?: number;
+}
+
+export interface LedgerTuitionMonth {
+  billingMonth: string; // yyyy-mm
+  monthStart: Date;
+  amountCents: number;
+}
+
+export interface LedgerTuitionInput {
+  terms: LedgerTuitionTermsInput;
+  // The registration's coverage: startsAt falls in the first charged month, endsAt is exclusive.
+  startsAt: Date;
+  endsAt: Date;
+  withdrawnAt?: Date;
+  now: Date;
+}
+
+const utcMonthStart = (date: Date, offsetMonths = 0): Date => new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + offsetMonths, 1));
+
+export const toBillingMonth = (date: Date): string => `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
+
+const monthAmount = (terms: LedgerTuitionTermsInput, index: number): number => {
+  if (index === 0) return terms.firstMonthCents;
+  const discounted = terms.discountMonths === undefined || index <= terms.discountMonths;
+  return Math.max(0, terms.monthlyAmountCents - (discounted ? terms.discountCents : 0));
+};
+
+// Every month a pay-in-person monthly registration owes as of `now`, matching the card plan: the
+// first month is charged at registration (even when it starts later), and each following month on
+// its 1st, through the section's last month. A withdrawal stops the months after it; a month whose
+// 1st had already come stays owed.
+export const ledgerTuitionMonths = ({ terms, startsAt, endsAt, withdrawnAt, now }: LedgerTuitionInput): LedgerTuitionMonth[] => {
+  const cutoff = withdrawnAt && withdrawnAt < now ? withdrawnAt : now;
+  const months: LedgerTuitionMonth[] = [];
+  for (let index = 0; ; index += 1) {
+    const monthStart = utcMonthStart(startsAt, index);
+    if (index > 0 && (monthStart >= endsAt || monthStart > cutoff)) break;
+    months.push({ billingMonth: toBillingMonth(monthStart), monthStart, amountCents: monthAmount(terms, index) });
+  }
+  return months;
+};
+
+// When a withdrawn pay-in-person registration's last owed month runs out.
+export const ledgerTuitionAccessEndsAt = (startsAt: Date, endsAt: Date, withdrawnAt: Date): Date => {
+  const lastMonth = withdrawnAt > startsAt ? withdrawnAt : startsAt;
+  const nextMonth = utcMonthStart(lastMonth, 1);
+  return nextMonth < endsAt ? nextMonth : endsAt;
+};

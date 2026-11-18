@@ -6,6 +6,7 @@ export interface UserDocument extends Document {
   email: string;
   firstName: string;
   lastName?: string;
+  phone?: string;
   passwordHash: string;
   role: Role;
   isOwner: boolean;
@@ -22,6 +23,7 @@ const userSchema = new Schema<UserDocument>(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: false },
+    phone: { type: String, required: false, trim: true },
     passwordHash: { type: String, required: true },
     role: { type: String, required: true, enum: CORE_ROLES, default: 'user' },
     isOwner: { type: Boolean, required: true, default: false },

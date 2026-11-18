@@ -213,9 +213,13 @@ export const OrderAdminDetail = ({ orderId, canManageLedger }: { readonly orderI
         </Section>
         <Section title="Payment">
           <Muted>
-            {order.kind === 'manual'
-              ? `Recorded by ${order.createdBy ? fullNameOf(order.createdBy) : 'staff'} - paid outside the store`
-              : `${order.payment.provider}${paymentReference ? ` · ${paymentReference}` : ''}`}
+            {order.kind !== 'manual'
+              ? `${order.payment.provider}${paymentReference ? ` · ${paymentReference}` : ''}`
+              : order.payment.provider === 'manual'
+                ? `Recorded by ${order.createdBy ? fullNameOf(order.createdBy) : 'staff'} - paid outside the store`
+                : order.payment.provider === 'ledger'
+                  ? `Registered at the front desk by ${order.createdBy ? fullNameOf(order.createdBy) : 'staff'} - owed on the family’s account`
+                  : `Registered at the front desk by ${order.createdBy ? fullNameOf(order.createdBy) : 'staff'} - card via ${order.payment.provider}${paymentReference ? ` · ${paymentReference}` : ''}`}
           </Muted>
           {order.discount ? (
             <Box>

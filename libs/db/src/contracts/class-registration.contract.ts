@@ -6,6 +6,22 @@ import type { ClassPlanKind } from '../utils/class-pricing';
 export const CLASS_REGISTRATION_STATUSES = ['active', 'withdrawn', 'ended'] as const;
 export type ClassRegistrationStatus = (typeof CLASS_REGISTRATION_STATUSES)[number];
 
+// subscription - monthly, renewed on a saved card
+// ledger       - monthly, paid in person: each month's tuition is posted to the account ledger
+// prepaid      - semester/year paid in full up front
+export const CLASS_BILLING_MODES = ['subscription', 'ledger', 'prepaid'] as const;
+export type ClassBillingMode = (typeof CLASS_BILLING_MODES)[number];
+
+// What a ledger-billed monthly registration charges. The first month is the order line's own total;
+// later months are monthlyAmountCents, less discountCents for the promo code's duration.
+export interface LedgerTuitionTerms {
+  firstMonthCents: number;
+  monthlyAmountCents: number;
+  discountCents: number;
+  // Months after the first that get discountCents off; undefined = every month.
+  discountMonths?: number;
+}
+
 // Who attends: one of the account's child profiles, or the account holder themselves.
 export type ClassAttendee = { type: 'child'; childId: string; name: string } | { type: 'self'; name: string };
 
@@ -20,6 +36,9 @@ export interface ClassRegistrationEntity {
   courseId: string;
   schoolYearId: string;
   plan: ClassPlanKind;
+  billingMode: ClassBillingMode;
+  // Ledger billing only.
+  ledgerTerms?: LedgerTuitionTerms;
   semesterId?: string;
   // The span of classes this registration pays for (endsAt exclusive).
   startsAt: Date;
@@ -50,6 +69,8 @@ export interface ClassRegistrationRepository {
   findByOrderLineId: (orderLineId: string) => Promise<ClassRegistrationEntity | null>;
   // Withdrawn registrations whose access has ended but still hold a seat.
   findSeatsToRelease: (now: Date) => Promise<ClassRegistrationEntity[]>;
+  // Ledger-billed monthly registrations that can still owe a month (not ended).
+  findLedgerBilled: (userId?: string) => Promise<ClassRegistrationEntity[]>;
   create: (input: CreateClassRegistrationInput) => Promise<ClassRegistrationEntity>;
   update: (id: string, input: UpdateClassRegistrationInput) => Promise<ClassRegistrationEntity | null>;
   // Compare-and-set so concurrent sweeps can't both release the same seat.

@@ -11,6 +11,9 @@ import type {
 import type { PaginatedResult } from '../../contracts/pagination.contract';
 import type { LedgerEntryDocument } from '../../schemas/ledger-entry.schema';
 
+const isDuplicateKeyError = (error: unknown): boolean =>
+  typeof error === 'object' && error !== null && (error as { code?: unknown }).code === 11000;
+
 const mapToLedgerEntryEntity = (doc: LedgerEntryDocument): LedgerEntryEntity => ({
   id: doc._id.toString(),
   userId: doc.userId,
@@ -30,6 +33,8 @@ const mapToLedgerEntryEntity = (doc: LedgerEntryDocument): LedgerEntryEntity => 
   source: doc.source,
   ...(doc.orderId ? { orderId: doc.orderId } : {}),
   ...(doc.subscriptionId ? { subscriptionId: doc.subscriptionId } : {}),
+  ...(doc.registrationId ? { registrationId: doc.registrationId } : {}),
+  ...(doc.billingMonth ? { billingMonth: doc.billingMonth } : {}),
   ...(doc.createdByUserId ? { createdByUserId: doc.createdByUserId } : {}),
   ...(doc.voidedAt ? { voidedAt: doc.voidedAt } : {}),
   ...(doc.voidedByUserId ? { voidedByUserId: doc.voidedByUserId } : {}),
@@ -56,6 +61,20 @@ const toUserBalance = (row: { _id: string; balanceCents: number }): LedgerUserBa
 
 export const createMongoLedgerEntryRepository = (model: Model<LedgerEntryDocument>): LedgerEntryRepository => ({
   create: async (input: CreateLedgerEntryInput): Promise<LedgerEntryEntity> => mapToLedgerEntryEntity(await model.create(input)),
+
+  findBilledMonths: async (registrationId: string): Promise<string[]> => {
+    const docs = await model.find({ registrationId, billingMonth: { $type: 'string' } }, { billingMonth: 1 }).lean<{ billingMonth: string }[]>().exec();
+    return docs.map((doc) => doc.billingMonth);
+  },
+
+  createTuitionCharge: async (input) => {
+    try {
+      return mapToLedgerEntryEntity(await model.create(input));
+    } catch (error) {
+      if (isDuplicateKeyError(error)) return null;
+      throw error;
+    }
+  },
 
   findById: async (id: string): Promise<LedgerEntryEntity | null> => {
     if (!isValidObjectId(id)) return null;

@@ -22,6 +22,17 @@ const mapToClassRegistrationEntity = (doc: ClassRegistrationDocument): ClassRegi
   courseId: doc.courseId,
   schoolYearId: doc.schoolYearId,
   plan: doc.plan,
+  billingMode: doc.billingMode ?? (doc.subscriptionId ? 'subscription' : 'prepaid'),
+  ...(doc.ledgerTerms
+    ? {
+        ledgerTerms: {
+          firstMonthCents: doc.ledgerTerms.firstMonthCents,
+          monthlyAmountCents: doc.ledgerTerms.monthlyAmountCents,
+          discountCents: doc.ledgerTerms.discountCents ?? 0,
+          ...(typeof doc.ledgerTerms.discountMonths === 'number' ? { discountMonths: doc.ledgerTerms.discountMonths } : {}),
+        },
+      }
+    : {}),
   semesterId: doc.semesterId ?? undefined,
   startsAt: doc.startsAt,
   endsAt: doc.endsAt,
@@ -57,6 +68,10 @@ export const createMongoClassRegistrationRepository = (model: Model<ClassRegistr
   },
   findSeatsToRelease: async (now: Date) => {
     const docs = await model.find({ status: 'withdrawn', seatReleased: false, accessEndsAt: { $lte: now } }).exec();
+    return docs.map(mapToClassRegistrationEntity);
+  },
+  findLedgerBilled: async (userId?: string) => {
+    const docs = await model.find({ billingMode: 'ledger', status: { $ne: 'ended' }, ...(userId ? { userId } : {}) }).exec();
     return docs.map(mapToClassRegistrationEntity);
   },
   create: async (input: CreateClassRegistrationInput) => mapToClassRegistrationEntity(await model.create(input)),

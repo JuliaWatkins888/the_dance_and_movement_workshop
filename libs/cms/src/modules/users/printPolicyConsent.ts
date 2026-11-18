@@ -6,7 +6,9 @@ export const formatConsentTimestamp = (iso: string): string =>
 export const describeConsentMethod = (consent: PolicyConsentDto): string =>
   consent.method === 'paper'
     ? `Paper copy, recorded by ${consent.recordedByName ?? 'staff'}`
-    : 'Signed online';
+    : consent.method === 'desk'
+      ? `Signed at the front desk, entered with ${consent.recordedByName ?? 'staff'}`
+      : 'Signed online';
 
 // Opens the record as its own plain document, so the printout has no CMS chrome and always prints
 // black on white regardless of the viewer's theme. Returns false when a popup blocker refuses.

@@ -16,6 +16,7 @@ import { useDeleteUserMutation, useListUsersQuery } from '@inithium/api-client';
 import type { AdminUser, UserSearchField } from '@inithium/api-client';
 import { canAccessCmsResource, useCmsCurrentUser } from '../../CmsCurrentUserContext';
 import { openAccountLedger } from '../ledger/openAccountLedger';
+import { openAccountRegistrations } from '../desk/AccountRegistrationsPanel';
 import { PolicyConsentsDialog } from './PolicyConsentsDialog';
 import { UserFormDialog } from './UserFormDialog';
 
@@ -29,7 +30,9 @@ const FIELD_OPTIONS: { value: UserSearchField; label: string }[] = [
 ];
 
 export const UsersModule = () => {
-  const canManageLedger = canAccessCmsResource(useCmsCurrentUser(), 'ledger:manage');
+  const currentCmsUser = useCmsCurrentUser();
+  const canManageLedger = canAccessCmsResource(currentCmsUser, 'ledger:manage');
+  const canUseDesk = canAccessCmsResource(currentCmsUser, 'registrations:desk');
   const [page, setPage] = useState(1);
   const [searchField, setSearchField] = useState<UserSearchField>('email');
   const [searchInput, setSearchInput] = useState('');
@@ -176,6 +179,13 @@ export const UsersModule = () => {
                       icon="Wallet"
                       label={`Account ledger for ${user.email}`}
                       onClick={() => openAccountLedger(user.id, [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email)}
+                    />
+                  ) : null}
+                  {canUseDesk ? (
+                    <IconButton
+                      icon="Student"
+                      label={`Class registrations for ${user.email}`}
+                      onClick={() => openAccountRegistrations(user.id, [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email)}
                     />
                   ) : null}
                   <IconButton icon="Signature" label={`Policy signatures for ${user.email}`} onClick={() => openPolicyConsentsDialog(user)} />

@@ -12,7 +12,9 @@ import type {
   UserSearchField,
 } from '@inithium/db';
 import { toMajorUnits } from '../orders/orders-csv';
+import { LEDGER_PAYMENT_PROVIDER, MANUAL_PAYMENT_PROVIDER } from '../orders/payment-collection';
 import { getStoreCurrency } from '../settings';
+import { accrueLedgerTuition } from './tuition-accrual';
 
 export const LEDGER_BALANCE_SOURCE_TYPE = 'ledger_balance';
 const ACCOUNT_SEARCH_LIMIT = 10;
@@ -75,6 +77,7 @@ export interface AccountLedgerView {
 }
 
 export const getAccountLedger = async (userId: string, paging: { page: number; pageSize: number }): Promise<AccountLedgerView> => {
+  await accrueLedgerTuition(userId);
   const repository = getLedgerEntryRepository();
   const [customer, currency, all, history, children] = await Promise.all([
     requireAccount(userId),
@@ -190,18 +193,45 @@ export const recordLedgerPayment = async (userId: string, input: RecordLedgerPay
 
 // Entries written by an order mirror money that really moved through it, so they only change
 // through that order (mark it refunded). Voiding one half would make a paid order look unpaid.
+// Monthly tuition the system posted for a pay-in-person class can be voided to waive that month;
+// it stays on the ledger, so accrual never posts the month again.
 export const voidLedgerEntry = async (entryId: string, reason: string, actorUserId: string): Promise<LedgerEntryEntity> => {
   const repository = getLedgerEntryRepository();
   const entry = await repository.findById(entryId);
   if (!entry) throw NotFoundError('Ledger entry not found');
-  if (entry.source !== 'staff') throw ConflictError('This entry came from an order. To reverse it, mark that order refunded.');
+  if (entry.source !== 'staff' && entry.source !== 'system') {
+    throw ConflictError('This entry came from an order. To reverse it, mark that order refunded.');
+  }
 
   const voided = await repository.void(entryId, { voidedAt: new Date(), voidedByUserId: actorUserId, voidReason: reason });
   if (!voided) throw ConflictError('This entry has already been voided');
   return voided;
 };
 
-const orderPaymentMethod = (order: OrderEntity): LedgerPaymentMethod => (order.kind === 'manual' ? 'other' : 'card_online');
+const orderPaymentMethod = (order: OrderEntity): LedgerPaymentMethod =>
+  order.payment.provider === MANUAL_PAYMENT_PROVIDER ? 'other' : 'card_online';
+
+const describeLines = (lines: OrderLine[]): string =>
+  lines.map((line) => (line.quantity > 1 ? `${line.quantity} × ${line.name}` : line.name)).join(', ');
+
+// A pay-in-person desk order moved no money, so it only charges the account. Monthly class lines
+// are left to tuition accrual, which posts their first month and every month after it.
+const recordLedgerOrderCharge = async (order: OrderEntity): Promise<void> => {
+  const lines = order.lines.filter((line) => line.sourceType !== LEDGER_BALANCE_SOURCE_TYPE && line.billing.type !== 'recurring');
+  const billedElsewhereCents = order.lines
+    .filter((line) => line.sourceType === LEDGER_BALANCE_SOURCE_TYPE || line.billing.type === 'recurring')
+    .reduce((sum, line) => sum + line.totalCents, 0);
+  const amountCents = order.totals.totalCents - billedElsewhereCents;
+  if (amountCents <= 0) return;
+  await getLedgerEntryRepository().create({
+    userId: order.userId,
+    kind: 'charge',
+    amountCents,
+    description: describeLines(lines) || 'Order',
+    source: 'order',
+    orderId: order.id,
+  });
+};
 
 const orderEntryOrigin = (order: OrderEntity): Pick<CreateLedgerEntryInput, 'source' | 'orderId' | 'subscriptionId'> => {
   const subscriptionId = order.kind === 'renewal' ? order.subscriptionIds[0] : undefined;
@@ -216,16 +246,14 @@ const orderEntryOrigin = (order: OrderEntity): Pick<CreateLedgerEntryInput, 'sou
 // without moving the balance. Balance-payment lines are skipped: they pay existing charges rather
 // than creating a new one, and recordLedgerBalancePayment writes their payment.
 export const recordOrderLedgerEntries = async (order: OrderEntity): Promise<void> => {
+  if (order.payment.provider === LEDGER_PAYMENT_PROVIDER) return recordLedgerOrderCharge(order);
   const balanceLines = order.lines.filter((line) => line.sourceType === LEDGER_BALANCE_SOURCE_TYPE);
   const amountCents = order.totals.totalCents - balanceLines.reduce((sum, line) => sum + line.totalCents, 0);
   if (amountCents <= 0) return;
 
   const repository = getLedgerEntryRepository();
   const origin = orderEntryOrigin(order);
-  const description = order.lines
-    .filter((line) => line.sourceType !== LEDGER_BALANCE_SOURCE_TYPE)
-    .map((line) => (line.quantity > 1 ? `${line.quantity} × ${line.name}` : line.name))
-    .join(', ');
+  const description = describeLines(order.lines.filter((line) => line.sourceType !== LEDGER_BALANCE_SOURCE_TYPE));
 
   const charge = await repository.create({ userId: order.userId, kind: 'charge', amountCents, description: description || 'Order', ...origin });
   await repository.create({
@@ -292,7 +320,9 @@ export interface LedgerAccountSummary {
 const summarize = (users: UserEntity[], balanceByUserId: Map<string, number>): LedgerAccountSummary[] =>
   users.map((user) => ({ customer: toLedgerPerson(user), balanceCents: balanceByUserId.get(user.id) ?? 0 }));
 
+// Read by the CMS dashboard widget, which is where every account's tuition gets caught up.
 export const listOutstandingBalances = async (limit: number): Promise<LedgerAccountSummary[]> => {
+  await accrueLedgerTuition();
   const balances = await getLedgerEntryRepository().findOutstandingBalances(limit);
   const users = await Promise.all(balances.map((balance) => getUserRepository().findById(balance.userId)));
   return summarize(

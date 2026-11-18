@@ -10,6 +10,7 @@ import type { OrderDiscountSnapshot, OrderEntity, OrderLine } from '@inithium/db
 import { getPaymentProvider, getTaxProvider } from '@inithium/payments';
 import type { SubscriptionCoupon } from '@inithium/payments';
 import { recordOrderLedgerEntries } from '../ledger/ledger.service';
+import { LEDGER_PAYMENT_PROVIDER } from '../orders/payment-collection';
 import { findPurchasableSource } from '../purchasables/registry';
 import type { PurchasableContext, PurchasableLineRef } from '../purchasables/purchasable.contract';
 import { findPaymentCustomerId } from './payment-customer';
@@ -118,7 +119,8 @@ const recurringGroupKey = (line: OrderLine): string =>
 // firstBillingAt.
 const createOrderSubscriptions = async (order: OrderEntity, errors: string[]): Promise<string[]> => {
   const recurringLines = order.lines.filter((line) => line.billing.type === 'recurring');
-  if (recurringLines.length === 0) return [];
+  // A pay-in-person order's monthly lines bill through the account ledger instead.
+  if (recurringLines.length === 0 || order.payment.provider === LEDGER_PAYMENT_PROVIDER) return [];
 
   const provider = getPaymentProvider();
   const customerId = await findPaymentCustomerId(order.userId);

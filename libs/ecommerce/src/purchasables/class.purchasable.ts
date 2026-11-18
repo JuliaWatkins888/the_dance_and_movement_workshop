@@ -20,6 +20,8 @@ import {
 import type {
   AttendeeRef,
   BillingSubscriptionEntity,
+  ClassBillingMode,
+  LedgerTuitionTerms,
   BillingSubscriptionLine,
   ClassPlanKind,
   ClassPlanOption,
@@ -32,6 +34,7 @@ import type {
   SchoolYearEntity,
   SemesterEntity,
 } from '@inithium/db';
+import { LEDGER_PAYMENT_PROVIDER } from '../orders/payment-collection';
 import type { PurchasableContext, PurchasableLineRef, PurchasableSource, ResolvedPurchasable } from './purchasable.contract';
 
 export const CLASS_SOURCE_TYPE = 'class';
@@ -114,6 +117,26 @@ const planLabel = (option: ClassPlanOption): string => {
   return 'Full year (paid in full)';
 };
 
+// What a pay-in-person monthly line charges each month, frozen at registration so a later price
+// change or an expired promo code doesn't alter it.
+const ledgerTermsFor = (orderLine: OrderLine, order: OrderEntity): LedgerTuitionTerms => {
+  const billing = orderLine.billing;
+  const monthlyAmountCents = billing.type === 'recurring' ? billing.recurringUnitAmountCents * orderLine.quantity : orderLine.unitAmountCents;
+  const discountCents = billing.type === 'recurring' ? billing.recurringDiscountCents : 0;
+  const repeating = order.discount?.duration === 'repeating' ? order.discount.durationInMonths : undefined;
+  return {
+    firstMonthCents: orderLine.totalCents,
+    monthlyAmountCents,
+    discountCents,
+    ...(discountCents > 0 && repeating !== undefined ? { discountMonths: repeating } : {}),
+  };
+};
+
+const billingModeFor = (plan: ClassPlanKind, order: OrderEntity): ClassBillingMode => {
+  if (plan !== 'monthly') return 'prepaid';
+  return order.payment.provider === LEDGER_PAYMENT_PROVIDER ? 'ledger' : 'subscription';
+};
+
 const loadUserName = async (userId: string): Promise<string> => {
   const user = await getUserRepository().findById(userId);
   return [user?.firstName, user?.lastName].filter(Boolean).join(' ');
@@ -181,10 +204,11 @@ const classPurchasable: PurchasableSource = {
       return { ok: false, reason: `${attendee.attendee.name} is already registered for this class.` };
     }
 
-    // Another line in the cart for the same dancer and section covering the same classes (e.g.
-    // monthly and a semester plan) - an identical line merges instead, so it never lands here.
-    const cart = await getCartRepository().findByUserId(ctx.userId);
-    const conflicting = (cart?.lines ?? []).some((cartLine) => {
+    // Another line in the cart (or the staff order being priced) for the same dancer and section
+    // covering the same classes (e.g. monthly and a semester plan) - an identical cart line merges
+    // instead, so it never lands here.
+    const otherLines = ctx.lines ?? (await getCartRepository().findByUserId(ctx.userId))?.lines ?? [];
+    const conflicting = otherLines.some((cartLine) => {
       if (cartLine.sourceType !== CLASS_SOURCE_TYPE || cartLine.sourceId !== ref.sourceId) return false;
       const other = parseClassLine(cartLine.sourceId, cartLine.options);
       if (!other || !sameAttendee(other.attendee, line.attendee)) return false;
@@ -229,8 +253,9 @@ const classPurchasable: PurchasableSource = {
     const coverage = resolvePlanCoverage(line.plan, line.semesterId, section.daysOfWeek, semesters, paidAt);
     if (!coverage) throw new Error('The class has no remaining dates to register for');
 
+    const billingMode = billingModeFor(line.plan, order);
     const subscriptionLine =
-      line.plan === 'monthly'
+      billingMode === 'subscription'
         ? (await getBillingSubscriptionRepository().findLiveByUserAndSource(order.userId, CLASS_SOURCE_TYPE, section.id))
             .flatMap((subscription) => subscription.lines.map((subLine) => ({ subscription, subLine })))
             .find(({ subLine }) => subLine.orderLineId === orderLine.id)
@@ -243,6 +268,8 @@ const classPurchasable: PurchasableSource = {
       courseId: course.id,
       schoolYearId: schoolYear.id,
       plan: line.plan,
+      billingMode,
+      ...(billingMode === 'ledger' ? { ledgerTerms: ledgerTermsFor(orderLine, order) } : {}),
       ...(line.semesterId ? { semesterId: line.semesterId } : {}),
       startsAt: coverage.startsAt,
       endsAt: coverage.endsAt,

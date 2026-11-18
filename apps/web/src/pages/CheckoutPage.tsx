@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { alert, Box, Button, Checkbox, Divider, Loader, RadioGroup, RadioGroupItem, Text, useNavigateWithTransition } from '@inithium/ui';
+import { alert, Box, Button, Checkbox, Divider, Loader, PaymentFields, RadioGroup, RadioGroupItem, Text, useNavigateWithTransition } from '@inithium/ui';
+import type { PaymentFieldsHandle } from '@inithium/ui';
 import {
   describeRenewal,
   formatMoney,
@@ -20,8 +21,6 @@ import type { CheckoutDetailsInput, CheckoutQuoteDto, PostalAddressInput, Shippi
 import { useCurrentUser } from '../app/useCurrentUser';
 import { AddressFields, emptyAddress, isAddressComplete, toAddressPayload, validateAddress } from './ecommerce/AddressFields';
 import type { AddressErrors } from './ecommerce/AddressFields';
-import { PaymentFields } from './ecommerce/payment/PaymentFields';
-import type { PaymentFieldsHandle } from './ecommerce/payment/payment-fields.contract';
 import { PolicyConsentStep, validatePolicyConsent } from './ecommerce/PolicyConsentStep';
 import { PriceSummary } from './ecommerce/PriceSummary';
 import { SignInPrompt } from './ecommerce/SignInPrompt';

@@ -31,6 +31,7 @@ export {
   quoteCheckout,
   placeOrder,
   confirmOrderPayment,
+  confirmStaffOrderPayment,
   setOrderStatusByAdmin,
   ADMIN_ORDER_STATUSES,
 } from './checkout/checkout.service';
@@ -41,6 +42,8 @@ export {
   POLICY_CONSENT_REQUIRED,
   POLICY_VERSION_CHANGED,
   getPolicyConsentStatus,
+  getPolicyConsentStatusForLines,
+  recordDeskPolicyConsent,
   signPolicyConsent,
   assertPolicyConsent,
   listPolicyConsentsForUser,
@@ -53,10 +56,24 @@ export type {
   PolicyConsentSummary,
   SignPolicyConsentInput,
   RecordPaperConsentInput,
+  DeskPolicyConsentInput,
 } from './policy-consent/policy-consent.service';
 
-export { createManualOrder, quoteManualOrder, MANUAL_PAYMENT_PROVIDER } from './orders/manual-order.service';
-export type { ManualOrderInput, ManualOrderLineInput } from './orders/manual-order.service';
+export { createManualOrder, quoteManualOrder, createDeskOrder, quoteDeskOrder, MANUAL_PAYMENT_PROVIDER } from './orders/manual-order.service';
+export type {
+  ManualOrderInput,
+  ManualOrderLineInput,
+  DeskConsentInput,
+  DeskOrderInput,
+  DeskPayment,
+  DeskPaymentMethod,
+  DeskPaymentRecord,
+  DeskQuote,
+  DeskQuoteInput,
+} from './orders/manual-order.service';
+export { LEDGER_PAYMENT_PROVIDER } from './orders/payment-collection';
+export { accrueLedgerTuition } from './ledger/tuition-accrual';
+export { withdrawClassRegistrationByStaff } from './registrations/staff-withdrawal';
 export { getSalesReport, SALES_PERIODS } from './orders/sales-report';
 export type { SalesPeriod, SalesReport } from './orders/sales-report';
 export { buildOrdersCsv } from './orders/orders-csv';

@@ -4,7 +4,8 @@ import { baseApi } from '../baseApi';
 export const POLICY_CONSENT_REQUIRED = 'POLICY_CONSENT_REQUIRED';
 export const POLICY_VERSION_CHANGED = 'POLICY_VERSION_CHANGED';
 
-export type PolicyConsentMethod = 'online' | 'paper';
+// desk - typed by the family on a staff member's screen at the front desk
+export type PolicyConsentMethod = 'online' | 'paper' | 'desk';
 
 export interface PolicySnapshotCategoryDto {
   title: string;

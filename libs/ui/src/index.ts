@@ -312,3 +312,5 @@ export type {
 // inithium:block:storage:composite-types:end
   // inithium:anchor:composite-types
 } from './composites';
+export { PaymentFields } from './payments/PaymentFields';
+export type { PaymentBillingAddress, PaymentBillingDetails, PaymentFieldsHandle, PaymentFieldsProps } from './payments/payment-fields.contract';

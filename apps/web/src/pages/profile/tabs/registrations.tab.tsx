@@ -227,7 +227,7 @@ const SignedPolicies = () => {
       {consents.map((consent) => (
         <Text key={consent.id} as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
           {`Policies signed${consent.schoolYearName ? ` for ${consent.schoolYearName}` : ''} on ${formatDate(consent.agreedAt)}`}
-          {consent.method === 'paper' ? ' (paper copy)' : ''}
+          {consent.method === 'paper' ? ' (paper copy)' : consent.method === 'desk' ? ' (at the front desk)' : ''}
           {consent.isCurrentVersion ? '' : '. The policies have changed since, so you’ll be asked to sign again at your next registration.'}
         </Text>
       ))}

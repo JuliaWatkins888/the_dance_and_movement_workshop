@@ -78,6 +78,7 @@ export interface UserEntity {
   email: string;
   firstName: string;
   lastName?: string;
+  phone?: string;
   passwordHash: string;
   role: Role;
   // The single distinguished account: bypasses every capability check unconditionally and is
@@ -98,6 +99,7 @@ export interface CreateUserInput {
   email: string;
   firstName: string;
   lastName?: string;
+  phone?: string;
   passwordHash: string;
   role?: Role;
   avatar?: AvatarConfig;
@@ -109,6 +111,7 @@ export interface UpdateUserInput {
   email?: string;
   firstName?: string;
   lastName?: string;
+  phone?: string;
   passwordHash?: string;
   role?: Role;
   // Whole-map replace, matching this repository's existing convention for avatar/profileBanner -
@@ -119,7 +122,7 @@ export interface UpdateUserInput {
   darkMode?: boolean;
 }
 
-export type UserSearchField = 'firstName' | 'lastName' | 'email';
+export type UserSearchField = 'firstName' | 'lastName' | 'email' | 'phone';
 
 export interface FindManyUsersOptions {
   page: number;

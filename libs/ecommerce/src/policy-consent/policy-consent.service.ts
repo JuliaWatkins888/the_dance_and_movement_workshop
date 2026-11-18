@@ -9,6 +9,7 @@ import {
 } from '@inithium/db';
 import type { CartLine, PolicyConsentEntity, PolicyConsentMethod, PolicySnapshotCategory, SchoolYearEntity } from '@inithium/db';
 import { toLineRef } from '../cart/cart-lines';
+import type { PurchasableLineRef } from '../purchasables/purchasable.contract';
 import { findPurchasableSource } from '../purchasables/registry';
 
 export const POLICY_CONSENT_REQUIRED = 'POLICY_CONSENT_REQUIRED';
@@ -54,6 +55,18 @@ export interface RecordPaperConsentInput {
   signedName: string;
   recordedByUserId: string;
   recordedByName: string;
+  orderId?: string;
+}
+
+// A family signing at the front desk while staff register them: typed on the staff member's screen,
+// or a paper copy the family signed that staff attest to.
+export interface DeskPolicyConsentInput {
+  method: 'desk' | 'paper';
+  versionHash: string;
+  signedName: string;
+  recordedByUserId: string;
+  recordedByName: string;
+  orderId: string;
 }
 
 const toConsentYear = (year: SchoolYearEntity | null): ConsentSchoolYear => (year ? { id: year.id, name: year.name } : { id: null });
@@ -79,13 +92,13 @@ const resolveCurrentSchoolYear = (years: SchoolYearEntity[], now: Date): SchoolY
   return [...candidates].sort((a, b) => a.start - b.start)[0]?.year ?? null;
 };
 
-const resolveRegistrationYears = async (lines: CartLine[], years: SchoolYearEntity[], now: Date): Promise<ConsentSchoolYear[]> => {
+const resolveRegistrationYears = async (lines: PurchasableLineRef[], years: SchoolYearEntity[], now: Date): Promise<ConsentSchoolYear[]> => {
   const current = resolveCurrentSchoolYear(years, now);
   const resolved = await Promise.all(
     lines.map(async (line): Promise<ConsentSchoolYear[]> => {
       const source = findPurchasableSource(line.sourceType);
       if (!source?.requiresPolicyConsent) return [];
-      const yearId = source.policySchoolYearId ? await source.policySchoolYearId(toLineRef(line)) : null;
+      const yearId = source.policySchoolYearId ? await source.policySchoolYearId(line) : null;
       return [toConsentYear(years.find((year) => year.id === yearId) ?? current)];
     }),
   );
@@ -102,7 +115,7 @@ const loadCurrentPolicies = async () => {
   };
 };
 
-const loadConsentState = async (userId: string, lines: CartLine[], now: Date) => {
+const loadConsentState = async (userId: string, lines: PurchasableLineRef[], now: Date) => {
   const [policies, years] = await Promise.all([loadCurrentPolicies(), getSchoolYearRepository().findAll()]);
   const registrationYears = await resolveRegistrationYears(lines, years, now);
   const signedYearIds = await getPolicyConsentRepository().findSignedSchoolYearIds(userId, policies.versionHash);
@@ -110,10 +123,15 @@ const loadConsentState = async (userId: string, lines: CartLine[], now: Date) =>
   return { policies, registrationYears, signedYearIds, outstanding, currentYear: toConsentYear(resolveCurrentSchoolYear(years, now)) };
 };
 
-const loadCartLines = async (userId: string): Promise<CartLine[]> => (await getCartRepository().findByUserId(userId))?.lines ?? [];
+const loadCartLines = async (userId: string): Promise<PurchasableLineRef[]> =>
+  ((await getCartRepository().findByUserId(userId))?.lines ?? []).map(toLineRef);
 
-export const getPolicyConsentStatus = async (userId: string): Promise<PolicyConsentStatus> => {
-  const { policies, registrationYears, outstanding, currentYear } = await loadConsentState(userId, await loadCartLines(userId), new Date());
+export const getPolicyConsentStatus = async (userId: string): Promise<PolicyConsentStatus> =>
+  getPolicyConsentStatusForLines(userId, await loadCartLines(userId));
+
+// The same status for lines that aren't in the account's cart, e.g. a desk registration.
+export const getPolicyConsentStatusForLines = async (userId: string, lines: PurchasableLineRef[]): Promise<PolicyConsentStatus> => {
+  const { policies, registrationYears, outstanding, currentYear } = await loadConsentState(userId, lines, new Date());
   const year = outstanding[0] ?? registrationYears[0] ?? currentYear;
   const required = outstanding.length > 0;
   return {
@@ -158,8 +176,8 @@ export const signPolicyConsent = async (userId: string, input: SignPolicyConsent
   );
 };
 
-export const assertPolicyConsent = async (userId: string, lines: CartLine[]): Promise<void> => {
-  const { outstanding } = await loadConsentState(userId, lines, new Date());
+export const assertPolicyConsent = async (userId: string, lines: Array<CartLine | PurchasableLineRef>): Promise<void> => {
+  const { outstanding } = await loadConsentState(userId, lines.map(toLineRef), new Date());
   if (outstanding.length > 0) {
     throw new AppError(403, POLICY_CONSENT_REQUIRED, 'Please read and sign the studio policies before registering.', {
       outstandingSchoolYears: outstanding,
@@ -202,5 +220,39 @@ export const recordPaperPolicyConsent = async (userId: string, input: RecordPape
     method: 'paper',
     recordedByUserId: input.recordedByUserId,
     recordedByName: input.recordedByName,
+    ...(input.orderId ? { orderId: input.orderId } : {}),
   });
+};
+
+// Signs every school year the lines still need, tied to the desk order that needed it. Returns
+// only the records it created, so nothing is written when every year is already signed.
+export const recordDeskPolicyConsent = async (
+  userId: string,
+  lines: PurchasableLineRef[],
+  input: DeskPolicyConsentInput,
+): Promise<PolicyConsentEntity[]> => {
+  const { policies, outstanding } = await loadConsentState(userId, lines, new Date());
+  if (outstanding.length === 0) return [];
+  if (input.versionHash !== policies.versionHash) {
+    throw new AppError(409, POLICY_VERSION_CHANGED, 'The studio policies were just updated. Please review them and sign again.');
+  }
+  const repository = getPolicyConsentRepository();
+  const agreedAt = new Date();
+  return Promise.all(
+    outstanding.map((year) =>
+      repository.create({
+        userId,
+        schoolYearId: year.id,
+        ...(year.name ? { schoolYearName: year.name } : {}),
+        policyVersionHash: policies.versionHash,
+        policySnapshot: policies.snapshot,
+        signedName: input.signedName,
+        agreedAt,
+        method: input.method,
+        recordedByUserId: input.recordedByUserId,
+        recordedByName: input.recordedByName,
+        orderId: input.orderId,
+      }),
+    ),
+  );
 };

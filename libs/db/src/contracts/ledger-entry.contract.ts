@@ -43,6 +43,10 @@ export interface LedgerEntryEntity {
   source: LedgerEntrySource;
   orderId?: string;
   subscriptionId?: string;
+  // Monthly tuition on a pay-in-person class registration. Together they're unique, so a month
+  // is only ever charged once however many times accrual runs.
+  registrationId?: string;
+  billingMonth?: string; // yyyy-mm
   createdByUserId?: string;
   voidedAt?: Date;
   voidedByUserId?: string;
@@ -73,6 +77,10 @@ export interface LedgerUserBalance {
 // Deliberately has no update or delete: the ledger is an audit trail, so a mistake is voided.
 export interface LedgerEntryRepository {
   create: (input: CreateLedgerEntryInput) => Promise<LedgerEntryEntity>;
+  // The yyyy-mm months already charged (voided or not) for one registration's tuition.
+  findBilledMonths: (registrationId: string) => Promise<string[]>;
+  // Null when an entry with the same registrationId + billingMonth already exists.
+  createTuitionCharge: (input: CreateLedgerEntryInput & { registrationId: string; billingMonth: string }) => Promise<LedgerEntryEntity | null>;
   findById: (id: string) => Promise<LedgerEntryEntity | null>;
   // Newest first.
   findByUserId: (userId: string, paging: { page: number; pageSize: number }) => Promise<PaginatedResult<LedgerEntryEntity>>;
