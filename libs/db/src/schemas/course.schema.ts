@@ -13,6 +13,7 @@ export interface CourseDocument extends Document {
   minAgeYears?: number;
   maxAgeYears?: number;
   monthlyPriceCents: number;
+  dropInPriceCents?: number;
   order: number;
   isPublished: boolean;
   createdAt: Date;
@@ -31,6 +32,7 @@ const courseSchema = new Schema<CourseDocument>(
     minAgeYears: { type: Number, required: false },
     maxAgeYears: { type: Number, required: false },
     monthlyPriceCents: { type: Number, required: true },
+    dropInPriceCents: { type: Number, required: false },
     order: { type: Number, required: true, default: 0 },
     isPublished: { type: Boolean, required: true, default: true },
   },

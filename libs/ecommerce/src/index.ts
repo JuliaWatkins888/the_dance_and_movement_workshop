@@ -9,6 +9,9 @@ export type {
 export { purchasableSources, findPurchasableSource } from './purchasables/registry';
 export { PRODUCT_SOURCE_TYPE } from './purchasables/product.purchasable';
 export { CLASS_SOURCE_TYPE } from './purchasables/class.purchasable';
+export { DROP_IN_SOURCE_TYPE } from './purchasables/drop-in.purchasable';
+export { loadSectionContext } from './purchasables/class-section-context';
+export type { SectionContext } from './purchasables/class-section-context';
 export { WORKSHOP_SOURCE_TYPE } from './purchasables/workshop.purchasable';
 export { EVENT_SOURCE_TYPE } from './purchasables/event.purchasable';
 export { LEDGER_BALANCE_SOURCE_TYPE } from './purchasables/ledger-balance.purchasable';
@@ -74,6 +77,7 @@ export type {
 export { LEDGER_PAYMENT_PROVIDER } from './orders/payment-collection';
 export { accrueLedgerTuition } from './ledger/tuition-accrual';
 export { withdrawClassRegistrationByStaff } from './registrations/staff-withdrawal';
+export { cancelDropInByStaff } from './registrations/drop-in-cancel';
 export { getSalesReport, SALES_PERIODS } from './orders/sales-report';
 export type { SalesPeriod, SalesReport } from './orders/sales-report';
 export { buildOrdersCsv } from './orders/orders-csv';

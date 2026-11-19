@@ -23,6 +23,8 @@ export interface CourseEntity {
   // Admin-set monthly tuition in integer cents; semester/year plan prices derive from it (see
   // utils/class-pricing.ts). Every section of the course shares it.
   monthlyPriceCents: number;
+  // Admin-set price of a single drop-in class in integer cents. Absent = no drop-ins for this course.
+  dropInPriceCents?: number;
   order: number;
   isPublished: boolean;
   createdAt: Date;

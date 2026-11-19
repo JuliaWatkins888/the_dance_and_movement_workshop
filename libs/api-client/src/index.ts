@@ -347,6 +347,16 @@ export type {
   ClassRegistrationStatus,
   ClassLineOptions,
 } from './endpoints/class-registrations.endpoints';
+export {
+  dropInsApi,
+  DROP_IN_SOURCE_TYPE,
+  toDropInLineOptions,
+  useListDropInDatesQuery,
+  useListMyDropInsQuery,
+  useListAccountDropInsQuery,
+  useCancelDropInMutation,
+} from './endpoints/drop-ins.endpoints';
+export type { DropInDateDto, DropInDatesArgs, DropInDatesDto, DropInDto, DropInStatus } from './endpoints/drop-ins.endpoints';
 
 // inithium:block:children:exports:end
 // inithium:block:ecommerce:exports:start

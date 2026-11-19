@@ -103,6 +103,7 @@ export const createCourseSchema = z
     minAgeYears: ageYears.optional(),
     maxAgeYears: ageYears.optional(),
     monthlyPriceCents: z.number().int().min(0, 'Price must be zero or greater'),
+    dropInPriceCents: z.number().int().min(0, 'Price must be zero or greater').optional(),
     order: z.number().int().optional(),
     isPublished: z.boolean().optional(),
   })
@@ -120,6 +121,7 @@ export const updateCourseSchema = z
     minAgeYears: ageYears.nullable().optional(),
     maxAgeYears: ageYears.nullable().optional(),
     monthlyPriceCents: z.number().int().min(0, 'Price must be zero or greater').optional(),
+    dropInPriceCents: z.number().int().min(0, 'Price must be zero or greater').nullable().optional(),
     order: z.number().int().optional(),
     isPublished: z.boolean().optional(),
   })

@@ -68,6 +68,9 @@ import { SchoolYearModel } from '../../schemas/school-year.schema';
 import { ClassRegistrationRepository } from '../../contracts/class-registration.contract';
 import { createMongoClassRegistrationRepository } from './class-registration.repository';
 import { ClassRegistrationModel } from '../../schemas/class-registration.schema';
+import { DropInRegistrationRepository } from '../../contracts/drop-in-registration.contract';
+import { createMongoDropInRegistrationRepository } from './drop-in-registration.repository';
+import { DropInRegistrationModel, DropInSeatModel } from '../../schemas/drop-in-registration.schema';
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import { ChildRepository } from '../../contracts/child.contract';
@@ -156,6 +159,7 @@ const courseRepository = createMongoCourseRepository(CourseModel);
 const classSectionRepository = createMongoClassSectionRepository(ClassSectionModel);
 const schoolYearRepository = createMongoSchoolYearRepository(SchoolYearModel);
 const classRegistrationRepository = createMongoClassRegistrationRepository(ClassRegistrationModel);
+const dropInRegistrationRepository = createMongoDropInRegistrationRepository(DropInRegistrationModel, DropInSeatModel);
 // inithium:block:classes:repository-instances:end
 // inithium:block:children:repository-instances:start
 const childRepository = createMongoChildRepository(ChildModel);
@@ -230,6 +234,7 @@ export const mongoProvider: DbProvider = {
   getClassSectionRepository: (): ClassSectionRepository => classSectionRepository,
   getSchoolYearRepository: (): SchoolYearRepository => schoolYearRepository,
   getClassRegistrationRepository: (): ClassRegistrationRepository => classRegistrationRepository,
+  getDropInRegistrationRepository: (): DropInRegistrationRepository => dropInRegistrationRepository,
 // inithium:block:classes:members:end
 // inithium:block:children:members:start
   getChildRepository: (): ChildRepository => childRepository,

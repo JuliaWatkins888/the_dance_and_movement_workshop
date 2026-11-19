@@ -5,9 +5,7 @@ import {
   getClassRegistrationRepository,
   getClassSectionRepository,
   getCourseRepository,
-  getProgramRepository,
   getSchoolYearRepository,
-  getUserRepository,
   releaseExpiredClassSeats,
   resolveClassPlanOptions,
   resolveEligibleAttendee,
@@ -25,16 +23,13 @@ import type {
   BillingSubscriptionLine,
   ClassPlanKind,
   ClassPlanOption,
-  ClassSectionEntity,
-  CourseEntity,
   LineOptions,
   OrderEntity,
   OrderLine,
-  ProgramEntity,
-  SchoolYearEntity,
-  SemesterEntity,
 } from '@inithium/db';
 import { LEDGER_PAYMENT_PROVIDER } from '../orders/payment-collection';
+import { loadSectionContext, loadUserName, parseAttendee, sameAttendee, sectionLabel } from './class-section-context';
+import type { SectionContext } from './class-section-context';
 import type { PurchasableContext, PurchasableLineRef, PurchasableSource, ResolvedPurchasable } from './purchasable.contract';
 
 export const CLASS_SOURCE_TYPE = 'class';
@@ -55,39 +50,9 @@ const parseClassLine = (sectionId: string, options: LineOptions): ClassLine | nu
   if (!plan || !CLASS_PLANS.includes(plan)) return null;
   const semesterId = options['semesterId'];
   if (plan === 'semester' && !semesterId) return null;
-  const attendee: AttendeeRef | null =
-    options['attendee'] === 'self'
-      ? { type: 'self' }
-      : options['attendee'] === 'child' && options['childId']
-        ? { type: 'child', childId: options['childId'] }
-        : null;
+  const attendee = parseAttendee(options);
   if (!attendee) return null;
   return { sectionId, attendee, plan, ...(plan === 'semester' && semesterId ? { semesterId } : {}) };
-};
-
-const sameAttendee = (a: AttendeeRef, b: AttendeeRef): boolean =>
-  a.type === 'self' ? b.type === 'self' : b.type === 'child' && a.childId === b.childId;
-
-interface SectionContext {
-  section: ClassSectionEntity;
-  course: CourseEntity;
-  program: ProgramEntity;
-  schoolYear: SchoolYearEntity;
-  semesters: SemesterEntity[];
-}
-
-// Everything published that a line depends on, or null when any of it is gone or hidden.
-const loadSectionContext = async (sectionId: string): Promise<SectionContext | null> => {
-  const section = await getClassSectionRepository().findById(sectionId);
-  if (!section?.isPublished) return null;
-  const [course, schoolYear] = await Promise.all([
-    getCourseRepository().findById(section.courseId),
-    getSchoolYearRepository().findById(section.schoolYearId),
-  ]);
-  if (!course?.isPublished || !schoolYear?.isPublished) return null;
-  const program = await getProgramRepository().findById(course.programId);
-  if (!program?.isPublished) return null;
-  return { section, course, program, schoolYear, semesters: resolveSectionSemesters(section.semesterIds, schoolYear.semesters) };
 };
 
 // The plan exactly as still offered today - null once its period has ended (registration closed).
@@ -101,15 +66,6 @@ const findPlanOption = (ctx: SectionContext, line: ClassLine, now: Date): ClassP
 
 const coverageOf = (ctx: SectionContext, line: ClassLine, now: Date) =>
   resolvePlanCoverage(line.plan, line.semesterId, ctx.section.daysOfWeek, ctx.semesters, now);
-
-const formatTime = (time: string): string => {
-  const [hoursRaw, minutes] = time.split(':');
-  const hours = Number(hoursRaw);
-  return `${hours % 12 === 0 ? 12 : hours % 12}:${minutes} ${hours >= 12 ? 'PM' : 'AM'}`;
-};
-
-const sectionLabel = (section: ClassSectionEntity): string =>
-  `${section.daysOfWeek.map((day) => day.slice(0, 3)).join(' & ')} ${formatTime(section.startTime)}`;
 
 const planLabel = (option: ClassPlanOption): string => {
   if (option.kind === 'monthly') return 'Monthly';
@@ -135,11 +91,6 @@ const ledgerTermsFor = (orderLine: OrderLine, order: OrderEntity): LedgerTuition
 const billingModeFor = (plan: ClassPlanKind, order: OrderEntity): ClassBillingMode => {
   if (plan !== 'monthly') return 'prepaid';
   return order.payment.provider === LEDGER_PAYMENT_PROVIDER ? 'ledger' : 'subscription';
-};
-
-const loadUserName = async (userId: string): Promise<string> => {
-  const user = await getUserRepository().findById(userId);
-  return [user?.firstName, user?.lastName].filter(Boolean).join(' ');
 };
 
 const classPurchasable: PurchasableSource = {

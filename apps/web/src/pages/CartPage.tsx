@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { alert, Box, Button, dialog, Divider, IconButton, Input, Loader, Text, useNavigateWithTransition } from '@inithium/ui';
 import {
   CLASS_SOURCE_TYPE,
+  DROP_IN_SOURCE_TYPE,
   WORKSHOP_SOURCE_TYPE,
   EVENT_SOURCE_TYPE,
   describeRenewal,
@@ -25,7 +26,7 @@ import { useContinueShoppingPath } from './ecommerce/continueShopping';
 const ALERT_POSITION = 'bottom-right' as const;
 const MAX_QUANTITY = 99;
 // Lines whose source writes a useful subtitle (who's registered, which days, which date).
-const DESCRIBED_SOURCE_TYPES = [CLASS_SOURCE_TYPE, WORKSHOP_SOURCE_TYPE, EVENT_SOURCE_TYPE];
+const DESCRIBED_SOURCE_TYPES = [CLASS_SOURCE_TYPE, DROP_IN_SOURCE_TYPE, WORKSHOP_SOURCE_TYPE, EVENT_SOURCE_TYPE];
 
 interface CartLineRowProps {
   readonly line: CartLineDto;

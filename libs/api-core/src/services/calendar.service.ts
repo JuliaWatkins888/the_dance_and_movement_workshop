@@ -1,21 +1,22 @@
 import {
-  DAYS_OF_WEEK,
+  addDaysToKey,
+  dateKeyToUtc,
   listCalendarEntriesOverlapping,
   listClassSections,
   listCourses,
   listEvents,
-  listFederalHolidaysBetween,
-  listHolidayOpenings,
   listPrograms,
   listSchoolYears,
   listWorkshops,
+  resolveHolidays,
   resolveSectionSemesters,
+  sectionSessionDateKeys,
+  studioClosedDateKeys,
+  toDateKey,
 } from '@inithium/db';
-import type { CalendarEntryEntity, ClassSectionEntity, CourseEntity, EventEntity, FederalHoliday, WorkshopEntity } from '@inithium/db';
+import type { CalendarEntryEntity, ClassSectionEntity, CourseEntity, EventEntity, ResolvedHoliday, WorkshopEntity } from '@inithium/db';
 import { loadInstructorDirectory } from './class-catalog.service';
 import type { InstructorDirectory } from './class-catalog.service';
-
-const DAY_MS = 86_400_000;
 
 export type CalendarItemKind = 'class' | 'workshop' | 'event' | 'holiday' | 'entry';
 
@@ -54,44 +55,7 @@ export interface CalendarRange {
   to: string;
 }
 
-// ---- Date keys -------------------------------------------------------------------------------
-
-const toUtcDate = (dateKey: string): Date => new Date(`${dateKey}T00:00:00.000Z`);
-
-export const toDateKey = (date: Date): string => date.toISOString().slice(0, 10);
-
-const addDays = (dateKey: string, days: number): string => toDateKey(new Date(toUtcDate(dateKey).getTime() + days * DAY_MS));
-
-export const countDays = (fromKey: string, toKey: string): number => Math.round((toUtcDate(toKey).getTime() - toUtcDate(fromKey).getTime()) / DAY_MS);
-
-// Every date key with fromKey <= key <= toKey.
-const eachDateKey = (fromKey: string, toKey: string): string[] =>
-  fromKey > toKey ? [] : Array.from({ length: countDays(fromKey, toKey) + 1 }, (_, offset) => addDays(fromKey, offset));
-
-const maxKey = (a: string, b: string): string => (a > b ? a : b);
-const minKey = (a: string, b: string): string => (a < b ? a : b);
-
-const dayOfWeekOf = (dateKey: string) => DAYS_OF_WEEK[(toUtcDate(dateKey).getUTCDay() + 6) % 7];
-
 // ---- Holidays & closures ---------------------------------------------------------------------
-
-export interface ResolvedHoliday extends FederalHoliday {
-  isStudioClosed: boolean;
-}
-
-export const resolveHolidays = async (fromKey: string, lastKey: string): Promise<ResolvedHoliday[]> => {
-  const openings = await listHolidayOpenings(toUtcDate(fromKey), toUtcDate(lastKey));
-  const openDates = new Set(openings.map((opening) => toDateKey(opening.date)));
-  return listFederalHolidaysBetween(fromKey, lastKey).map((holiday) => ({ ...holiday, isStudioClosed: !openDates.has(holiday.date) }));
-};
-
-const closedDateKeys = (holidays: ResolvedHoliday[], entries: CalendarEntryEntity[], fromKey: string, lastKey: string): Set<string> =>
-  new Set([
-    ...holidays.filter((holiday) => holiday.isStudioClosed).map((holiday) => holiday.date),
-    ...entries
-      .filter((entry) => entry.isStudioClosed)
-      .flatMap((entry) => eachDateKey(maxKey(toDateKey(entry.startDate), fromKey), minKey(toDateKey(entry.endDate), lastKey))),
-  ]);
 
 const toHolidayItem = (holiday: ResolvedHoliday): CalendarItemDto => ({
   id: `holiday:${holiday.date}`,
@@ -99,7 +63,7 @@ const toHolidayItem = (holiday: ResolvedHoliday): CalendarItemDto => ({
   category: 'closures',
   title: holiday.name,
   start: holiday.date,
-  end: addDays(holiday.date, 1),
+  end: addDaysToKey(holiday.date, 1),
   allDay: true,
   isStudioClosed: holiday.isStudioClosed,
 });
@@ -114,7 +78,7 @@ const toEntryItem = (entry: CalendarEntryEntity): CalendarItemDto => {
     category: entry.isStudioClosed ? 'closures' : 'other',
     title: entry.title,
     start: isTimed ? `${startKey}T${entry.startTime}` : startKey,
-    end: isTimed ? `${endKey}T${entry.endTime}` : addDays(endKey, 1),
+    end: isTimed ? `${endKey}T${entry.endTime}` : addDaysToKey(endKey, 1),
     allDay: !isTimed,
     isStudioClosed: entry.isStudioClosed,
     ...(entry.description ? { description: entry.description } : {}),
@@ -159,9 +123,7 @@ const loadClassItems = async (fromKey: string, lastKey: string, closedDates: Set
     if (!section.isPublished || !course || !schoolYear) return [];
     const subtitle = formatInstructorNames(section.instructorStaffIds, directory);
 
-    return resolveSectionSemesters(section.semesterIds, schoolYear.semesters)
-      .flatMap((semester) => eachDateKey(maxKey(toDateKey(semester.startDate), fromKey), minKey(toDateKey(semester.endDate), lastKey)))
-      .filter((dateKey) => section.daysOfWeek.includes(dayOfWeekOf(dateKey)) && !closedDates.has(dateKey))
+    return sectionSessionDateKeys(section.daysOfWeek, resolveSectionSemesters(section.semesterIds, schoolYear.semesters), fromKey, lastKey, closedDates)
       .map((dateKey) => ({
         id: `class:${section.id}:${dateKey}`,
         kind: 'class' as const,
@@ -221,14 +183,14 @@ const toEventItem = (event: EventEntity): CalendarItemDto => {
 // workshop days, and events. Closures only ever remove class sessions - a workshop or event the
 // admin scheduled on a closed date still runs.
 export const buildPublicCalendar = async ({ from, to }: CalendarRange): Promise<CalendarItemDto[]> => {
-  const lastKey = addDays(to, -1);
+  const lastKey = addDaysToKey(to, -1);
   const [holidays, entries, workshops, events] = await Promise.all([
     resolveHolidays(from, lastKey),
-    listCalendarEntriesOverlapping(toUtcDate(from), toUtcDate(lastKey)).then((all) => all.filter((entry) => entry.isPublished)),
+    listCalendarEntriesOverlapping(dateKeyToUtc(from), dateKeyToUtc(lastKey)).then((all) => all.filter((entry) => entry.isPublished)),
     listWorkshops(),
     listEvents(),
   ]);
-  const classItems = await loadClassItems(from, lastKey, closedDateKeys(holidays, entries, from, lastKey));
+  const classItems = await loadClassItems(from, lastKey, studioClosedDateKeys(holidays, entries, from, lastKey));
 
   return [
     ...holidays.map(toHolidayItem),

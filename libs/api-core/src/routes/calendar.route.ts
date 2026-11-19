@@ -6,12 +6,14 @@ import { requireAuth } from '@inithium/auth';
 import { requirePermission } from '@inithium/permissions';
 import {
   closeStudioOnHoliday,
+  countDaysBetweenKeys as countDays,
   createCalendarEntry,
   deleteCalendarEntry,
   findFederalHoliday,
   getCalendarEntryById,
   listCalendarEntries,
   openStudioOnHoliday,
+  resolveHolidays,
   updateCalendarEntry,
 } from '@inithium/db';
 import type { CreateCalendarEntryInput } from '@inithium/db';
@@ -24,7 +26,7 @@ import {
   holidayYearQuerySchema,
 } from '../schemas/calendar.schema';
 import type { CalendarEntryWriteBody } from '../schemas/calendar.schema';
-import { buildPublicCalendar, countDays, resolveHolidays } from '../services/calendar.service';
+import { buildPublicCalendar } from '../services/calendar.service';
 
 const router: RouterType = Router();
 

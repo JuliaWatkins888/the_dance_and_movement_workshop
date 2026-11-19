@@ -31,6 +31,7 @@ import policyConsentRouter from './routes/policy-consent.route';
 // inithium:block:classes:imports:start
 import classesRouter from './routes/classes.route';
 import classRegistrationsRouter from './routes/class-registrations.route';
+import dropInsRouter from './routes/drop-ins.route';
 // inithium:block:workshops:imports:start
 import workshopsRouter from './routes/workshops.route';
 import workshopRegistrationsRouter from './routes/workshop-registrations.route';
@@ -95,6 +96,7 @@ export const registerCoreRoutes = (app: Express): void => {
 // inithium:block:classes:routes:start
   app.use(classesRouter);
   app.use(classRegistrationsRouter);
+  app.use(dropInsRouter);
 // inithium:block:classes:routes:end
 // inithium:block:workshops:routes:start
   app.use(workshopsRouter);

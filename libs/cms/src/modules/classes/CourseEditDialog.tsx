@@ -13,6 +13,8 @@ import { FormError, MoneyInput, TagInput, useStoreCurrency } from '../ecommerce/
 import { parseOptionalNumber, slugify } from './classAdmin.shared';
 
 const NO_LEVEL = 'none';
+// New courses start with the studio's usual drop-in price.
+const DEFAULT_DROP_IN_PRICE_CENTS = 2200;
 const LEVEL_OPTIONS: { value: CourseLevel; label: string }[] = [
   { value: 'beginner', label: 'Beginner (0–3 years experience)' },
   { value: 'intermediate', label: 'Intermediate (4+ years experience)' },
@@ -46,6 +48,9 @@ export const CourseEditDialog = ({ programs, course, defaultProgramId, knownStyl
   const [minAge, setMinAge] = useState(course?.minAgeYears !== undefined ? String(course.minAgeYears) : '');
   const [maxAge, setMaxAge] = useState(course?.maxAgeYears !== undefined ? String(course.maxAgeYears) : '');
   const [price, setPrice] = useState(formatMinorUnitsForInput(course?.monthlyPriceCents, currency));
+  const [dropInPrice, setDropInPrice] = useState(
+    course ? (course.dropInPriceCents !== undefined ? formatMinorUnitsForInput(course.dropInPriceCents, currency) : '') : formatMinorUnitsForInput(DEFAULT_DROP_IN_PRICE_CENTS, currency),
+  );
   const [isPublished, setIsPublished] = useState(course?.isPublished ?? true);
 
   const handleNameChange = (value: string) => {
@@ -58,10 +63,13 @@ export const CourseEditDialog = ({ programs, course, defaultProgramId, knownStyl
     const minAgeYears = parseOptionalNumber(minAge);
     const maxAgeYears = parseOptionalNumber(maxAge);
     const monthlyPriceCents = parseMinorUnitsInput(price, currency);
+    // Blank turns drop-ins off for this course.
+    const dropInPriceCents = dropInPrice.trim() ? parseMinorUnitsInput(dropInPrice, currency) : undefined;
     if (!programId) return setError('Choose a program.');
     if (!name.trim()) return setError('Name is required.');
     if (!slug.trim()) return setError('URL slug is required.');
     if (monthlyPriceCents === null) return setError('Enter a valid monthly price.');
+    if (dropInPriceCents === null) return setError('Enter a valid drop-in price, or leave it blank for no drop-ins.');
     if (minAgeYears === 'invalid' || maxAgeYears === 'invalid') return setError('Ages must be zero or greater.');
     if (minAgeYears !== undefined && maxAgeYears !== undefined && maxAgeYears < minAgeYears) {
       return setError('Max age must be greater than or equal to min age.');
@@ -82,6 +90,7 @@ export const CourseEditDialog = ({ programs, course, defaultProgramId, knownStyl
           minAgeYears: minAgeYears ?? null,
           maxAgeYears: maxAgeYears ?? null,
           monthlyPriceCents,
+          dropInPriceCents: dropInPriceCents ?? null,
           isPublished,
         }).unwrap();
       } else {
@@ -96,6 +105,7 @@ export const CourseEditDialog = ({ programs, course, defaultProgramId, knownStyl
           ...(minAgeYears !== undefined ? { minAgeYears } : {}),
           ...(maxAgeYears !== undefined ? { maxAgeYears } : {}),
           monthlyPriceCents,
+          ...(dropInPriceCents !== undefined ? { dropInPriceCents } : {}),
           isPublished,
         }).unwrap();
       }
@@ -158,6 +168,15 @@ export const CourseEditDialog = ({ programs, course, defaultProgramId, knownStyl
         value={price}
         onChange={setPrice}
         helperText="Semester (5% off) and full-year (10% off) prices are calculated from this."
+      />
+
+      <MoneyInput
+        label="Drop-in Price"
+        currency={currency}
+        value={dropInPrice}
+        onChange={setDropInPrice}
+        placeholder="No drop-ins"
+        helperText="Price of a single class on a date the family picks. Leave blank to not offer drop-ins for this course."
       />
 
       <Switch label="Published (visible on the public Classes page)" checked={isPublished} onCheckedChange={setIsPublished} />
