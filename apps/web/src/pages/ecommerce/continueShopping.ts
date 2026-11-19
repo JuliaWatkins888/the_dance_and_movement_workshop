@@ -1,10 +1,11 @@
-import { CLASS_SOURCE_TYPE, EVENT_SOURCE_TYPE, WORKSHOP_SOURCE_TYPE, useGetPageByRouteQuery } from '@inithium/api-client';
+import { CLASS_SOURCE_TYPE, DROP_IN_SOURCE_TYPE, EVENT_SOURCE_TYPE, WORKSHOP_SOURCE_TYPE, useGetPageByRouteQuery } from '@inithium/api-client';
 import { PRODUCT_SOURCE_TYPE } from './productLinks';
 
 // Priority order: classes are the studio's main offering, so they win whenever present and are
 // the first fallback when nothing in the list matches.
 const CATALOGS = [
   { sourceType: CLASS_SOURCE_TYPE, path: '/classes' },
+  { sourceType: DROP_IN_SOURCE_TYPE, path: '/classes' },
   { sourceType: WORKSHOP_SOURCE_TYPE, path: '/workshops' },
   { sourceType: EVENT_SOURCE_TYPE, path: '/events' },
   { sourceType: PRODUCT_SOURCE_TYPE, path: '/merch' },

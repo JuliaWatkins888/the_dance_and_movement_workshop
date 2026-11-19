@@ -209,7 +209,9 @@ export const CatalogTab = () => {
                             {course.name}
                           </Text>
                           <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
-                            {formatMoney(course.monthlyPriceCents, currency)}/mo · {courseSections.length} time slot
+                            {formatMoney(course.monthlyPriceCents, currency)}/mo
+                            {course.dropInPriceCents !== undefined ? ` · ${formatMoney(course.dropInPriceCents, currency)} drop-in` : ''} ·{' '}
+                            {courseSections.length} time slot
                             {courseSections.length === 1 ? '' : 's'}
                           </Text>
                           {!course.isPublished ? <DraftPill /> : null}

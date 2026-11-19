@@ -40,7 +40,13 @@ const parseOptionalInt = (value: string): number | null | 'invalid' => {
   return /^\d+$/.test(value.trim()) && Number(value) > 0 ? Number(value) : 'invalid';
 };
 
-const SOURCE_TYPE_LABELS: Record<string, string> = { product: 'Merch', class: 'Classes', workshop: 'Workshops', event: 'Events' };
+const SOURCE_TYPE_LABELS: Record<string, string> = {
+  product: 'Merch',
+  class: 'Classes',
+  drop_in: 'Drop-ins',
+  workshop: 'Workshops',
+  event: 'Events',
+};
 const labelSourceType = (type: string): string => SOURCE_TYPE_LABELS[type] ?? `${type.charAt(0).toUpperCase()}${type.slice(1)}s`;
 
 // Specific products an items-scoped code targets, picked by name.

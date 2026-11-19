@@ -69,6 +69,7 @@ export const baseApi = createApi({
     'Class',
     'SchoolYear',
     'ClassRegistration',
+    'DropIn',
 // inithium:block:classes:tag-types:end
 // inithium:block:workshops:tag-types:start
     'Workshop',

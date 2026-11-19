@@ -76,3 +76,7 @@ export const courseMatchesAge =(course: CatalogCourseDto, age: number): boolean 
 export const sectionMatchesDay = (section: CatalogSectionDto, day: DayOfWeek): boolean => section.daysOfWeek.includes(day);
 
 export const runsSingleSemester = (section: CatalogSectionDto): boolean => section.semesters.length === 1;
+
+// A "YYYY-MM-DD" class date, e.g. "Tue, Nov 25".
+const classDateFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
+export const formatClassDate = (dateKey: string): string => classDateFormatter.format(new Date(`${dateKey}T00:00:00.000Z`));

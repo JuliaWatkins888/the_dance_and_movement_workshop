@@ -3,8 +3,10 @@ import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { alert, Box, Breadcrumbs, Button, Divider, Loader, Pill, Text, useNavigateWithTransition } from '@inithium/ui';
 import {
   CLASS_SOURCE_TYPE,
+  DROP_IN_SOURCE_TYPE,
   readApiError,
   toClassLineOptions,
+  toDropInLineOptions,
   useAddCartLineMutation,
   useGetClassCourseBySlugQuery,
   useListEligibleAttendeesQuery,
@@ -17,6 +19,7 @@ import {
   LEVEL_LABELS,
   formatAgeRange,
   formatCents,
+  formatClassDate,
   formatDateRange,
   formatDays,
   formatShortDate,
@@ -28,6 +31,7 @@ import {
   planTitle,
   showLockNotices,
 } from './classes/classFormat';
+import { DropInDatePicker } from './classes/DropInDatePicker';
 import { ProgramBanner } from './classes/ProgramBanner';
 import { useRouteSlug } from './classes/useRouteSlug';
 import { AddStudentAction } from './students/AddStudentAction';
@@ -35,6 +39,7 @@ import { AddStudentAction } from './students/AddStudentAction';
 const ALERT_POSITION = 'bottom-right' as const;
 
 const planKey = (plan: ClassPlanOptionDto): string => `${plan.kind}:${plan.semesterId ?? ''}`;
+const DROP_IN_KEY = 'drop-in';
 
 const registrationOpensLater = (section: CatalogSectionDto, now: Date): string | undefined => {
   const opensAt = section.schoolYear.registrationOpensAt;
@@ -77,6 +82,22 @@ const SectionChoice = ({ section }: { section: CatalogSectionDto }) => (
   </>
 );
 
+const DropInChoice = ({ priceCents }: { priceCents: number }) => (
+  <>
+    <span className="flex items-baseline justify-between gap-3">
+      <Text as="span" textColor={{ color: 'surface', intensity: 950 }} className="font-semibold">
+        Drop-in
+      </Text>
+      <Text as="span" textColor={{ color: 'surface', intensity: 950 }} className="font-semibold">
+        {formatCents(priceCents)}/class
+      </Text>
+    </span>
+    <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
+      One class on a date you pick, paid once
+    </Text>
+  </>
+);
+
 const PlanChoice = ({ plan }: { plan: ClassPlanOptionDto }) => (
   <>
     <span className="flex items-baseline justify-between gap-3">
@@ -108,6 +129,7 @@ export const ClassDetailPage = () => {
   const [sectionId, setSectionId] = useState<string | undefined>(undefined);
   const [selectedPlanKey, setSelectedPlanKey] = useState<string | undefined>(undefined);
   const [selectedAttendeeKey, setSelectedAttendeeKey] = useState<string | undefined>(undefined);
+  const [dropInDate, setDropInDate] = useState<string | undefined>(undefined);
   const { currentUser } = useCurrentUser();
   const navigate = useNavigateWithTransition();
   const location = useLocation();
@@ -115,6 +137,8 @@ export const ClassDetailPage = () => {
 
   const selectedSection = course?.sections.find((section) => section.id === sectionId);
   const selectedPlan = selectedSection?.planOptions.find((plan) => planKey(plan) === selectedPlanKey);
+  const dropInPriceCents = course?.dropInPriceCents;
+  const isDropIn = selectedPlanKey === DROP_IN_KEY && dropInPriceCents !== undefined;
   const {
     data: attendees = [],
     isFetching: isLoadingAttendees,
@@ -145,6 +169,7 @@ export const ClassDetailPage = () => {
   // A different time slot can offer different plans (e.g. no full-year option).
   useEffect(() => {
     setSelectedPlanKey(selectedSection?.planOptions[0] ? planKey(selectedSection.planOptions[0]) : undefined);
+    setDropInDate(undefined);
   }, [selectedSection]);
 
   if (isLoading) {
@@ -177,15 +202,19 @@ export const ClassDetailPage = () => {
       navigate(loginPathFor(currentPath));
       return;
     }
-    if (!selectedSection || !selectedPlan || !selectedAttendee) return;
+    if (!selectedSection || !selectedAttendee) return;
+    const line = isDropIn
+      ? dropInDate
+        ? { sourceType: DROP_IN_SOURCE_TYPE, options: toDropInLineOptions(selectedAttendee, dropInDate) }
+        : undefined
+      : selectedPlan
+        ? { sourceType: CLASS_SOURCE_TYPE, options: toClassLineOptions(selectedAttendee, selectedPlan) }
+        : undefined;
+    if (!line) return;
     try {
-      await addCartLine({
-        sourceType: CLASS_SOURCE_TYPE,
-        sourceId: selectedSection.id,
-        options: toClassLineOptions(selectedAttendee, selectedPlan),
-        quantity: 1,
-      }).unwrap();
-      alert.success(`${course.name} for ${selectedAttendee.name} added to your cart.`, { position: ALERT_POSITION });
+      await addCartLine({ ...line, sourceId: selectedSection.id, quantity: 1 }).unwrap();
+      const what = isDropIn && dropInDate ? `${course.name} drop-in on ${formatClassDate(dropInDate)}` : course.name;
+      alert.success(`${what} for ${selectedAttendee.name} added to your cart.`, { position: ALERT_POSITION });
       navigate('/cart');
     } catch (error) {
       alert.danger(readApiError(error, 'Could not add this class to your cart.').message, { position: ALERT_POSITION });
@@ -224,9 +253,9 @@ export const ClassDetailPage = () => {
         variant={{ kind: 'filled', color: 'primary' }}
         className="w-full"
         onClick={handleAddToCart}
-        disabled={isAdding || !selectedPlan || !selectedAttendee}
+        disabled={isAdding || !selectedAttendee || (isDropIn ? !dropInDate : !selectedPlan)}
       >
-        {isAdding ? 'Adding…' : !selectedAttendee ? 'Choose a dancer' : 'Add to cart'}
+        {isAdding ? 'Adding…' : !selectedAttendee ? 'Choose a dancer' : isDropIn && !dropInDate ? 'Choose a date' : 'Add to cart'}
       </Button>
     );
   };
@@ -365,6 +394,11 @@ export const ClassDetailPage = () => {
                           <PlanChoice plan={plan} />
                         </ChoiceCard>
                       ))}
+                      {dropInPriceCents !== undefined ? (
+                        <ChoiceCard name="plan" value={DROP_IN_KEY} checked={isDropIn} onSelect={setSelectedPlanKey}>
+                          <DropInChoice priceCents={dropInPriceCents} />
+                        </ChoiceCard>
+                      ) : null}
                     </div>
                   ) : (
                     <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
@@ -374,11 +408,21 @@ export const ClassDetailPage = () => {
                   <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
                     Semester and full-year plans are paid up front and can’t be withdrawn. Monthly plans can be withdrawn
                     anytime; you just won’t be charged for the following month.
+                    {dropInPriceCents !== undefined ? ' A drop-in is a single class; to cancel one, contact the studio.' : ''}
                     {selectedSection && showLockNotices(selectedSection, new Date()).length > 0
                       ? ' The exception is a show semester: once its withdrawal date above passes, dancers 7+ can only be withdrawn by contacting the studio.'
                       : ''}
                   </Text>
                 </DetailBlock>
+
+                {isDropIn && selectedSection && !isFull && !opensAt ? (
+                  <>
+                    <Divider />
+                    <DetailBlock title="4. Pick a date">
+                      <DropInDatePicker sectionId={selectedSection.id} selectedDate={dropInDate} onSelect={setDropInDate} />
+                    </DetailBlock>
+                  </>
+                ) : null}
 
                 {renderAction()}
                 {isFull ? (

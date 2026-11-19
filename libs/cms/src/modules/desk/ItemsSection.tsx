@@ -2,18 +2,21 @@ import { useMemo, useState } from 'react';
 import { Box, Button, Checkbox, IconButton, RadioGroup, RadioGroupItem, Select, SelectItem, Text } from '@inithium/ui';
 import {
   CLASS_SOURCE_TYPE,
+  DROP_IN_SOURCE_TYPE,
   WORKSHOP_SOURCE_TYPE,
   formatMoney,
   toClassLineOptions,
+  toDropInLineOptions,
   toWorkshopLineOptions,
   useListClassCatalogQuery,
+  useListDropInDatesQuery,
   useListWorkshopsQuery,
 } from '@inithium/api-client';
 import type { ClassAttendeeDto, ClassPlanOptionDto, DeskAccountDetailDto } from '@inithium/api-client';
 import { attendeeKey, attendeeOptions, formatCalendarDay, sectionLabel } from './deskShared';
 import type { DeskLine } from './deskShared';
 
-type ItemKind = 'class' | 'workshop';
+type ItemKind = 'class' | 'drop-in' | 'workshop';
 
 const planKey = (option: ClassPlanOptionDto): string => (option.kind === 'semester' ? `semester:${option.semesterId}` : option.kind);
 
@@ -119,6 +122,98 @@ const ClassPicker = ({ attendees, currency, onAdd }: PickerProps) => {
         <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
           No sections of this class are open for registration.
         </Text>
+      ) : null}
+    </Box>
+  );
+};
+
+const DropInDateSelect = ({ sectionId, value, onChange }: { readonly sectionId: string; readonly value: string; readonly onChange: (date: string) => void }) => {
+  const { data, isLoading, isError } = useListDropInDatesQuery({ sectionId });
+  if (isLoading) return <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">Loading dates…</Text>;
+  if (isError || !data || data.dates.length === 0) {
+    return (
+      <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+        No upcoming classes to drop in on in the next six weeks.
+      </Text>
+    );
+  }
+  return (
+    <Select label="Date" value={value} onValueChange={onChange} placeholder="Choose a class date">
+      {data.dates.map(({ date, seatsLeft }) => (
+        <SelectItem key={date} value={date} disabled={seatsLeft <= 0}>
+          {`${formatCalendarDay(`${date}T00:00:00.000Z`)} · ${seatsLeft > 0 ? `${seatsLeft} open` : 'Full'}`}
+        </SelectItem>
+      ))}
+    </Select>
+  );
+};
+
+// One class on one date, for courses with a drop-in price. Same eligibility and capacity checks as
+// the class page; paid by card or in person like everything else on the order.
+const DropInPicker = ({ attendees, currency, onAdd }: PickerProps) => {
+  const { data: programs = [], isLoading } = useListClassCatalogQuery();
+  const courses = useMemo(
+    () =>
+      programs.flatMap((program) =>
+        program.courses.filter((course) => course.dropInPriceCents !== undefined).map((course) => ({ ...course, programName: program.name })),
+      ),
+    [programs],
+  );
+  const [courseId, setCourseId] = useState('');
+  const [sectionId, setSectionId] = useState('');
+  const [date, setDate] = useState('');
+  const [attendee, setAttendee] = useState(attendees[0] ? attendeeKey(attendees[0]) : '');
+
+  const course = courses.find((candidate) => candidate.id === courseId);
+  const section = course?.sections.find((candidate) => candidate.id === sectionId);
+  const dancer = attendees.find((candidate) => attendeeKey(candidate) === attendee);
+
+  const add = () => {
+    if (!course || course.dropInPriceCents === undefined || !section || !date || !dancer) return;
+    onAdd({
+      key: `drop-in-${section.id}-${date}-${attendeeKey(dancer)}`,
+      title: `${course.name} · ${sectionLabel(section)}`,
+      detail: `Drop-in ${formatCalendarDay(`${date}T00:00:00.000Z`)} · ${formatMoney(course.dropInPriceCents, currency)} · for ${dancer.name}`,
+      input: { sourceType: DROP_IN_SOURCE_TYPE, sourceId: section.id, options: toDropInLineOptions(dancer, date), quantity: 1 },
+    });
+    setDate('');
+  };
+
+  if (isLoading) return <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">Loading classes…</Text>;
+  if (courses.length === 0) {
+    return (
+      <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+        No open class has a drop-in price. Set one on the course in Classes.
+      </Text>
+    );
+  }
+
+  return (
+    <Box flex={{ direction: 'col', gap: 12 }}>
+      <Select label="Class" value={courseId} onValueChange={(id) => { setCourseId(id); setSectionId(''); setDate(''); }} placeholder="Choose a class">
+        {courses.map((candidate) => (
+          <SelectItem key={candidate.id} value={candidate.id}>
+            {`${candidate.programName} · ${candidate.name}`}
+          </SelectItem>
+        ))}
+      </Select>
+      {course ? (
+        <Select label="Section" value={sectionId} onValueChange={(id) => { setSectionId(id); setDate(''); }} placeholder="Choose a day and time">
+          {course.sections.map((candidate) => (
+            <SelectItem key={candidate.id} value={candidate.id}>
+              {sectionLabel(candidate)}
+            </SelectItem>
+          ))}
+        </Select>
+      ) : null}
+      {section ? <DropInDateSelect key={section.id} sectionId={section.id} value={date} onChange={setDate} /> : null}
+      {section ? (
+        <Box flex={{ direction: 'row', wrap: 'wrap', align: 'end', gap: 8 }}>
+          <AttendeeSelect attendees={attendees} value={attendee} onChange={setAttendee} />
+          <Button variant={{ kind: 'filled', color: 'primary' }} disabled={!date || !dancer} onClick={add}>
+            Add drop-in
+          </Button>
+        </Box>
       ) : null}
     </Box>
   );
@@ -234,10 +329,13 @@ export const ItemsSection = ({ account, currency, lines, lineErrors, onAdd, onRe
       <Box borderColor={{ color: 'surface', intensity: 300 }} padding={{ base: 12 }} flex={{ direction: 'col', gap: 12 }} className="rounded-md border">
         <RadioGroup label="Add" value={kind} onValueChange={(value) => setKind(value as ItemKind)} className="flex flex-row gap-6">
           <RadioGroupItem value="class" label="Class" />
+          <RadioGroupItem value="drop-in" label="Drop-in" />
           <RadioGroupItem value="workshop" label="Workshop" />
         </RadioGroup>
         {kind === 'class' ? (
           <ClassPicker key={account.id} attendees={attendees} currency={currency} onAdd={add} />
+        ) : kind === 'drop-in' ? (
+          <DropInPicker key={account.id} attendees={attendees} currency={currency} onAdd={add} />
         ) : (
           <WorkshopPicker key={account.id} attendees={attendees} currency={currency} onAdd={add} />
         )}

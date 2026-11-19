@@ -159,6 +159,16 @@
 			"key": "classRegistrationId",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "dropInDate",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "dropInId",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -1560,7 +1570,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"programId\": \"{{programId}}\",\n  \"name\": \"Mini Movers\",\n  \"slug\": \"mini-movers\",\n  \"description\": \"A high-energy introduction to dance for toddlers.\",\n  \"dressCode\": \"Leggings or leotard. Ballet shoes required.\",\n  \"styles\": [\n    \"Creative Movement\"\n  ],\n  \"minAgeYears\": 2.5,\n  \"maxAgeYears\": 4,\n  \"monthlyPriceCents\": 4000,\n  \"isPublished\": true\n}",
+							"raw": "{\n  \"programId\": \"{{programId}}\",\n  \"name\": \"Mini Movers\",\n  \"slug\": \"mini-movers\",\n  \"description\": \"A high-energy introduction to dance for toddlers.\",\n  \"dressCode\": \"Leggings or leotard. Ballet shoes required.\",\n  \"styles\": [\n    \"Creative Movement\"\n  ],\n  \"minAgeYears\": 2.5,\n  \"maxAgeYears\": 4,\n  \"monthlyPriceCents\": 4000,\n  \"dropInPriceCents\": 2200,\n  \"isPublished\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1608,7 +1618,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"monthlyPriceCents\": 4500\n}",
+							"raw": "{\n  \"monthlyPriceCents\": 4500,\n  \"dropInPriceCents\": 2200\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2553,6 +2563,265 @@
 								"class-registrations",
 								"{{classRegistrationId}}",
 								"withdraw"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Drop-Ins",
+			"description": "Drop-in class purchases (QA-13): one class on one date for a course with a drop-in price. Bought through the cart (sourceType drop_in) or at the front desk; staff cancel from the CMS.",
+			"item": [
+				{
+					"name": "List Drop-In Dates",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"if (pm.response.code === 200) {",
+									"  const open = pm.response.json().data.dates.find((d) => d.seatsLeft > 0);",
+									"  if (open) pm.collectionVariables.set('dropInDate', open.date);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/classes/sections/{{sectionId}}/drop-in-dates?from=2026-11-18&to=2026-12-30",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"sections",
+								"{{sectionId}}",
+								"drop-in-dates"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "2026-11-18",
+									"description": "Optional YYYY-MM-DD; defaults to today in the studio's time zone"
+								},
+								{
+									"key": "to",
+									"value": "2026-12-30",
+									"description": "Optional YYYY-MM-DD, exclusive; defaults to six weeks after from (max 120 days)"
+								}
+							]
+						},
+						"description": "Public. Upcoming class dates for the section that can still take a drop-in (not a closure, class not yet started), with seats left after term enrollments and drop-ins. 404 when the course has no drop-in price."
+					}
+				},
+				{
+					"name": "Add Drop-In To Cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/lines",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"cart",
+								"lines"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"sourceType\": \"drop_in\",\n  \"sourceId\": \"{{sectionId}}\",\n  \"options\": {\n    \"attendee\": \"child\",\n    \"childId\": \"{{childId}}\",\n    \"classDate\": \"{{dropInDate}}\"\n  },\n  \"quantity\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"description": "Use { \"attendee\": \"self\" } for the account holder (adult courses only). Rejected for a past or closed date, a date the class doesn't meet, an ineligible dancer, a dancer already enrolled in the section, or a full date."
+					}
+				},
+				{
+					"name": "Create Desk Order (Drop-In, Cash)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"if (pm.response.code === 201) pm.collectionVariables.set('deskOrderId', pm.response.json().data.order.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/desk/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"desk",
+								"orders"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerUserId\": \"{{deskAccountId}}\",\n  \"lines\": [\n    {\n      \"sourceType\": \"drop_in\",\n      \"sourceId\": \"{{classSectionId}}\",\n      \"options\": {\n        \"attendee\": \"child\",\n        \"childId\": \"{{deskStudentId}}\",\n        \"classDate\": \"{{dropInDate}}\"\n      },\n      \"quantity\": 1\n    }\n  ],\n  \"consent\": {\n    \"method\": \"paper\",\n    \"signedName\": \"Pat Grandparent\",\n    \"versionHash\": \"{{policyVersionHash}}\"\n  },\n  \"payment\": {\n    \"mode\": \"in_person\",\n    \"record\": {\n      \"method\": \"cash\",\n      \"amountCents\": 2200\n    }\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"description": "Staff (registrations:desk). Posts the drop-in as a ledger charge and records the cash against it."
+					}
+				},
+				{
+					"name": "List My Drop-Ins",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"if (pm.response.code === 200 && pm.response.json().data[0]) pm.collectionVariables.set('dropInId', pm.response.json().data[0].id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/drop-ins/mine",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drop-ins",
+								"mine"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Account Drop-Ins (Staff)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Needs registrations:desk.",
+									"pm.test('Status code is 200 or 403', () => pm.expect(pm.response.code).to.be.oneOf([200, 403]));",
+									"if (pm.response.code === 200 && pm.response.json().data[0]) pm.collectionVariables.set('dropInId', pm.response.json().data[0].id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{deskAccountId}}/drop-ins",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{deskAccountId}}",
+								"drop-ins"
+							]
+						}
+					}
+				},
+				{
+					"name": "Cancel Drop-In (Staff)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Needs registrations:desk. Frees the seat; refunds and ledger voids are separate.",
+									"pm.test('Status code is 200 or 403', () => pm.expect(pm.response.code).to.be.oneOf([200, 403]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/drop-ins/{{dropInId}}/cancel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drop-ins",
+								"{{dropInId}}",
+								"cancel"
 							]
 						}
 					}

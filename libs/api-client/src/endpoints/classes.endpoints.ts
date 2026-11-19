@@ -69,6 +69,8 @@ export interface CourseDto {
   minAgeYears?: number;
   maxAgeYears?: number;
   monthlyPriceCents: number;
+  // Absent = no drop-ins for this course.
+  dropInPriceCents?: number;
   order: number;
   isPublished: boolean;
   createdAt: string;
@@ -169,6 +171,7 @@ export interface CourseWriteInput {
   minAgeYears?: number;
   maxAgeYears?: number;
   monthlyPriceCents: number;
+  dropInPriceCents?: number;
   order?: number;
   isPublished?: boolean;
 }

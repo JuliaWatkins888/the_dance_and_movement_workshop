@@ -22,6 +22,7 @@ const mapToCourseEntity = (doc: CourseDocument): CourseEntity => ({
   minAgeYears: doc.minAgeYears ?? undefined,
   maxAgeYears: doc.maxAgeYears ?? undefined,
   monthlyPriceCents: doc.monthlyPriceCents,
+  dropInPriceCents: doc.dropInPriceCents ?? undefined,
   order: doc.order,
   isPublished: doc.isPublished,
   createdAt: doc.createdAt,

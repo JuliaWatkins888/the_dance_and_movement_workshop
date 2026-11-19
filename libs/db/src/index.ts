@@ -250,6 +250,7 @@ export const updateClassSection = (id: string, input: UpdateClassSectionInput) =
 export const deleteClassSection = (id: string) => getClassSectionRepository().delete(id);
 
 export const getClassRegistrationRepository = () => activeProvider.getClassRegistrationRepository();
+export const getDropInRegistrationRepository = () => activeProvider.getDropInRegistrationRepository();
 
 export const getSchoolYearRepository = () => activeProvider.getSchoolYearRepository();
 export const listSchoolYears = () => getSchoolYearRepository().findAll();
@@ -558,6 +559,27 @@ export {
   resolveEligibleAttendee,
 } from './class-registrations/class-registration.rules';
 export type { AttendeeRef, AttendeeResolution } from './class-registrations/class-registration.rules';
+export { checkDropInDate, listOpenDropInDates, resolveHolidays, resolveStudioClosedDateKeys } from './class-registrations/drop-in.rules';
+export type { DropInDateCheck, ResolvedHoliday } from './class-registrations/drop-in.rules';
+export { DROP_IN_STATUSES } from './contracts/drop-in-registration.contract';
+export type {
+  CreateDropInRegistrationInput,
+  DropInRegistrationEntity,
+  DropInRegistrationRepository,
+  DropInStatus,
+} from './contracts/drop-in-registration.contract';
+export {
+  addDaysToKey,
+  countDaysBetweenKeys,
+  dateKeyToUtc,
+  dayOfWeekOfKey,
+  eachDateKey,
+  isValidDateKey,
+  sectionSessionDateKeys,
+  studioClosedDateKeys,
+  toDateKey,
+} from './utils/class-sessions';
+export { zonedDateKey, zonedWallTimeToUtc, zonedYearBoundsToUtc } from './utils/zoned-time';
 export type {
   ClassAttendee,
   ClassBillingMode,

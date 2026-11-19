@@ -8,10 +8,11 @@ import {
   useGetStoreConfigQuery,
   useListMyPolicyConsentsQuery,
   useListMyClassRegistrationsQuery,
+  useListMyDropInsQuery,
   useListMyWorkshopRegistrationsQuery,
 } from '@inithium/api-client';
-import type { ClassRegistrationDto, WorkshopRegistrationDto } from '@inithium/api-client';
-import { formatDays, formatTimeRange } from '../../classes/classFormat';
+import type { ClassRegistrationDto, DropInDto, WorkshopRegistrationDto } from '@inithium/api-client';
+import { formatClassDate, formatDays, formatTimeRange } from '../../classes/classFormat';
 import { formatDateSpan, formatDayShort } from '../../workshops/workshopFormat';
 import type { ProfileTabDescriptor, ProfileTabProps } from './registry';
 
@@ -187,9 +188,53 @@ const WorkshopRegistrationRow = ({ registration }: { readonly registration: Work
   );
 };
 
+// Read-only: staff cancel drop-ins at the studio.
+const DropInRow = ({ dropIn }: { readonly dropIn: DropInDto }) => {
+  const title = dropIn.course?.name ?? 'Class';
+  const isUpcoming = dropIn.status === 'active' && !dropIn.isPast;
+  const statusLabel = dropIn.status === 'cancelled' ? 'Cancelled' : dropIn.isPast ? 'Ended' : 'Upcoming';
+  return (
+    <Box flex={{ direction: 'row', align: 'start', gap: 16 }} padding={{ top: 16, bottom: 16 }} className="flex-wrap sm:flex-nowrap">
+      <Box flex={{ direction: 'col', gap: 4 }} className="min-w-0 flex-1">
+        {dropIn.course ? (
+          <Link
+            to={`/classes/${dropIn.course.slug}`}
+            className="truncate font-semibold text-surface-950 underline-offset-4 hover:text-accent-500 hover:underline"
+          >
+            {title}
+          </Link>
+        ) : (
+          <Text as="span" textColor={{ color: 'surface', intensity: 950 }} className="font-semibold">
+            {title}
+          </Text>
+        )}
+        <Text as="span" textColor={{ color: 'surface', intensity: 800 }} className="text-sm">
+          {dropIn.attendee.name} · {formatClassDate(dropIn.classDate)}
+          {dropIn.section ? ` · ${formatTimeRange(dropIn.section.startTime, dropIn.section.endTime)}` : ''}
+        </Text>
+        <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-xs">
+          Drop-in · paid in full
+        </Text>
+      </Box>
+      <Box flex={{ direction: 'row', align: 'center', gap: 12 }} className="shrink-0">
+        {isUpcoming ? (
+          <Pill color={{ color: 'primary', intensity: 500 }} className="text-primary-foreground-500">
+            {statusLabel}
+          </Pill>
+        ) : (
+          <Pill color={{ color: 'surface', intensity: 300 }} className="text-surface-800">
+            {statusLabel}
+          </Pill>
+        )}
+      </Box>
+    </Box>
+  );
+};
+
 type RegistrationEntry =
   | { readonly kind: 'class'; readonly registration: ClassRegistrationDto }
-  | { readonly kind: 'workshop'; readonly registration: WorkshopRegistrationDto };
+  | { readonly kind: 'workshop'; readonly registration: WorkshopRegistrationDto }
+  | { readonly kind: 'drop_in'; readonly registration: DropInDto };
 
 const RegistrationGroup = ({
   title,
@@ -210,8 +255,10 @@ const RegistrationGroup = ({
           {index > 0 ? <Divider color={{ color: 'surface', intensity: 300 }} /> : null}
           {entry.kind === 'class' ? (
             <RegistrationRow registration={entry.registration} currency={currency} />
-          ) : (
+          ) : entry.kind === 'workshop' ? (
             <WorkshopRegistrationRow registration={entry.registration} />
+          ) : (
+            <DropInRow dropIn={entry.registration} />
           )}
         </Box>
       ))}
@@ -235,13 +282,14 @@ const SignedPolicies = () => {
   );
 };
 
-// Every class and workshop the account's dancers are (or were) registered for. Monthly class plans
+// Every class, drop-in and workshop the account's dancers are (or were) registered for. Monthly class plans
 // that are still renewing can be cancelled here; everything else is paid in full and can't be.
 const RegistrationsTab = (_props: ProfileTabProps) => {
   const { data: registrations = [], isLoading: isLoadingClasses } = useListMyClassRegistrationsQuery();
   const { data: workshopRegistrations = [], isLoading: isLoadingWorkshops } = useListMyWorkshopRegistrationsQuery();
+  const { data: dropIns = [], isLoading: isLoadingDropIns } = useListMyDropInsQuery();
   const { data: storeConfig } = useGetStoreConfigQuery();
-  const isLoading = isLoadingClasses || isLoadingWorkshops;
+  const isLoading = isLoadingClasses || isLoadingWorkshops || isLoadingDropIns;
 
   if (isLoading) {
     return (
@@ -251,7 +299,7 @@ const RegistrationsTab = (_props: ProfileTabProps) => {
     );
   }
 
-  if (registrations.length === 0 && workshopRegistrations.length === 0) {
+  if (registrations.length === 0 && workshopRegistrations.length === 0 && dropIns.length === 0) {
     return (
       <Box flex={{ direction: 'col', align: 'center', gap: 12 }} padding={{ base: 24 }}>
         <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-center">
@@ -272,9 +320,13 @@ const RegistrationsTab = (_props: ProfileTabProps) => {
   const entries: RegistrationEntry[] = [
     ...registrations.map((registration): RegistrationEntry => ({ kind: 'class', registration })),
     ...workshopRegistrations.map((registration): RegistrationEntry => ({ kind: 'workshop', registration })),
+    ...dropIns.map((registration): RegistrationEntry => ({ kind: 'drop_in', registration })),
   ];
-  const isCurrentEntry = (entry: RegistrationEntry): boolean =>
-    entry.kind === 'class' ? isCurrent(entry.registration) : entry.registration.status !== 'ended';
+  const isCurrentEntry = (entry: RegistrationEntry): boolean => {
+    if (entry.kind === 'class') return isCurrent(entry.registration);
+    if (entry.kind === 'drop_in') return entry.registration.status === 'active' && !entry.registration.isPast;
+    return entry.registration.status !== 'ended';
+  };
   const current = entries.filter(isCurrentEntry);
   const past = entries.filter((entry) => !isCurrentEntry(entry));
 
