@@ -251,6 +251,9 @@ export const deleteClassSection = (id: string) => getClassSectionRepository().de
 
 export const getClassRegistrationRepository = () => activeProvider.getClassRegistrationRepository();
 export const getDropInRegistrationRepository = () => activeProvider.getDropInRegistrationRepository();
+export const getClassCardTypeRepository = () => activeProvider.getClassCardTypeRepository();
+export const getClassCardRepository = () => activeProvider.getClassCardRepository();
+export const getClassCardRedemptionRepository = () => activeProvider.getClassCardRedemptionRepository();
 
 export const getSchoolYearRepository = () => activeProvider.getSchoolYearRepository();
 export const listSchoolYears = () => getSchoolYearRepository().findAll();
@@ -555,6 +558,7 @@ export {
   describeAttendee,
   findOverlappingRegistration,
   listEligibleAttendees,
+  listSectionRegistrationsOn,
   releaseExpiredClassSeats,
   resolveEligibleAttendee,
 } from './class-registrations/class-registration.rules';
@@ -562,6 +566,21 @@ export type { AttendeeRef, AttendeeResolution } from './class-registrations/clas
 export { checkDropInDate, listOpenDropInDates, resolveHolidays, resolveStudioClosedDateKeys } from './class-registrations/drop-in.rules';
 export type { DropInDateCheck, ResolvedHoliday } from './class-registrations/drop-in.rules';
 export { DROP_IN_STATUSES } from './contracts/drop-in-registration.contract';
+export { CLASS_CARD_REDEMPTION_STATUSES, CLASS_CARD_STATUSES } from './contracts/class-card.contract';
+export type {
+  ClassCardEntity,
+  ClassCardRedemptionEntity,
+  ClassCardRedemptionRepository,
+  ClassCardRedemptionStatus,
+  ClassCardRepository,
+  ClassCardStatus,
+  ClassCardTypeEntity,
+  ClassCardTypeRepository,
+  CreateClassCardInput,
+  CreateClassCardRedemptionInput,
+  CreateClassCardTypeInput,
+  UpdateClassCardTypeInput,
+} from './contracts/class-card.contract';
 export type {
   CreateDropInRegistrationInput,
   DropInRegistrationEntity,

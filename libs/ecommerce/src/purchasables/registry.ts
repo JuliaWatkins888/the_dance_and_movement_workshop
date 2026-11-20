@@ -2,6 +2,7 @@ import type { PurchasableSource } from './purchasable.contract';
 import productPurchasable from './product.purchasable';
 import classPurchasable from './class.purchasable';
 import dropInPurchasable from './drop-in.purchasable';
+import classCardPurchasable from './class-card.purchasable';
 import workshopPurchasable from './workshop.purchasable';
 import eventPurchasable from './event.purchasable';
 import ledgerBalancePurchasable from './ledger-balance.purchasable';
@@ -16,6 +17,7 @@ export const purchasableSources: PurchasableSource[] = [
   productPurchasable,
   classPurchasable,
   dropInPurchasable,
+  classCardPurchasable,
   workshopPurchasable,
   eventPurchasable,
   ledgerBalancePurchasable,

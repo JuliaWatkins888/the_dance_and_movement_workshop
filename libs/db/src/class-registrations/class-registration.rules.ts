@@ -89,6 +89,16 @@ export const findOverlappingRegistration = async (
   });
 };
 
+// Registrations holding a seat in the section on the class day starting at `classDate` (UTC midnight).
+export const listSectionRegistrationsOn = async (sectionId: string, classDate: Date): Promise<ClassRegistrationEntity[]> => {
+  const day: PlanCoverage = { startsAt: classDate, endsAt: new Date(classDate.getTime() + 86_400_000) };
+  const registrations = await getClassRegistrationRepository().findBySection(sectionId);
+  return registrations.filter((registration) => {
+    const occupied = occupiedCoverage(registration);
+    return occupied !== null && coveragesOverlap(occupied, day);
+  });
+};
+
 // Lazy, like the ecommerce plugin's stale-checkout sweep: there's no job runner, so seats held by
 // withdrawn monthly registrations are handed back whenever the catalog or a checkout next looks
 // at seat counts. The compare-and-set keeps concurrent sweeps from releasing a seat twice.

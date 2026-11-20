@@ -10,6 +10,7 @@ export { purchasableSources, findPurchasableSource } from './purchasables/regist
 export { PRODUCT_SOURCE_TYPE } from './purchasables/product.purchasable';
 export { CLASS_SOURCE_TYPE } from './purchasables/class.purchasable';
 export { DROP_IN_SOURCE_TYPE } from './purchasables/drop-in.purchasable';
+export { CLASS_CARD_SOURCE_TYPE } from './purchasables/class-card.purchasable';
 export { loadSectionContext } from './purchasables/class-section-context';
 export type { SectionContext } from './purchasables/class-section-context';
 export { WORKSHOP_SOURCE_TYPE } from './purchasables/workshop.purchasable';
@@ -78,6 +79,8 @@ export { LEDGER_PAYMENT_PROVIDER } from './orders/payment-collection';
 export { accrueLedgerTuition } from './ledger/tuition-accrual';
 export { withdrawClassRegistrationByStaff } from './registrations/staff-withdrawal';
 export { cancelDropInByStaff } from './registrations/drop-in-cancel';
+export { redeemClassCard, voidClassCardRedemption } from './class-cards/class-card-check-in';
+export type { RedeemClassCardInput, RedeemClassCardResult } from './class-cards/class-card-check-in';
 export { getSalesReport, SALES_PERIODS } from './orders/sales-report';
 export type { SalesPeriod, SalesReport } from './orders/sales-report';
 export { buildOrdersCsv } from './orders/orders-csv';

@@ -169,6 +169,18 @@
 			"key": "dropInId",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "classCardTypeId",
+			"value": ""
+		},
+		{
+			"key": "classCardId",
+			"value": ""
+		},
+		{
+			"key": "classCardRedemptionId",
+			"value": ""
 		}
 	],
 	"item": [
@@ -2824,6 +2836,510 @@
 								"cancel"
 							]
 						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Class Cards",
+			"description": "Adult class cards (QA-14): admin-configured prepaid packs of adult (18+) classes that never expire. Bought through the cart (sourceType class_card) or at the front desk, owned by one adult, used at CMS check-in.",
+			"item": [
+				{
+					"name": "List Class Card Types",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"if (pm.response.code === 200 && pm.response.json().data[0]) pm.collectionVariables.set('classCardTypeId', pm.response.json().data[0].id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/class-card-types",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"class-card-types"
+							]
+						},
+						"description": "Public. The card types for sale (isActive), shown on adult class pages."
+					}
+				},
+				{
+					"name": "List Class Card Types (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/class-card-types/admin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"class-card-types",
+								"admin"
+							]
+						},
+						"description": "classes:manage. Every card type, including ones not for sale."
+					}
+				},
+				{
+					"name": "Create Class Card Type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"if (pm.response.code === 201) pm.collectionVariables.set('classCardTypeId', pm.response.json().data.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/class-card-types",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"class-card-types"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"5-Class Card\",\n  \"classCount\": 5,\n  \"priceCents\": 8000,\n  \"isActive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"description": "classes:manage. Cards never expire. Price and class count changes only affect cards bought afterwards."
+					}
+				},
+				{
+					"name": "Update Class Card Type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/class-card-types/{{classCardTypeId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"class-card-types",
+								"{{classCardTypeId}}"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"priceCents\": 8000,\n  \"isActive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"description": "classes:manage. Partial update; set isActive false to stop selling a type."
+					}
+				},
+				{
+					"name": "Delete Class Card Type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/class-card-types/{{classCardTypeId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"class-card-types",
+								"{{classCardTypeId}}"
+							]
+						},
+						"description": "classes:manage. 409 once any card of this type has been sold - turn it off instead."
+					}
+				},
+				{
+					"name": "Add Class Card To Cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/lines",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"cart",
+								"lines"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"sourceType\": \"class_card\",\n  \"sourceId\": \"{{classCardTypeId}}\",\n  \"options\": {\n    \"attendee\": \"self\"\n  },\n  \"quantity\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"description": "Use { \"attendee\": \"child\", \"childId\": ... } for an 18+ student on the account. Rejected for a student under 18 or a type not for sale. Requires the studio policy signature like other registrations. One card per line (quantity 1)."
+					}
+				},
+				{
+					"name": "Create Desk Order (Class Card, Cash)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/desk/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"desk",
+								"orders"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerUserId\": \"{{deskAccountId}}\",\n  \"lines\": [\n    {\n      \"sourceType\": \"class_card\",\n      \"sourceId\": \"{{classCardTypeId}}\",\n      \"options\": {\n        \"attendee\": \"self\"\n      },\n      \"quantity\": 1\n    }\n  ],\n  \"payment\": {\n    \"mode\": \"in_person\",\n    \"record\": {\n      \"method\": \"cash\",\n      \"amountCents\": 8000\n    }\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"description": "Staff (registrations:desk). The card is active straight away, even while the ledger charge is unpaid."
+					}
+				},
+				{
+					"name": "My Class Cards",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"if (pm.response.code === 200 && pm.response.json().data[0]) pm.collectionVariables.set('classCardId', pm.response.json().data[0].id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/class-cards/mine",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"class-cards",
+								"mine"
+							]
+						},
+						"description": "The signed-in account's cards with classes left and every check-in (redemptions)."
+					}
+				},
+				{
+					"name": "Account's Class Cards (Staff)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{deskAccountId}}/class-cards",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{deskAccountId}}",
+								"class-cards"
+							]
+						},
+						"description": "Staff (checkin:manage or registrations:desk). Same shape as /mine."
+					}
+				}
+			]
+		},
+		{
+			"name": "Check-in",
+			"description": "CMS check-in (QA-14). Requires the checkin:manage capability (contributor and up). A card check-in takes one class off the card and holds a seat in the section on that date.",
+			"item": [
+				{
+					"name": "Check-in Sessions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/check-in/sessions?date=2026-11-20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"check-in",
+								"sessions"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2026-11-20",
+									"description": "Optional YYYY-MM-DD; defaults to today in the studio time zone"
+								}
+							]
+						},
+						"description": "Classes meeting on the date (closures removed) with registered students, drop-ins and card check-ins, plus every adult holding a card with classes left."
+					}
+				},
+				{
+					"name": "Redeem Class Card",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"if (pm.response.code === 201) pm.collectionVariables.set('classCardRedemptionId', pm.response.json().data.redemption.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/check-in/redeem",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"check-in",
+								"redeem"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cardId\": \"{{classCardId}}\",\n  \"sectionId\": \"{{sectionId}}\",\n  \"classDate\": \"2026-11-20\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"description": "Rejected for a non-adult course, an exhausted or refunded card, a future date, a date the class does not meet, a full class, a dancer already registered or dropping in, or a second check-in of the same dancer for that class date (409)."
+					}
+				},
+				{
+					"name": "Undo Check-in",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/check-in/redemptions/{{classCardRedemptionId}}/void",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"check-in",
+								"redemptions",
+								"{{classCardRedemptionId}}",
+								"void"
+							]
+						},
+						"description": "Gives the class back to the card and frees the seat. 409 when already undone."
 					}
 				}
 			]

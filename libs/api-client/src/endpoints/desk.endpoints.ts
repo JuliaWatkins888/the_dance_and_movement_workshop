@@ -87,7 +87,7 @@ export type DeskOrderResultDto =
 
 const unwrap = <T>(response: ApiResponse<T>): T => response.data;
 
-const ORDER_TAGS = ['Order', 'Ledger', 'ClassRegistration', 'DropIn', 'Class', 'Workshop', 'PolicyConsent'] as const;
+const ORDER_TAGS = ['Order', 'Ledger', 'ClassRegistration', 'DropIn', 'ClassCard', 'Class', 'Workshop', 'PolicyConsent'] as const;
 
 export const deskApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

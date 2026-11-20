@@ -49,17 +49,19 @@ export const ChoiceCard = ({ name, value, checked, disabled, type = 'radio', onS
 export const attendeeKeyOf = (attendee: ClassAttendeeDto): string => (attendee.type === 'self' ? 'self' : attendee.childId);
 
 export interface AttendeeChoicesProps {
+  // Radio group name - must differ when two pickers share a page.
+  readonly name?: string;
   readonly attendees: ClassAttendeeDto[];
   readonly selectedKey: string | undefined;
   readonly onSelect: (key: string) => void;
 }
 
-export const AttendeeChoices = ({ attendees, selectedKey, onSelect }: AttendeeChoicesProps) => (
+export const AttendeeChoices = ({ name = 'attendee', attendees, selectedKey, onSelect }: AttendeeChoicesProps) => (
   <div role="radiogroup" aria-label="Dancer" className="flex flex-col gap-2">
     {attendees.map((attendee) => (
       <ChoiceCard
         key={attendeeKeyOf(attendee)}
-        name="attendee"
+        name={name}
         value={attendeeKeyOf(attendee)}
         checked={attendeeKeyOf(attendee) === selectedKey}
         onSelect={onSelect}

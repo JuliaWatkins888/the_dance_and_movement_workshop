@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react';
 import { Box, Button, Checkbox, IconButton, RadioGroup, RadioGroupItem, Select, SelectItem, Text } from '@inithium/ui';
 import {
+  CLASS_CARD_SOURCE_TYPE,
   CLASS_SOURCE_TYPE,
   DROP_IN_SOURCE_TYPE,
   WORKSHOP_SOURCE_TYPE,
   formatMoney,
+  toClassCardLineOptions,
   toClassLineOptions,
   toDropInLineOptions,
   toWorkshopLineOptions,
+  useListClassCardTypesQuery,
   useListClassCatalogQuery,
   useListDropInDatesQuery,
   useListWorkshopsQuery,
@@ -16,7 +19,7 @@ import type { ClassAttendeeDto, ClassPlanOptionDto, DeskAccountDetailDto } from 
 import { attendeeKey, attendeeOptions, formatCalendarDay, sectionLabel } from './deskShared';
 import type { DeskLine } from './deskShared';
 
-type ItemKind = 'class' | 'drop-in' | 'workshop';
+type ItemKind = 'class' | 'drop-in' | 'class-card' | 'workshop';
 
 const planKey = (option: ClassPlanOptionDto): string => (option.kind === 'semester' ? `semester:${option.semesterId}` : option.kind);
 
@@ -219,6 +222,61 @@ const DropInPicker = ({ attendees, currency, onAdd }: PickerProps) => {
   );
 };
 
+// A prepaid card of adult classes, for the account holder or an 18+ student (the API checks the age).
+// Staff use its classes from the Check-in screen.
+const ClassCardPicker = ({ attendees, currency, onAdd }: PickerProps) => {
+  const { data: cardTypes = [], isLoading } = useListClassCardTypesQuery();
+  const [cardTypeId, setCardTypeId] = useState('');
+  const [attendee, setAttendee] = useState(() => {
+    const holder = attendees.find((candidate) => candidate.type === 'self') ?? attendees[0];
+    return holder ? attendeeKey(holder) : '';
+  });
+
+  const cardType = cardTypes.find((candidate) => candidate.id === cardTypeId);
+  const dancer = attendees.find((candidate) => attendeeKey(candidate) === attendee);
+
+  const add = () => {
+    if (!cardType || !dancer) return;
+    onAdd({
+      key: `class-card-${cardType.id}-${attendeeKey(dancer)}`,
+      title: cardType.name,
+      detail: `${cardType.classCount} adult classes · ${formatMoney(cardType.priceCents, currency)} · for ${dancer.name}`,
+      input: { sourceType: CLASS_CARD_SOURCE_TYPE, sourceId: cardType.id, options: toClassCardLineOptions(dancer), quantity: 1 },
+    });
+    setCardTypeId('');
+  };
+
+  if (isLoading) return <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">Loading class cards…</Text>;
+  if (cardTypes.length === 0) {
+    return (
+      <Text as="p" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+        No class cards are for sale. Add one under Classes → Class Cards.
+      </Text>
+    );
+  }
+
+  return (
+    <Box flex={{ direction: 'col', gap: 12 }}>
+      <Select label="Card" value={cardTypeId} onValueChange={setCardTypeId} placeholder="Choose a class card">
+        {cardTypes.map((candidate) => (
+          <SelectItem key={candidate.id} value={candidate.id}>
+            {`${candidate.name} · ${candidate.classCount} classes · ${formatMoney(candidate.priceCents, currency)}`}
+          </SelectItem>
+        ))}
+      </Select>
+      <Box flex={{ direction: 'row', wrap: 'wrap', align: 'end', gap: 8 }}>
+        <AttendeeSelect attendees={attendees} value={attendee} onChange={setAttendee} />
+        <Button variant={{ kind: 'filled', color: 'primary' }} disabled={!cardType || !dancer} onClick={add}>
+          Add class card
+        </Button>
+      </Box>
+      <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
+        Adults only (18+). The card belongs to the person chosen and never expires.
+      </Text>
+    </Box>
+  );
+};
+
 const WorkshopPicker = ({ attendees, currency, onAdd }: PickerProps) => {
   const { data: workshops = [], isLoading } = useListWorkshopsQuery();
   const open = workshops.filter((workshop) => workshop.status === 'open');
@@ -330,12 +388,15 @@ export const ItemsSection = ({ account, currency, lines, lineErrors, onAdd, onRe
         <RadioGroup label="Add" value={kind} onValueChange={(value) => setKind(value as ItemKind)} className="flex flex-row gap-6">
           <RadioGroupItem value="class" label="Class" />
           <RadioGroupItem value="drop-in" label="Drop-in" />
+          <RadioGroupItem value="class-card" label="Class card" />
           <RadioGroupItem value="workshop" label="Workshop" />
         </RadioGroup>
         {kind === 'class' ? (
           <ClassPicker key={account.id} attendees={attendees} currency={currency} onAdd={add} />
         ) : kind === 'drop-in' ? (
           <DropInPicker key={account.id} attendees={attendees} currency={currency} onAdd={add} />
+        ) : kind === 'class-card' ? (
+          <ClassCardPicker key={account.id} attendees={attendees} currency={currency} onAdd={add} />
         ) : (
           <WorkshopPicker key={account.id} attendees={attendees} currency={currency} onAdd={add} />
         )}

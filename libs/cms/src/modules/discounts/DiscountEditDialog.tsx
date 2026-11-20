@@ -44,6 +44,7 @@ const SOURCE_TYPE_LABELS: Record<string, string> = {
   product: 'Merch',
   class: 'Classes',
   drop_in: 'Drop-ins',
+  class_card: 'Class cards',
   workshop: 'Workshops',
   event: 'Events',
 };

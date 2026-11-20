@@ -43,8 +43,9 @@ export interface DropInRegistrationRepository {
   // it wasn't active.
   cancel: (id: string, cancelledByUserId: string, at: Date) => Promise<DropInRegistrationEntity | null>;
 
-  // Drop-in seats are counted per section and date, apart from the section's term `enrolled`
-  // counter. A seat is held from the moment an order reserves it, so unpaid checkouts count too.
+  // Per-date seats are counted per section and date, apart from the section's term `enrolled`
+  // counter: drop-ins and class-card check-ins share this count. A drop-in seat is held from the
+  // moment an order reserves it, so unpaid checkouts count too.
   countForSectionDate: (sectionId: string, classDate: Date) => Promise<number>;
   // Held seats per date key ("YYYY-MM-DD") for dates in [from, to]; dates with none are absent.
   countForSectionDates: (sectionId: string, from: Date, to: Date) => Promise<Map<string, number>>;

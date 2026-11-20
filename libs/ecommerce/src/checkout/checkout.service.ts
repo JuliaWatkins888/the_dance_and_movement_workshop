@@ -4,6 +4,7 @@ import type { CreateOrderInput, OrderEntity, OrderStatus } from '@inithium/db';
 import { getPaymentProvider } from '@inithium/payments';
 import type { PaymentResult } from '@inithium/payments';
 import { recordOrderRefundLedgerEntries } from '../ledger/ledger.service';
+import { findPurchasableSource } from '../purchasables/registry';
 import { assertPolicyConsent } from '../policy-consent/policy-consent.service';
 import type { CheckoutQuote } from '../views';
 import { failOrder, finalizeOrder, reserveOrderLines, sweepStalePendingOrders } from './order-lifecycle';
@@ -192,16 +193,22 @@ export const setOrderStatusByAdmin = async (
   if (!updated) throw ConflictError(`An order that is "${order.status}" cannot be marked "${status}"`);
   if (status !== 'refunded') return updated;
 
-  // The refund itself stands either way, so a ledger failure is flagged on the order for an admin
-  // rather than undoing the status change.
-  try {
-    await recordOrderRefundLedgerEntries(updated);
-    return updated;
-  } catch (error) {
-    logError(error);
-    const message = error instanceof Error ? error.message : String(error);
-    return (
-      (await getOrderRepository().update(orderId, { fulfillmentErrors: [...updated.fulfillmentErrors, `Account ledger refund: ${message}`] })) ?? updated
-    );
+  // The refund itself stands either way, so a ledger or source failure is flagged on the order for
+  // an admin rather than undoing the status change.
+  const errors: string[] = [];
+  const attempt = async (label: string, run: () => Promise<void>) => {
+    try {
+      await run();
+    } catch (error) {
+      logError(error);
+      errors.push(`${label}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+  await attempt('Account ledger refund', () => recordOrderRefundLedgerEntries(updated));
+  for (const line of updated.lines) {
+    const source = findPurchasableSource(line.sourceType);
+    if (source?.onRefunded) await attempt(`Refund of "${line.name}"`, () => source.onRefunded!(line, updated));
   }
+  if (errors.length === 0) return updated;
+  return (await getOrderRepository().update(orderId, { fulfillmentErrors: [...updated.fulfillmentErrors, ...errors] })) ?? updated;
 };

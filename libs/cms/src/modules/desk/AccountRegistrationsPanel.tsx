@@ -4,12 +4,14 @@ import {
   formatMoney,
   readApiError,
   useCancelDropInMutation,
+  useListAccountClassCardsQuery,
   useListAccountClassRegistrationsQuery,
   useListAccountDropInsQuery,
   useWithdrawClassRegistrationMutation,
 } from '@inithium/api-client';
 import type { ClassRegistrationDto, DropInDto } from '@inithium/api-client';
 import { DIALOG_WIDTH_WIDE, EmptyState, useStoreCurrency } from '../ecommerce/shared';
+import { AccountClassCards } from './AccountClassCards';
 import { formatCalendarDay, sectionLabel, SECTION_TITLE_CLASS } from './deskShared';
 
 const ALERT_POSITION = 'bottom-right' as const;
@@ -126,8 +128,9 @@ export const AccountRegistrationsPanel = ({ userId }: { readonly userId: string 
   const currency = useStoreCurrency();
   const { data: registrations, isLoading, isError } = useListAccountClassRegistrationsQuery(userId);
   const { data: dropIns, isLoading: isLoadingDropIns, isError: isDropInsError } = useListAccountDropInsQuery(userId);
+  const { data: classCards = [], isLoading: isLoadingCards } = useListAccountClassCardsQuery(userId);
 
-  if (isLoading || isLoadingDropIns) {
+  if (isLoading || isLoadingDropIns || isLoadingCards) {
     return (
       <Box flex={{ justify: 'center' }} padding={{ base: 32 }}>
         <Loader />
@@ -135,7 +138,9 @@ export const AccountRegistrationsPanel = ({ userId }: { readonly userId: string 
     );
   }
   if (isError || isDropInsError || !registrations || !dropIns) return <EmptyState message="Couldn’t load this account’s registrations." />;
-  if (registrations.length === 0 && dropIns.length === 0) return <EmptyState message="No class registrations or drop-ins on this account." />;
+  if (registrations.length === 0 && dropIns.length === 0 && classCards.length === 0) {
+    return <EmptyState message="No class registrations, drop-ins, or class cards on this account." />;
+  }
 
   return (
     <Box flex={{ direction: 'col', gap: 16 }}>
@@ -153,6 +158,12 @@ export const AccountRegistrationsPanel = ({ userId }: { readonly userId: string 
           {dropIns.map((dropIn) => (
             <DropInRow key={dropIn.id} dropIn={dropIn} />
           ))}
+        </Box>
+      ) : null}
+      {classCards.length > 0 ? (
+        <Box flex={{ direction: 'col', gap: 8 }}>
+          <GroupTitle>Class Cards</GroupTitle>
+          <AccountClassCards cards={classCards} />
         </Box>
       ) : null}
     </Box>
