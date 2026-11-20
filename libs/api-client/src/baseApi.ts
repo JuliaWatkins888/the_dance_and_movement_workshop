@@ -70,6 +70,8 @@ export const baseApi = createApi({
     'SchoolYear',
     'ClassRegistration',
     'DropIn',
+    'ClassCard',
+    'ClassCardType',
 // inithium:block:classes:tag-types:end
 // inithium:block:workshops:tag-types:start
     'Workshop',

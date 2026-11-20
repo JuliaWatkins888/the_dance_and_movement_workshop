@@ -29,6 +29,7 @@ import { ClassSectionRepository } from './class-section.contract';
 import { SchoolYearRepository } from './school-year.contract';
 import { ClassRegistrationRepository } from './class-registration.contract';
 import { DropInRegistrationRepository } from './drop-in-registration.contract';
+import { ClassCardRedemptionRepository, ClassCardRepository, ClassCardTypeRepository } from './class-card.contract';
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import { ChildRepository } from './child.contract';
@@ -99,6 +100,9 @@ export interface DbProvider {
   getSchoolYearRepository: () => SchoolYearRepository;
   getClassRegistrationRepository: () => ClassRegistrationRepository;
   getDropInRegistrationRepository: () => DropInRegistrationRepository;
+  getClassCardTypeRepository: () => ClassCardTypeRepository;
+  getClassCardRepository: () => ClassCardRepository;
+  getClassCardRedemptionRepository: () => ClassCardRedemptionRepository;
 // inithium:block:classes:members:end
 // inithium:block:children:members:start
   getChildRepository: () => ChildRepository;

@@ -35,6 +35,7 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:children:contributor:start
   'children:manage',
 // inithium:block:children:contributor:end
+  'checkin:manage',
     // inithium:anchor:contributor
   ],
   editor: [
@@ -76,6 +77,7 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:storage:editor:end
   'ledger:manage',
   'registrations:desk',
+  'checkin:manage',
     // inithium:anchor:editor
   ],
   // users:managePermissions is deliberately absent even from admin - granting the ability to
@@ -131,6 +133,7 @@ export const ROLE_CAPABILITY_DEFAULTS: Record<Role, readonly string[]> = {
 // inithium:block:storage:admin:end
   'ledger:manage',
   'registrations:desk',
+  'checkin:manage',
     // inithium:anchor:admin
   ],
 };

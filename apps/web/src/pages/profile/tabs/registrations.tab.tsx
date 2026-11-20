@@ -8,6 +8,7 @@ import {
   useGetStoreConfigQuery,
   useListMyPolicyConsentsQuery,
   useListMyClassRegistrationsQuery,
+  useListMyClassCardsQuery,
   useListMyDropInsQuery,
   useListMyWorkshopRegistrationsQuery,
 } from '@inithium/api-client';
@@ -15,6 +16,7 @@ import type { ClassRegistrationDto, DropInDto, WorkshopRegistrationDto } from '@
 import { formatClassDate, formatDays, formatTimeRange } from '../../classes/classFormat';
 import { formatDateSpan, formatDayShort } from '../../workshops/workshopFormat';
 import type { ProfileTabDescriptor, ProfileTabProps } from './registry';
+import { ClassCardsList } from './ClassCardsList';
 
 const ALERT_POSITION = 'bottom-right' as const;
 
@@ -288,8 +290,9 @@ const RegistrationsTab = (_props: ProfileTabProps) => {
   const { data: registrations = [], isLoading: isLoadingClasses } = useListMyClassRegistrationsQuery();
   const { data: workshopRegistrations = [], isLoading: isLoadingWorkshops } = useListMyWorkshopRegistrationsQuery();
   const { data: dropIns = [], isLoading: isLoadingDropIns } = useListMyDropInsQuery();
+  const { data: classCards = [], isLoading: isLoadingCards } = useListMyClassCardsQuery();
   const { data: storeConfig } = useGetStoreConfigQuery();
-  const isLoading = isLoadingClasses || isLoadingWorkshops || isLoadingDropIns;
+  const isLoading = isLoadingClasses || isLoadingWorkshops || isLoadingDropIns || isLoadingCards;
 
   if (isLoading) {
     return (
@@ -299,7 +302,7 @@ const RegistrationsTab = (_props: ProfileTabProps) => {
     );
   }
 
-  if (registrations.length === 0 && workshopRegistrations.length === 0 && dropIns.length === 0) {
+  if (registrations.length === 0 && workshopRegistrations.length === 0 && dropIns.length === 0 && classCards.length === 0) {
     return (
       <Box flex={{ direction: 'col', align: 'center', gap: 12 }} padding={{ base: 24 }}>
         <Text as="p" textColor={{ color: 'surface', intensity: 600 }} className="text-center">
@@ -333,6 +336,7 @@ const RegistrationsTab = (_props: ProfileTabProps) => {
   return (
     <Box flex={{ direction: 'col', gap: 24 }}>
       {current.length > 0 ? <RegistrationGroup title="Current" entries={current} currency={storeConfig?.currency} /> : null}
+      {classCards.length > 0 ? <ClassCardsList cards={classCards} /> : null}
       {past.length > 0 ? <RegistrationGroup title="Past" entries={past} currency={storeConfig?.currency} /> : null}
       <SignedPolicies />
     </Box>

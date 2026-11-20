@@ -357,6 +357,36 @@ export {
   useCancelDropInMutation,
 } from './endpoints/drop-ins.endpoints';
 export type { DropInDateDto, DropInDatesArgs, DropInDatesDto, DropInDto, DropInStatus } from './endpoints/drop-ins.endpoints';
+export {
+  classCardsApi,
+  CLASS_CARD_SOURCE_TYPE,
+  toClassCardLineOptions,
+  useListClassCardTypesQuery,
+  useListClassCardTypesAdminQuery,
+  useCreateClassCardTypeMutation,
+  useUpdateClassCardTypeMutation,
+  useDeleteClassCardTypeMutation,
+  useListMyClassCardsQuery,
+  useListAccountClassCardsQuery,
+  useGetCheckInDayQuery,
+  useRedeemClassCardMutation,
+  useVoidClassCardRedemptionMutation,
+} from './endpoints/class-cards.endpoints';
+export type {
+  CheckInCardHolderDto,
+  CheckInCardUseDto,
+  CheckInDayDto,
+  CheckInPersonDto,
+  CheckInSessionDto,
+  ClassCardCheckInResult,
+  ClassCardDto,
+  ClassCardRedemptionDto,
+  ClassCardRedemptionStatus,
+  ClassCardStatus,
+  ClassCardTypeDto,
+  ClassCardTypeInput,
+  RedeemClassCardArgs,
+} from './endpoints/class-cards.endpoints';
 
 // inithium:block:children:exports:end
 // inithium:block:ecommerce:exports:start

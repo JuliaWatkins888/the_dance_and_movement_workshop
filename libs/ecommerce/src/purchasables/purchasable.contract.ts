@@ -85,6 +85,8 @@ export interface PurchasableSource {
   release?: (ref: PurchasableLineRef, ctx: PurchasableContext) => Promise<void>;
   // Fulfillment once the checkout charge succeeds (e.g. enroll the attendee).
   onPaid?: (line: OrderLine, order: OrderEntity) => Promise<void>;
+  // Staff marked the order refunded - undo what onPaid granted (e.g. cancel a class card).
+  onRefunded?: (line: OrderLine, order: OrderEntity) => Promise<void>;
   // Each successful automatic renewal of a subscription line.
   onRenewalPaid?: (line: BillingSubscriptionLine, subscription: BillingSubscriptionEntity, order: OrderEntity) => Promise<void>;
   // A subscription line stopped billing (dropped, canceled, or ran to its end). paidThrough is the

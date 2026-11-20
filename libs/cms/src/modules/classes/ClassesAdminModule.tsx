@@ -1,5 +1,6 @@
 import { Box, Tabs, TabsContent, TabsList, TabsTrigger, Text } from '@inithium/ui';
 import { CatalogTab } from './CatalogTab';
+import { ClassCardTypesTab } from './ClassCardTypesTab';
 import { SchoolYearsTab } from './SchoolYearsTab';
 
 export const ClassesAdminModule = () => (
@@ -11,12 +12,16 @@ export const ClassesAdminModule = () => (
       <TabsList>
         <TabsTrigger value="catalog">Programs &amp; Courses</TabsTrigger>
         <TabsTrigger value="school-years">School Years</TabsTrigger>
+        <TabsTrigger value="class-cards">Class Cards</TabsTrigger>
       </TabsList>
       <TabsContent value="catalog" className="pt-4">
         <CatalogTab />
       </TabsContent>
       <TabsContent value="school-years" className="pt-4">
         <SchoolYearsTab />
+      </TabsContent>
+      <TabsContent value="class-cards" className="pt-4">
+        <ClassCardTypesTab />
       </TabsContent>
     </Tabs>
   </Box>

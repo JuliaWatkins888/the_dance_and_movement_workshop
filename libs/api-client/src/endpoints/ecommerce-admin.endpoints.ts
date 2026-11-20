@@ -306,7 +306,7 @@ export const ecommerceAdminApi = baseApi.injectEndpoints({
     setOrderStatusAdmin: builder.mutation<AdminOrderDto, { id: string; status: AdminOrderStatus; note?: string }>({
       query: ({ id, ...body }) => ({ url: `/api/orders/admin/${id}/status`, method: 'PATCH', body }),
       transformResponse: unwrap<AdminOrderDto>,
-      invalidatesTags: ['Order', 'Ledger'],
+      invalidatesTags: ['Order', 'Ledger', 'ClassCard'],
     }),
     updateOrderAdmin: builder.mutation<AdminOrderDto, { id: string; internalNotes?: string; trackingNumber?: string }>({
       query: ({ id, ...body }) => ({ url: `/api/orders/admin/${id}`, method: 'PATCH', body }),

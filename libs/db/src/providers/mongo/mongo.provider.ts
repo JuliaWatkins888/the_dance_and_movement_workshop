@@ -71,6 +71,13 @@ import { ClassRegistrationModel } from '../../schemas/class-registration.schema'
 import { DropInRegistrationRepository } from '../../contracts/drop-in-registration.contract';
 import { createMongoDropInRegistrationRepository } from './drop-in-registration.repository';
 import { DropInRegistrationModel, DropInSeatModel } from '../../schemas/drop-in-registration.schema';
+import { ClassCardRedemptionRepository, ClassCardRepository, ClassCardTypeRepository } from '../../contracts/class-card.contract';
+import {
+  createMongoClassCardRedemptionRepository,
+  createMongoClassCardRepository,
+  createMongoClassCardTypeRepository,
+} from './class-card.repository';
+import { ClassCardModel, ClassCardRedemptionModel, ClassCardTypeModel } from '../../schemas/class-card.schema';
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import { ChildRepository } from '../../contracts/child.contract';
@@ -160,6 +167,9 @@ const classSectionRepository = createMongoClassSectionRepository(ClassSectionMod
 const schoolYearRepository = createMongoSchoolYearRepository(SchoolYearModel);
 const classRegistrationRepository = createMongoClassRegistrationRepository(ClassRegistrationModel);
 const dropInRegistrationRepository = createMongoDropInRegistrationRepository(DropInRegistrationModel, DropInSeatModel);
+const classCardTypeRepository = createMongoClassCardTypeRepository(ClassCardTypeModel);
+const classCardRepository = createMongoClassCardRepository(ClassCardModel);
+const classCardRedemptionRepository = createMongoClassCardRedemptionRepository(ClassCardRedemptionModel);
 // inithium:block:classes:repository-instances:end
 // inithium:block:children:repository-instances:start
 const childRepository = createMongoChildRepository(ChildModel);
@@ -235,6 +245,9 @@ export const mongoProvider: DbProvider = {
   getSchoolYearRepository: (): SchoolYearRepository => schoolYearRepository,
   getClassRegistrationRepository: (): ClassRegistrationRepository => classRegistrationRepository,
   getDropInRegistrationRepository: (): DropInRegistrationRepository => dropInRegistrationRepository,
+  getClassCardTypeRepository: (): ClassCardTypeRepository => classCardTypeRepository,
+  getClassCardRepository: (): ClassCardRepository => classCardRepository,
+  getClassCardRedemptionRepository: (): ClassCardRedemptionRepository => classCardRedemptionRepository,
 // inithium:block:classes:members:end
 // inithium:block:children:members:start
   getChildRepository: (): ChildRepository => childRepository,

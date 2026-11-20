@@ -9,8 +9,9 @@ import { hasCapability } from './resolveEffectiveCapabilities';
 // dependency-light as @inithium/auth, and routes already compose requireAuth then
 // requirePermission as two separate middlewares in sequence, the same two-step shape
 // `requireAuth, requireRole(...)` already used.
+// A list passes when the user holds any one of the capabilities.
 export const requirePermission =
-  (capability: string) =>
+  (capability: string | readonly string[]) =>
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     if (!req.user) {
       res.status(401).json({ error: 'Missing or invalid Authorization header' });
@@ -23,7 +24,8 @@ export const requirePermission =
         return;
       }
       req.permissionUser = user;
-      if (!hasCapability(user, capability)) {
+      const capabilities = typeof capability === 'string' ? [capability] : capability;
+      if (!capabilities.some((key) => hasCapability(user, key))) {
         res.status(403).json({ error: 'Insufficient permissions' });
         return;
       }

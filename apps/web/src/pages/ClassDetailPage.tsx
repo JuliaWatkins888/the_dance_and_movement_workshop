@@ -31,6 +31,7 @@ import {
   planTitle,
   showLockNotices,
 } from './classes/classFormat';
+import { ClassCardOffer } from './classes/ClassCardOffer';
 import { DropInDatePicker } from './classes/DropInDatePicker';
 import { ProgramBanner } from './classes/ProgramBanner';
 import { useRouteSlug } from './classes/useRouteSlug';
@@ -339,6 +340,7 @@ export const ClassDetailPage = () => {
                 </Text>
               </DetailBlock>
             ) : null}
+            <ClassCardOffer course={course} />
           </Box>
 
           <Box
