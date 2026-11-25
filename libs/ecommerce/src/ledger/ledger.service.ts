@@ -14,6 +14,7 @@ import type {
 import { toMajorUnits } from '../orders/orders-csv';
 import { LEDGER_PAYMENT_PROVIDER, MANUAL_PAYMENT_PROVIDER } from '../orders/payment-collection';
 import { getStoreCurrency } from '../settings';
+import { accruePrivateLessonCharges } from './private-lesson-accrual';
 import { accrueLedgerTuition } from './tuition-accrual';
 
 export const LEDGER_BALANCE_SOURCE_TYPE = 'ledger_balance';
@@ -78,6 +79,7 @@ export interface AccountLedgerView {
 
 export const getAccountLedger = async (userId: string, paging: { page: number; pageSize: number }): Promise<AccountLedgerView> => {
   await accrueLedgerTuition(userId);
+  await accruePrivateLessonCharges(userId);
   const repository = getLedgerEntryRepository();
   const [customer, currency, all, history, children] = await Promise.all([
     requireAccount(userId),
@@ -320,9 +322,11 @@ export interface LedgerAccountSummary {
 const summarize = (users: UserEntity[], balanceByUserId: Map<string, number>): LedgerAccountSummary[] =>
   users.map((user) => ({ customer: toLedgerPerson(user), balanceCents: balanceByUserId.get(user.id) ?? 0 }));
 
-// Read by the CMS dashboard widget, which is where every account's tuition gets caught up.
+// Read by the CMS dashboard widget, which is where every account's tuition and private lessons get
+// caught up.
 export const listOutstandingBalances = async (limit: number): Promise<LedgerAccountSummary[]> => {
   await accrueLedgerTuition();
+  await accruePrivateLessonCharges();
   const balances = await getLedgerEntryRepository().findOutstandingBalances(limit);
   const users = await Promise.all(balances.map((balance) => getUserRepository().findById(balance.userId)));
   return summarize(

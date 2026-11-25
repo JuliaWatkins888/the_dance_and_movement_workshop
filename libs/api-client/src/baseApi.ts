@@ -72,6 +72,7 @@ export const baseApi = createApi({
     'DropIn',
     'ClassCard',
     'ClassCardType',
+    'PrivateLesson',
 // inithium:block:classes:tag-types:end
 // inithium:block:workshops:tag-types:start
     'Workshop',

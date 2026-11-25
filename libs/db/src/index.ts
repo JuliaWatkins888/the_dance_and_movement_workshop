@@ -254,6 +254,8 @@ export const getDropInRegistrationRepository = () => activeProvider.getDropInReg
 export const getClassCardTypeRepository = () => activeProvider.getClassCardTypeRepository();
 export const getClassCardRepository = () => activeProvider.getClassCardRepository();
 export const getClassCardRedemptionRepository = () => activeProvider.getClassCardRedemptionRepository();
+export const getPrivateLessonRepository = () => activeProvider.getPrivateLessonRepository();
+export const getPrivateLessonExceptionRepository = () => activeProvider.getPrivateLessonExceptionRepository();
 
 export const getSchoolYearRepository = () => activeProvider.getSchoolYearRepository();
 export const listSchoolYears = () => getSchoolYearRepository().findAll();
@@ -599,6 +601,28 @@ export {
   toDateKey,
 } from './utils/class-sessions';
 export { zonedDateKey, zonedWallTimeToUtc, zonedYearBoundsToUtc } from './utils/zoned-time';
+export {
+  expandPrivateLesson,
+  isPrivateLessonScheduledOn,
+  privateLessonDateKeys,
+  privateLessonFirstDateKey,
+} from './utils/private-lesson-sessions';
+export type { ExpandableLesson, LessonException, PrivateLessonOccurrence, PrivateLessonOccurrenceStatus } from './utils/private-lesson-sessions';
+export { PRIVATE_LESSON_EXCEPTION_KINDS, PRIVATE_LESSON_STATUSES } from './contracts/private-lesson.contract';
+export type {
+  CreatePrivateLessonExceptionInput,
+  CreatePrivateLessonInput,
+  OncePrivateLessonSchedule,
+  PrivateLessonEntity,
+  PrivateLessonExceptionEntity,
+  PrivateLessonExceptionKind,
+  PrivateLessonExceptionRepository,
+  PrivateLessonRepository,
+  PrivateLessonSchedule,
+  PrivateLessonStatus,
+  UpdatePrivateLessonInput,
+  WeeklyPrivateLessonSchedule,
+} from './contracts/private-lesson.contract';
 export type {
   ClassAttendee,
   ClassBillingMode,

@@ -7,12 +7,14 @@ import {
   useListAccountClassCardsQuery,
   useListAccountClassRegistrationsQuery,
   useListAccountDropInsQuery,
+  useListAccountPrivateLessonsQuery,
   useWithdrawClassRegistrationMutation,
 } from '@inithium/api-client';
-import type { ClassRegistrationDto, DropInDto } from '@inithium/api-client';
+import type { ClassRegistrationDto, DropInDto, PrivateLessonDto } from '@inithium/api-client';
 import { DIALOG_WIDTH_WIDE, EmptyState, useStoreCurrency } from '../ecommerce/shared';
 import { AccountClassCards } from './AccountClassCards';
 import { formatCalendarDay, sectionLabel, SECTION_TITLE_CLASS } from './deskShared';
+import { occurrenceLabel, scheduleLabel } from '../private-lessons/privateLessonFormat';
 
 const ALERT_POSITION = 'bottom-right' as const;
 const dateFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
@@ -118,6 +120,28 @@ const DropInRow = ({ dropIn }: { readonly dropIn: DropInDto }) => {
   );
 };
 
+// Read-only here; lessons are set up and changed in the Private Lessons module.
+const PrivateLessonRow = ({ lesson, currency }: { readonly lesson: PrivateLessonDto; readonly currency: string }) => (
+  <Box flex={{ direction: 'col' }} borderColor={{ color: 'surface', intensity: 200 }} padding={{ base: 12 }} className="rounded border">
+    <Text as="span" textColor={{ color: 'surface', intensity: 950 }} className="font-medium">
+      {`${lesson.attendee.name} · ${lesson.title}`}
+    </Text>
+    <Text as="span" textColor={{ color: 'surface', intensity: 700 }} className="text-sm">
+      {[scheduleLabel(lesson.schedule), lesson.instructor ? `with ${lesson.instructor.name}` : undefined, lesson.status === 'ended' ? 'Ended' : undefined]
+        .filter(Boolean)
+        .join(' · ')}
+    </Text>
+    <Text as="span" textColor={{ color: 'surface', intensity: 600 }} className="text-sm">
+      {[
+        `${formatMoney(lesson.rateCents, currency)} per lesson`,
+        lesson.upcoming[0] ? `next ${occurrenceLabel(lesson.upcoming.find((occurrence) => occurrence.status === 'scheduled') ?? lesson.upcoming[0])}` : undefined,
+      ]
+        .filter(Boolean)
+        .join(' · ')}
+    </Text>
+  </Box>
+);
+
 const GroupTitle = ({ children }: { readonly children: string }) => (
   <Text as="h3" textColor={{ color: 'surface', intensity: 950 }} className={SECTION_TITLE_CLASS}>
     {children}
@@ -129,8 +153,9 @@ export const AccountRegistrationsPanel = ({ userId }: { readonly userId: string 
   const { data: registrations, isLoading, isError } = useListAccountClassRegistrationsQuery(userId);
   const { data: dropIns, isLoading: isLoadingDropIns, isError: isDropInsError } = useListAccountDropInsQuery(userId);
   const { data: classCards = [], isLoading: isLoadingCards } = useListAccountClassCardsQuery(userId);
+  const { data: privateLessons = [], isLoading: isLoadingLessons } = useListAccountPrivateLessonsQuery(userId);
 
-  if (isLoading || isLoadingDropIns || isLoadingCards) {
+  if (isLoading || isLoadingDropIns || isLoadingCards || isLoadingLessons) {
     return (
       <Box flex={{ justify: 'center' }} padding={{ base: 32 }}>
         <Loader />
@@ -138,8 +163,8 @@ export const AccountRegistrationsPanel = ({ userId }: { readonly userId: string 
     );
   }
   if (isError || isDropInsError || !registrations || !dropIns) return <EmptyState message="Couldn’t load this account’s registrations." />;
-  if (registrations.length === 0 && dropIns.length === 0 && classCards.length === 0) {
-    return <EmptyState message="No class registrations, drop-ins, or class cards on this account." />;
+  if (registrations.length === 0 && dropIns.length === 0 && classCards.length === 0 && privateLessons.length === 0) {
+    return <EmptyState message="No class registrations, drop-ins, class cards, or private lessons on this account." />;
   }
 
   return (
@@ -164,6 +189,14 @@ export const AccountRegistrationsPanel = ({ userId }: { readonly userId: string 
         <Box flex={{ direction: 'col', gap: 8 }}>
           <GroupTitle>Class Cards</GroupTitle>
           <AccountClassCards cards={classCards} />
+        </Box>
+      ) : null}
+      {privateLessons.length > 0 ? (
+        <Box flex={{ direction: 'col', gap: 8 }}>
+          <GroupTitle>Private Lessons</GroupTitle>
+          {privateLessons.map((lesson) => (
+            <PrivateLessonRow key={lesson.id} lesson={lesson} currency={currency} />
+          ))}
         </Box>
       ) : null}
     </Box>

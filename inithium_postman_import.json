@@ -181,6 +181,10 @@
 		{
 			"key": "classCardRedemptionId",
 			"value": ""
+		},
+		{
+			"key": "privateLessonId",
+			"value": ""
 		}
 	],
 	"item": [
@@ -3340,6 +3344,552 @@
 							]
 						},
 						"description": "Gives the class back to the card and frees the seat. 409 when already undone."
+					}
+				}
+			]
+		},
+		{
+			"name": "Private Lessons",
+			"description": "QA-15: staff-scheduled private lessons. Per-lesson billing to the account ledger (category private_lesson), posted lazily once each lesson ends. Never shown on the public calendar.",
+			"item": [
+				{
+					"name": "List My Private Lessons",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons/mine",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons",
+								"mine"
+							]
+						},
+						"description": "The signed-in family's lessons (active, or ended with dates still to come) with the next few occurrences and instructor. Staff notes are never included. Posts charges for lessons already taught first."
+					}
+				},
+				{
+					"name": "List Private Lesson Instructors",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons/instructors",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons",
+								"instructors"
+							]
+						},
+						"description": "Staff who can be picked as the instructor. Requires privates:manage."
+					}
+				},
+				{
+					"name": "Create Private Lesson",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"if (pm.response.code === 201) pm.collectionVariables.set('privateLessonId', pm.response.json().data.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons"
+							]
+						},
+						"description": "Requires privates:manage. schedule is either {kind:'weekly', weekday, startTime, endTime, startDate, endDate?} or {kind:'once', date, startTime, endTime}. attendee is {type:'self'} or {type:'child', childId} on that account. rateCents is charged to the account's ledger after each lesson that happens.",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{deskAccountId}}\",\n  \"attendee\": {\n    \"type\": \"child\",\n    \"childId\": \"{{deskStudentId}}\"\n  },\n  \"instructorStaffId\": \"{{staffId}}\",\n  \"title\": \"Jazz Private\",\n  \"schedule\": {\n    \"kind\": \"weekly\",\n    \"weekday\": \"Thursday\",\n    \"startTime\": \"17:00\",\n    \"endTime\": \"17:30\",\n    \"startDate\": \"2026-12-03\"\n  },\n  \"rateCents\": 4500,\n  \"notes\": \"Working on leaps for the recital solo.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "List Private Lessons (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons/admin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons",
+								"admin"
+							]
+						},
+						"description": "Every lesson with account, instructor, staff notes and upcoming occurrences. Requires privates:manage."
+					}
+				},
+				{
+					"name": "Get Private Lesson",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons/{{privateLessonId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons",
+								"{{privateLessonId}}"
+							]
+						},
+						"description": "Requires privates:manage."
+					}
+				},
+				{
+					"name": "Get Private Lesson Schedule",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons/schedule?from=2026-11-30&to=2026-12-07&instructorStaffId={{staffId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons",
+								"schedule"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "2026-11-30"
+								},
+								{
+									"key": "to",
+									"value": "2026-12-07"
+								},
+								{
+									"key": "instructorStaffId",
+									"value": "{{staffId}}"
+								}
+							]
+						},
+						"description": "Every occurrence in [from, to) (at most 62 days), cancelled ones included, sorted by when they happen. Closed dates skip occurrences unless they were moved. Optional instructorStaffId filter. Requires privates:manage; there is no public version."
+					}
+				},
+				{
+					"name": "List Account Private Lessons",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{deskAccountId}}/private-lessons",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{deskAccountId}}",
+								"private-lessons"
+							]
+						},
+						"description": "One account's lessons, for the front desk account view. Requires privates:manage or registrations:desk."
+					}
+				},
+				{
+					"name": "Update Private Lesson",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons/{{privateLessonId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons",
+								"{{privateLessonId}}"
+							]
+						},
+						"description": "Replaces the lesson (the billed account can't change). Lessons already taught are charged at the old rate first. A new day or time on a lesson that has already started applies from today on.",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"attendee\": {\n    \"type\": \"child\",\n    \"childId\": \"{{deskStudentId}}\"\n  },\n  \"instructorStaffId\": \"{{staffId}}\",\n  \"title\": \"Jazz Private\",\n  \"schedule\": {\n    \"kind\": \"weekly\",\n    \"weekday\": \"Thursday\",\n    \"startTime\": \"17:00\",\n    \"endTime\": \"17:30\",\n    \"startDate\": \"2026-12-03\"\n  },\n  \"rateCents\": 5000,\n  \"notes\": \"Working on leaps for the recital solo.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Cancel One Occurrence",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons/{{privateLessonId}}/exceptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons",
+								"{{privateLessonId}}",
+								"exceptions"
+							]
+						},
+						"description": "Cancels one date; it is not charged. Rejected (409) once that lesson has started.",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kind\": \"cancelled\",\n  \"date\": \"2026-12-10\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Move One Occurrence",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons/{{privateLessonId}}/exceptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons",
+								"{{privateLessonId}}",
+								"exceptions"
+							]
+						},
+						"description": "Moves one date (identified by its scheduled date) to a new date and time. Replaces any earlier change for that date. Rejected once the lesson has started or if the new time has passed.",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kind\": \"moved\",\n  \"date\": \"2026-12-17\",\n  \"newDate\": \"2026-12-16\",\n  \"newStartTime\": \"16:00\",\n  \"newEndTime\": \"16:30\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Undo Occurrence Change",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons/{{privateLessonId}}/exceptions/2026-12-17",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons",
+								"{{privateLessonId}}",
+								"exceptions",
+								"2026-12-17"
+							]
+						},
+						"description": "Puts the occurrence back on its scheduled date and time. 404 when that date has no change."
+					}
+				},
+				{
+					"name": "End Private Lesson",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons/{{privateLessonId}}/end",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons",
+								"{{privateLessonId}}",
+								"end"
+							]
+						},
+						"description": "Nothing after lastDate (default: today, studio time) is scheduled or charged. Charges already posted stay.",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lastDate\": \"2026-12-31\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Delete Private Lesson",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 204', () => pm.response.to.have.status(204));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/private-lessons/{{privateLessonId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"private-lessons",
+								"{{privateLessonId}}"
+							]
+						},
+						"description": "Only for a lesson that was never charged (409 otherwise; end it instead)."
 					}
 				}
 			]

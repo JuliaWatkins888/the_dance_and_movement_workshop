@@ -47,6 +47,10 @@ export interface LedgerEntryEntity {
   // is only ever charged once however many times accrual runs.
   registrationId?: string;
   billingMonth?: string; // yyyy-mm
+  // A private lesson's per-lesson charge. lessonDate is the occurrence's scheduled date (before any
+  // move), so together they're unique and a lesson is only ever charged once.
+  privateLessonId?: string;
+  lessonDate?: string; // yyyy-mm-dd
   createdByUserId?: string;
   voidedAt?: Date;
   voidedByUserId?: string;
@@ -81,6 +85,10 @@ export interface LedgerEntryRepository {
   findBilledMonths: (registrationId: string) => Promise<string[]>;
   // Null when an entry with the same registrationId + billingMonth already exists.
   createTuitionCharge: (input: CreateLedgerEntryInput & { registrationId: string; billingMonth: string }) => Promise<LedgerEntryEntity | null>;
+  // The yyyy-mm-dd lesson dates already charged (voided or not) for one private lesson.
+  findBilledLessonDates: (privateLessonId: string) => Promise<string[]>;
+  // Null when an entry with the same privateLessonId + lessonDate already exists.
+  createPrivateLessonCharge: (input: CreateLedgerEntryInput & { privateLessonId: string; lessonDate: string }) => Promise<LedgerEntryEntity | null>;
   findById: (id: string) => Promise<LedgerEntryEntity | null>;
   // Newest first.
   findByUserId: (userId: string, paging: { page: number; pageSize: number }) => Promise<PaginatedResult<LedgerEntryEntity>>;

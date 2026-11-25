@@ -69,7 +69,8 @@ Collected from the tickets so they can go out in one message:
    classes, or only some courses?
 4. **Class cards (QA-14):** Can a class card be used for any adult class, and can one card be
    shared between two adults on the same account?
-5. **Private lessons (QA-15):** What rate do you charge for privates (per lesson or monthly), and
+5. ~~**Private lessons (QA-15):** What rate do you charge for privates (per lesson or monthly), and
    is it billed like tuition on the 1st or after each lesson? Should booked Sunday privates show
-   on the public calendar as anonymous "booked" blocks, or stay hidden?
+   on the public calendar as anonymous "booked" blocks, or stay hidden?~~ Answered by the
+   developer on 2026-11-20 (per lesson, hidden). See QA-15.
 6. **PayPal (QA-17):** Not urgent. Okay to launch with card only and add PayPal after?

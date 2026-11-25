@@ -387,6 +387,33 @@ export type {
   ClassCardTypeInput,
   RedeemClassCardArgs,
 } from './endpoints/class-cards.endpoints';
+export {
+  privateLessonsApi,
+  useListMyPrivateLessonsQuery,
+  useListPrivateLessonsAdminQuery,
+  useListAccountPrivateLessonsQuery,
+  useListPrivateLessonInstructorsQuery,
+  useGetPrivateLessonScheduleQuery,
+  useCreatePrivateLessonMutation,
+  useUpdatePrivateLessonMutation,
+  useEndPrivateLessonMutation,
+  useDeletePrivateLessonMutation,
+  useSetPrivateLessonExceptionMutation,
+  useClearPrivateLessonExceptionMutation,
+} from './endpoints/private-lessons.endpoints';
+export type {
+  MyPrivateLessonDto,
+  PrivateLessonAttendeeRef,
+  PrivateLessonDto,
+  PrivateLessonExceptionInput,
+  PrivateLessonInstructorDto,
+  PrivateLessonOccurrenceDto,
+  PrivateLessonScheduleArgs,
+  PrivateLessonScheduleDto,
+  PrivateLessonScheduleItemDto,
+  PrivateLessonStatus,
+  PrivateLessonWriteInput,
+} from './endpoints/private-lessons.endpoints';
 
 // inithium:block:children:exports:end
 // inithium:block:ecommerce:exports:start
