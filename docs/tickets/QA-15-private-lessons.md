@@ -1,6 +1,6 @@
 # QA-15: Recurring private lessons (admin-scheduled)
 
-- **Status:** `todo`
+- **Status:** `review`
 - **Priority:** P1
 - **Depends on:** QA-06 (Sunday "By Appointment Only" copy), QA-11 (billing via ledger)
 - **Branch:** `feature/qa-15-private-lessons`
@@ -35,66 +35,133 @@
   record cash/check.
 - Closures/holidays skip occurrences (same rule as classes).
 
+### Answered 2026-11-20 (developer)
+
+- **Billing is per lesson only.** Each lesson that happens posts one ledger charge of the
+  lesson's rate once it has ended. There is no monthly cadence, so the `billing` field was dropped
+  from the data model.
+- **Cancelled lessons are never charged.** A lesson can only be cancelled or moved before it
+  starts. After that it's billed, and staff void the charge in Accounts to waive it (the same
+  approach as QA-12).
+- **Hidden from the public calendar.** Private lessons appear only in the CMS. The public just sees
+  Sunday's "By Appointment Only" hours from QA-06.
+- **JR walkthrough skipped.** The ticket's data model was built as written (no room field).
+
 ## Pre-work
 
-- [ ] **Developer:** look at Abrianna Elliott's "Jazz Private (Thursdays)" setup in Jackrabbit and
-      note which fields JR captures (rate model, billing cadence, instructor, room, end date,
-      attendance). Paste screenshots/notes into this ticket under "Findings" before building, and
-      adjust the data model if JR has something the client relies on.
+- [x] **Developer:** look at Abrianna Elliott's "Jazz Private (Thursdays)" setup in Jackrabbit.
+      Skipped by the developer's choice (2026-11-20). See Findings.
 
 ## Implementation steps
 
 ### Data
-- [ ] `PrivateLesson` contract + schema: `{ id, userId, attendee, instructorStaffId, title,
-      schedule: { kind: 'weekly', weekday, startTime, endTime, startDate, endDate? } | { kind:
-      'once', date, startTime, endTime }, rateCents, billing: 'per_lesson' | 'monthly', notes?,
-      status: 'active' | 'ended', createdAt, updatedAt }`.
-- [ ] `PrivateLessonException`: per-date cancel/reschedule `{ lessonId, date, kind: 'cancelled' |
-      'moved', newDate?, newStartTime? }`.
-- [ ] Pure occurrence expansion `expandPrivateLesson(lesson, exceptions, closures, range)`,
-      beside the class calendar expansion.
+- [x] `PrivateLesson` contract + schema (`libs/db/src/contracts/private-lesson.contract.ts`,
+      `schemas/private-lesson.schema.ts`): `{ id, userId, attendee, instructorStaffId, title,
+      schedule: weekly | once, rateCents, notes?, status: 'active' | 'ended', endedOn?,
+      createdByUserId, createdAt, updatedAt }`. `billing` was dropped because billing is per lesson
+      only.
+- [x] `PrivateLessonException`: `{ lessonId, date, kind: 'cancelled' | 'moved', newDate?,
+      newStartTime?, newEndTime? }`, unique on `(lessonId, date)`. `date` is the scheduled date,
+      so a moved lesson keeps its identity and billing key.
+- [x] Pure occurrence expansion `expandPrivateLesson(lesson, exceptions, closedDates, from, last)`
+      in `libs/db/src/utils/private-lesson-sessions.ts`, beside the class session expansion, with
+      a vitest spec. Closures skip an occurrence unless it was moved (a make-up). Moves into and
+      out of the range are handled.
 
 ### Billing
-- [ ] Lazy, idempotent ledger accrual (same approach as QA-12, since there's no job runner):
-      `per_lesson` → one charge per occurrence once it has occurred; `monthly` → one charge per
-      month on the 1st = rate × occurrences in that month (or flat rate, depending on the
-      client's answer). Unique key `(lessonId, period)`.
+- [x] Lazy, idempotent ledger accrual (`libs/ecommerce/src/ledger/private-lesson-accrual.ts`).
+      Each finished, non-cancelled occurrence posts one `private_lesson` charge (with the student
+      set and the due date set to the lesson date). The ledger has a new unique key
+      `(privateLessonId, lessonDate)`. It runs wherever tuition accrual runs (the account ledger
+      and the CMS dashboard balances widget), plus `GET /api/private-lessons/mine`, and before a
+      lesson is edited or deleted, so a rate change never re-prices lessons already taught.
 
 ### API
-- [ ] CRUD `/api/private-lessons` (new capability `privates:manage`) and exceptions.
-- [ ] `GET /api/private-lessons/mine` for families.
-- [ ] Calendar service: include private lesson occurrences for staff (CMS calendar / Time
-      users), plus an optional "Private lesson" busy block on the public calendar on Sundays
-      (decide with the client; default **hidden** publicly).
+- [x] CRUD `/api/private-lessons` (new capability `privates:manage`, admin + editor by default)
+      plus `POST /:id/end`, `POST /:id/exceptions` (cancel/move) and
+      `DELETE /:id/exceptions/:date` (undo). A lesson can only be deleted if it was never
+      charged; otherwise staff end it.
+- [x] `GET /api/private-lessons/mine` for families (no staff notes).
+- [x] `GET /api/private-lessons/schedule?from&to&instructorStaffId` for the staff schedule (max 62
+      days), `GET /api/private-lessons/instructors`, and `GET /api/users/:id/private-lessons`
+      (`privates:manage` or `registrations:desk`).
+- [x] Calendar service: **unchanged**. The public feed never includes private lessons (the answer
+      was hidden). Staff see them in the module's Schedule tab instead.
+- [x] `GET /api/desk/accounts` and `/api/desk/accounts/:id` also accept `privates:manage`, so the
+      create dialog can reuse the desk account picker.
 
 ### CMS
-- [ ] `private-lessons-admin.module.tsx`: list by instructor/day, create/edit dialog, per-date
-      cancel/move, end lesson.
-- [ ] The instructor's schedule appears on the CMS calendar.
+- [x] `private-lessons-admin.module.tsx` ("Private Lessons"). **Lessons** tab: filter by
+      instructor and status, sorted by weekday and time, with a create/edit dialog (account picker,
+      student, instructor, title, weekly or one-time schedule, rate, staff notes), per-date
+      cancel/move/undo on upcoming dates, end lesson (with last date), delete, and a link to the
+      account's ledger.
+- [x] The instructor's schedule: the module's **Schedule** tab is a week-by-week, day-by-day list
+      with an instructor filter and per-occurrence cancel/move/undo. This is the "CMS calendar"
+      for privates: the existing CMS Calendar module only manages entries and holidays and has no
+      calendar view to add to.
+- [x] Front Desk / Users → "Registrations" panel lists the account's private lessons (read-only).
 
 ### Web
-- [ ] Profile: "Private Lessons" list with upcoming dates and instructor.
+- [x] Profile → Registrations: a "Private Lessons" section with the schedule, instructor, rate,
+      and the next upcoming dates (moved and cancelled dates are marked).
 
 ### Docs
-- [ ] Postman: Private Lessons folder.
+- [x] Postman: Private Lessons folder (13 requests, `privateLessonId` variable).
 
 ## Findings
 
-_(JR walkthrough notes go here.)_
+The Jackrabbit walkthrough was skipped (developer's decision, 2026-11-20). The model follows the
+ticket as written. If the client later relies on something JR captured (room, attendance), add it
+as a follow-up.
 
 ## Acceptance criteria
 
 - [ ] Staff can set up "Jazz Private, Thursdays 5:00–5:30 PM with <instructor>, starting
-      <date>", and it recurs weekly, skipping studio closures.
-- [ ] Staff can cancel or move a single occurrence.
+      <date>", and it recurs weekly, skipping studio closures. *(built; awaiting manual check)*
+- [ ] Staff can cancel or move a single occurrence. *(built; awaiting manual check)*
 - [ ] The family sees upcoming lessons on their profile, and charges appear in their ledger per
-      the billing cadence.
-- [ ] No student names are exposed publicly.
-- [ ] Type-check passes for all touched projects. Postman updated.
+      the billing cadence. *(built; awaiting manual check)*
+- [x] No student names are exposed publicly. The public calendar is untouched, and every lesson
+      route except `/mine` (the family's own) requires `privates:manage`.
+- [x] Type-check passes for all touched projects (db, ecommerce, permissions, api-core,
+      api-client, cms, web, api). `db` tests pass (55). Postman updated.
+
+## Manual test plan
+
+1. Sign in to the CMS as an admin or editor. Open **Private Lessons** → **Lessons** → **New
+   private lesson**. Pick a family, a student, an instructor, "Jazz Private", every week on
+   Thursday, 5:00–5:30 PM, starting on a past Thursday, $45.
+2. **Schedule** tab: it shows on each Thursday. Add a closure on a Thursday in Calendar and
+   check that the lesson disappears that week.
+3. Cancel a future date, then move another one. Both show as marked, and **Restore**/**Undo
+   move** put them back. Started lessons have no buttons.
+4. Open the family's ledger (Lessons → Ledger). Past Thursdays each have a $45 "Private lesson"
+   charge, and the cancelled one doesn't. Reload the ledger: no duplicate charges.
+5. Sign in as the family. Profile → Registrations shows the lesson with upcoming dates. The public
+   `/calendar` shows nothing for it.
+6. Try deleting the lesson (rejected, it has charges), then **End** it. No dates after the last
+   date appear or get charged.
+
+## Note for the client response
+
+- Private lessons are set up by the studio in the CMS under **Private Lessons**. Families can't
+  book them online. Sunday's "By Appointment Only" on the Contact page links to the contact form
+  for requests.
+- Each lesson can repeat weekly (like Abrianna's Thursday Jazz Private) or happen once. Studio
+  closures and holidays skip a lesson automatically, the same as classes.
+- You can cancel or move a single lesson from the **Schedule** tab before it starts. Cancelled
+  lessons aren't charged.
+- After each lesson, its rate is added to the family's account balance. They can pay online from
+  their profile, or you can record cash or check in Accounts. To waive a lesson that already
+  happened, void its charge in Accounts.
+- Families see their upcoming private lessons on their profile. Lessons never appear on the
+  public calendar, and student names are never shown publicly.
+- Access: admins and editors can manage private lessons by default. You can grant it to others in
+  Permissions ("Private Lessons").
 
 ## Open questions (for the client)
 
-- What's the private lesson rate, and is it billed per lesson or monthly on the 1st (like
-  tuition)?
-- Should Sunday private lessons appear on the public calendar as anonymous "booked" blocks, or
-  stay hidden?
+- ~~What's the private lesson rate, and is it billed per lesson or monthly on the 1st?~~ Per
+  lesson, rate set per lesson in the CMS (answered 2026-11-20).
+- ~~Should Sunday private lessons appear on the public calendar?~~ Hidden (answered 2026-11-20).

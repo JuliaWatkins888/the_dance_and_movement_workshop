@@ -31,6 +31,8 @@ export interface LedgerEntryDocument extends Document {
   subscriptionId?: string;
   registrationId?: string;
   billingMonth?: string;
+  privateLessonId?: string;
+  lessonDate?: string;
   createdByUserId?: string;
   voidedAt?: Date;
   voidedByUserId?: string;
@@ -65,6 +67,8 @@ const ledgerEntrySchema = new Schema<LedgerEntryDocument>(
     subscriptionId: { type: String, required: false },
     registrationId: { type: String, required: false },
     billingMonth: { type: String, required: false },
+    privateLessonId: { type: String, required: false },
+    lessonDate: { type: String, required: false },
     createdByUserId: { type: String, required: false },
     voidedAt: { type: Date, required: false },
     voidedByUserId: { type: String, required: false },
@@ -79,6 +83,11 @@ ledgerEntrySchema.index({ kind: 1, receivedAt: 1 });
 ledgerEntrySchema.index(
   { registrationId: 1, billingMonth: 1 },
   { unique: true, partialFilterExpression: { registrationId: { $type: 'string' }, billingMonth: { $type: 'string' } } },
+);
+
+ledgerEntrySchema.index(
+  { privateLessonId: 1, lessonDate: 1 },
+  { unique: true, partialFilterExpression: { privateLessonId: { $type: 'string' }, lessonDate: { $type: 'string' } } },
 );
 
 export const LedgerEntryModel =

@@ -78,6 +78,9 @@ import {
   createMongoClassCardTypeRepository,
 } from './class-card.repository';
 import { ClassCardModel, ClassCardRedemptionModel, ClassCardTypeModel } from '../../schemas/class-card.schema';
+import { PrivateLessonExceptionRepository, PrivateLessonRepository } from '../../contracts/private-lesson.contract';
+import { createMongoPrivateLessonExceptionRepository, createMongoPrivateLessonRepository } from './private-lesson.repository';
+import { PrivateLessonExceptionModel, PrivateLessonModel } from '../../schemas/private-lesson.schema';
 // inithium:block:classes:imports:end
 // inithium:block:children:imports:start
 import { ChildRepository } from '../../contracts/child.contract';
@@ -170,6 +173,8 @@ const dropInRegistrationRepository = createMongoDropInRegistrationRepository(Dro
 const classCardTypeRepository = createMongoClassCardTypeRepository(ClassCardTypeModel);
 const classCardRepository = createMongoClassCardRepository(ClassCardModel);
 const classCardRedemptionRepository = createMongoClassCardRedemptionRepository(ClassCardRedemptionModel);
+const privateLessonRepository = createMongoPrivateLessonRepository(PrivateLessonModel);
+const privateLessonExceptionRepository = createMongoPrivateLessonExceptionRepository(PrivateLessonExceptionModel);
 // inithium:block:classes:repository-instances:end
 // inithium:block:children:repository-instances:start
 const childRepository = createMongoChildRepository(ChildModel);
@@ -248,6 +253,8 @@ export const mongoProvider: DbProvider = {
   getClassCardTypeRepository: (): ClassCardTypeRepository => classCardTypeRepository,
   getClassCardRepository: (): ClassCardRepository => classCardRepository,
   getClassCardRedemptionRepository: (): ClassCardRedemptionRepository => classCardRedemptionRepository,
+  getPrivateLessonRepository: (): PrivateLessonRepository => privateLessonRepository,
+  getPrivateLessonExceptionRepository: (): PrivateLessonExceptionRepository => privateLessonExceptionRepository,
 // inithium:block:classes:members:end
 // inithium:block:children:members:start
   getChildRepository: (): ChildRepository => childRepository,

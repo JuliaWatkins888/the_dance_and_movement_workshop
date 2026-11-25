@@ -35,6 +35,8 @@ const mapToLedgerEntryEntity = (doc: LedgerEntryDocument): LedgerEntryEntity => 
   ...(doc.subscriptionId ? { subscriptionId: doc.subscriptionId } : {}),
   ...(doc.registrationId ? { registrationId: doc.registrationId } : {}),
   ...(doc.billingMonth ? { billingMonth: doc.billingMonth } : {}),
+  ...(doc.privateLessonId ? { privateLessonId: doc.privateLessonId } : {}),
+  ...(doc.lessonDate ? { lessonDate: doc.lessonDate } : {}),
   ...(doc.createdByUserId ? { createdByUserId: doc.createdByUserId } : {}),
   ...(doc.voidedAt ? { voidedAt: doc.voidedAt } : {}),
   ...(doc.voidedByUserId ? { voidedByUserId: doc.voidedByUserId } : {}),
@@ -68,6 +70,20 @@ export const createMongoLedgerEntryRepository = (model: Model<LedgerEntryDocumen
   },
 
   createTuitionCharge: async (input) => {
+    try {
+      return mapToLedgerEntryEntity(await model.create(input));
+    } catch (error) {
+      if (isDuplicateKeyError(error)) return null;
+      throw error;
+    }
+  },
+
+  findBilledLessonDates: async (privateLessonId: string): Promise<string[]> => {
+    const docs = await model.find({ privateLessonId, lessonDate: { $type: 'string' } }, { lessonDate: 1 }).lean<{ lessonDate: string }[]>().exec();
+    return docs.map((doc) => doc.lessonDate);
+  },
+
+  createPrivateLessonCharge: async (input) => {
     try {
       return mapToLedgerEntryEntity(await model.create(input));
     } catch (error) {

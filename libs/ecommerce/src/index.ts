@@ -77,6 +77,7 @@ export type {
 } from './orders/manual-order.service';
 export { LEDGER_PAYMENT_PROVIDER } from './orders/payment-collection';
 export { accrueLedgerTuition } from './ledger/tuition-accrual';
+export { accruePrivateLessonCharges } from './ledger/private-lesson-accrual';
 export { withdrawClassRegistrationByStaff } from './registrations/staff-withdrawal';
 export { cancelDropInByStaff } from './registrations/drop-in-cancel';
 export { redeemClassCard, voidClassCardRedemption } from './class-cards/class-card-check-in';

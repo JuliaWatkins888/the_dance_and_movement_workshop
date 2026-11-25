@@ -60,10 +60,13 @@ const toDeskOrderResult = (result: PlaceOrderResult) => ({
   ...(result.status === 'requires_action' ? { clientSecret: result.clientSecret } : {}),
 });
 
+// Account lookups are shared with the Private Lessons screen, which picks the family to bill.
+const VIEW_ACCOUNTS = requirePermission([DESK_CAPABILITY, 'privates:manage']);
+
 router.get(
   '/api/desk/accounts',
   requireAuth,
-  requirePermission(DESK_CAPABILITY),
+  VIEW_ACCOUNTS,
   asyncHandler(async (req: Request, res: Response) => {
     const search = queryString(req, 'search');
     if (!search) {
@@ -100,7 +103,7 @@ router.post(
 router.get(
   '/api/desk/accounts/:id',
   requireAuth,
-  requirePermission(DESK_CAPABILITY),
+  VIEW_ACCOUNTS,
   asyncHandler(async (req: Request, res: Response) => {
     const user = await requireAccount(normalizeParam(req.params['id']));
     res.status(200).json(createSuccessResponse(await toAccountDetailDto(user)));
