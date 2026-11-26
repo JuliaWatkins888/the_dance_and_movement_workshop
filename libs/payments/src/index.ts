@@ -18,5 +18,8 @@ export type {
   CreatedSubscription,
   PaymentWebhookEvent,
   PaymentProvider,
+  PaymentKeyMode,
+  PaymentProviderHealth,
+  PaymentWebhookEndpointHealth,
 } from './contracts/payment-provider.contract';
 export type { TaxLineInput, CalculateTaxInput, TaxCalculation, TaxProvider } from './contracts/tax-provider.contract';

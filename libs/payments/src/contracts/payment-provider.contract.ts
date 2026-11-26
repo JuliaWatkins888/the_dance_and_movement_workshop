@@ -132,6 +132,27 @@ export interface PaymentClientConfig {
   publishableKey: string;
 }
 
+export type PaymentKeyMode = 'live' | 'test';
+
+export interface PaymentWebhookEndpointHealth {
+  url: string;
+  enabled: boolean;
+  // Event types ecommerce acts on that this endpoint isn't subscribed to.
+  missingEvents: string[];
+}
+
+// Configuration facts for the CMS payment-health screen. Never carries a key or secret value.
+export interface PaymentProviderHealth {
+  provider: string;
+  secretKey: { configured: boolean; valid: boolean; mode?: PaymentKeyMode; error?: string };
+  publishableKey: { configured: boolean; mode?: PaymentKeyMode };
+  webhookSecretConfigured: boolean;
+  // Endpoints registered with the provider that point at this API's webhook path. null when the
+  // provider couldn't be asked (e.g. the secret key is invalid); webhookEndpointsError says why.
+  webhookEndpoints: PaymentWebhookEndpointHealth[] | null;
+  webhookEndpointsError?: string;
+}
+
 export interface PaymentProvider {
   name: string;
   // Request header carrying the provider's webhook signature (lowercase).
@@ -151,4 +172,6 @@ export interface PaymentProvider {
   cancelSubscription: (providerSubscriptionId: string) => Promise<void>;
   // null when the signature doesn't verify - the caller must reject the request.
   parseWebhookEvent: (rawBody: Buffer, signature: string) => PaymentWebhookEvent | null;
+  // Cheap read-only calls that tell whether the keys work and the webhook is registered.
+  checkHealth: (webhookPath: string) => Promise<PaymentProviderHealth>;
 }

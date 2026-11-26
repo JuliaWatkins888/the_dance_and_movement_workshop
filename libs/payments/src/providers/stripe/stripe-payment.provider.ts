@@ -20,6 +20,7 @@ import {
   isStripeTaxEnabled,
   toUnixSeconds,
 } from './stripe.client';
+import { checkStripeHealth } from './stripe-health';
 
 const toStripeAddress = (address: PaymentAddress): Stripe.AddressParam => ({
   line1: address.line1,
@@ -294,4 +295,6 @@ export const stripePaymentProvider: PaymentProvider = {
     }
     return normalizeEvent(event);
   },
+
+  checkHealth: checkStripeHealth,
 };

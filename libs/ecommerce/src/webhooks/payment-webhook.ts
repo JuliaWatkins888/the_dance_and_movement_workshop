@@ -1,8 +1,9 @@
 import express, { Router } from 'express';
 import type { Request, Response, Router as RouterType } from 'express';
-import { asyncHandler } from '@inithium/api-utils';
+import { asyncHandler, logError } from '@inithium/api-utils';
 import { getOrderRepository, getPaymentEventRepository } from '@inithium/db';
 import { getPaymentProvider } from '@inithium/payments';
+import type { PaymentEventOutcome } from '@inithium/db';
 import type { PaymentWebhookEvent } from '@inithium/payments';
 import { failOrder, finalizeOrder } from '../checkout/order-lifecycle';
 import { handleSubscriptionWebhookEvent } from '../subscriptions/subscription.service';
@@ -12,22 +13,24 @@ export const PAYMENT_WEBHOOK_PATH = '/api/payments/webhook';
 const findEventOrder = async (paymentId: string, orderId: string | undefined) =>
   (orderId ? await getOrderRepository().findById(orderId) : null) ?? getOrderRepository().findByPaymentId(paymentId);
 
-const dispatch = async (event: PaymentWebhookEvent): Promise<void> => {
+// Returns what the event was about, so the CMS payment-health log can point at it.
+const dispatch = async (event: PaymentWebhookEvent): Promise<PaymentEventOutcome> => {
   switch (event.kind) {
     case 'payment.succeeded': {
       const order = await findEventOrder(event.paymentId, event.orderId);
       if (order?.status === 'pending') await finalizeOrder(order.id);
-      return;
+      return { reference: event.paymentId, ...(order ? { orderId: order.id } : {}) };
     }
     case 'payment.failed': {
       const order = await findEventOrder(event.paymentId, event.orderId);
       if (order?.status === 'pending') await failOrder(order.id, event.reason ?? 'Payment failed');
-      return;
+      return { reference: event.paymentId, ...(order ? { orderId: order.id } : {}) };
     }
     case 'ignored':
-      return;
+      return {};
     default:
       await handleSubscriptionWebhookEvent(event);
+      return { reference: event.providerSubscriptionId };
   }
 };
 
@@ -35,19 +38,25 @@ export type PaymentWebhookOutcome = 'processed' | 'duplicate' | 'invalid_signatu
 
 export const processPaymentWebhook = async (rawBody: Buffer, signature: string): Promise<PaymentWebhookOutcome> => {
   const provider = getPaymentProvider();
-  const event = provider.parseWebhookEvent(rawBody, signature);
-  if (!event) return 'invalid_signature';
-
   const events = getPaymentEventRepository();
+  const event = provider.parseWebhookEvent(rawBody, signature);
+  if (!event) {
+    // The usual cause is a rotated webhook signing secret; the CMS payment-health screen reports it.
+    await events.recordRejected(provider.name).catch(logError);
+    return 'invalid_signature';
+  }
+
   if (!(await events.claim(provider.name, event.eventId, event.eventType))) return 'duplicate';
 
+  let outcome: PaymentEventOutcome;
   try {
-    await dispatch(event);
+    outcome = await dispatch(event);
   } catch (error) {
-    // Un-claim so the provider's automatic retry gets processed rather than skipped as a duplicate.
-    await events.release(provider.name, event.eventId);
+    // Marked failed (not processed) so the provider's automatic retry can claim it again.
+    await events.markFailed(provider.name, event.eventId, error instanceof Error ? error.message : String(error));
     throw error;
   }
+  await events.markProcessed(provider.name, event.eventId, outcome);
   return 'processed';
 };
 
