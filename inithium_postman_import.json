@@ -5596,6 +5596,100 @@
 			]
 		},
 		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Get Payment Health",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Has an overall status', () => pm.expect(['ok', 'warning', 'critical']).to.include(pm.response.json().data.status));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/payments/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"payments",
+								"health"
+							]
+						},
+						"description": "Payment health for the CMS (ecommerce:manage-orders). Checks the Stripe keys and webhook endpoint with two read-only Stripe calls, and reports the last webhook received, orders pending over an hour, failed orders in the last 7 days, and past-due subscriptions."
+					}
+				},
+				{
+					"name": "List Payment Events",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/payments/events?page=1&pageSize=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"payments",
+								"events"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "failed",
+									"disabled": true,
+									"description": "processing | processed | failed | rejected"
+								}
+							]
+						},
+						"description": "Received Stripe webhook events, newest activity first (ecommerce:manage-orders)."
+					}
+				}
+			]
+		},
+		{
 			"name": "Ledger",
 			"item": [
 				{

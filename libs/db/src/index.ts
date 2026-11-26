@@ -706,6 +706,7 @@ export type {
   DiscountRepository,
 } from './contracts/discount.contract';
 export { BILLING_SUBSCRIPTION_STATUSES, BILLING_SUBSCRIPTION_LINE_STATUSES } from './contracts/billing-subscription.contract';
+export { PAYMENT_EVENT_STATUSES } from './contracts/payment-event.contract';
 export type {
   BillingSubscriptionEntity,
   BillingSubscriptionLine,
@@ -727,7 +728,13 @@ export type {
   CreatePaymentCustomerInput,
   PaymentCustomerRepository,
 } from './contracts/payment-customer.contract';
-export type { PaymentEventEntity, PaymentEventRepository } from './contracts/payment-event.contract';
+export type {
+  PaymentEventEntity,
+  PaymentEventOutcome,
+  PaymentEventRepository,
+  PaymentEventStatus,
+  FindManyPaymentEventsOptions,
+} from './contracts/payment-event.contract';
 // inithium:block:ecommerce:type-exports:end
 // inithium:block:storage:type-exports:start
 export type { AssetEntity, CreateAssetInput, AssetRepository, ListAssetsForUserOptions } from './contracts/asset.contract';

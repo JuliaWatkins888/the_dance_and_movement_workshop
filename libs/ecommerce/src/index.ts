@@ -116,6 +116,14 @@ export type {
 
 export { createPaymentWebhookRouter, processPaymentWebhook, PAYMENT_WEBHOOK_PATH } from './webhooks/payment-webhook';
 export type { PaymentWebhookOutcome } from './webhooks/payment-webhook';
+export { getPaymentHealth } from './payment-health/payment-health.service';
+export { assessPaymentHealth } from './payment-health/payment-health.rules';
+export type {
+  PaymentHealthCheck,
+  PaymentHealthFacts,
+  PaymentHealthLevel,
+  PaymentHealthReport,
+} from './payment-health/payment-health.rules';
 
 export type {
   CartView,

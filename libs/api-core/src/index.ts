@@ -56,6 +56,7 @@ import cartRouter from './routes/ecommerce/cart.route';
 import checkoutRouter from './routes/ecommerce/checkout.route';
 import ordersRouter from './routes/ecommerce/orders.route';
 import subscriptionsRouter from './routes/ecommerce/subscriptions.route';
+import paymentHealthRouter from './routes/ecommerce/payment-health.route';
 import storeRouter from './routes/ecommerce/store.route';
 // inithium:block:ecommerce:imports:end
 import ledgerRouter from './routes/ledger.route';
@@ -123,6 +124,7 @@ export const registerCoreRoutes = (app: Express): void => {
   app.use(checkoutRouter);
   app.use(ordersRouter);
   app.use(subscriptionsRouter);
+  app.use(paymentHealthRouter);
   app.use(storeRouter);
 // inithium:block:ecommerce:routes:end
   app.use(ledgerRouter);
